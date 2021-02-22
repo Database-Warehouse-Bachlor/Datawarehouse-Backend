@@ -273,4 +273,8 @@ __pycache__/
 !.vscode/extensions.json
 *.code-workspace
 
+### Docker ###
+Docker-compose.override.yml
+*.env
+
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,vscode
