@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 
-namespace Datawarehouse_Backend
+namespace Datawarehouse_Backend.App_Data
 {
     public class Program
     {
