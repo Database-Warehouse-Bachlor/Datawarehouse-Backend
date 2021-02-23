@@ -44,6 +44,8 @@ namespace Datawarehouse_Backend
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
