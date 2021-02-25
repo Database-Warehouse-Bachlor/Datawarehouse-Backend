@@ -45,6 +45,8 @@ namespace Datawarehouse_Backend.App_Start
             app.UseRouting();
 
             app.UseAuthentication();
+
+            app.UseMvc();
             
             app.UseAuthorization();
 
