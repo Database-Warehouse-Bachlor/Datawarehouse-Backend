@@ -26,7 +26,7 @@ namespace SecureAPI.Controllers
             _logger = logger;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         public IEnumerable<AbsenceRegister> Get()
         {
