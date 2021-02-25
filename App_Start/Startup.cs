@@ -46,7 +46,7 @@ namespace Datawarehouse_Backend.App_Start
 
             app.UseAuthentication();
 
-            app.UseMvc();
+            //app.UseMvc();
             
             app.UseAuthorization();
 

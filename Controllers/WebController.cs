@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
+using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend;
 
 namespace SecureAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[Controller]")]
     public class WebController : ControllerBase
     {
         private static readonly string[] Employee = new[]
@@ -25,15 +26,17 @@ namespace SecureAPI.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public IEnumerable<AbsenceRegister> Get()
         {
             var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new AbsenceRegister
+        
+            return Enumerable.Range(0, 9).Select(index => new AbsenceRegister
             {
                 Duration = rng.Next(1, 31),
-                EmployeeName = Employee[rng.Next(Employee.Length)]
+                EmployeeName = Employee[index],
+                AbsenceId = index + 1
             })
             .ToArray();
         }
