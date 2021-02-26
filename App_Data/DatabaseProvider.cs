@@ -19,6 +19,7 @@ namespace Datawarehouse_Backend.App_Data
             loginConn.Open();
             warehouseConn.Open();
 
+            // Prints the version of postgresql databases on launch
             string sqlCommand = "SELECT version()";
             var logincmd = new NpgsqlCommand(sqlCommand, loginConn);
             var warehousecmd = new NpgsqlCommand(sqlCommand, warehouseConn);
