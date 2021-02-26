@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Datawarehouse_Backend</RootNamespace>
+    <UserSecretsId>6bf9e1fe-eab6-4f49-9374-8dbf14332464</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
