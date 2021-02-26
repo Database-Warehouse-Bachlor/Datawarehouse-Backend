@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Datawarehouse_Backend.App_Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +25,12 @@ namespace Datawarehouse_Backend.App_Start
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            DatabaseProvider databaseProvider = new DatabaseProvider();
             services.AddControllersWithViews();
+            databaseProvider.setupDbConnection();
+            
+            
+           // services.AddEntityFrameworkNpgsql().AddDbContext<DbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
