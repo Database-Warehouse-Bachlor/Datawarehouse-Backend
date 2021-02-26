@@ -27,7 +27,7 @@ namespace Datawarehouse_Backend.App_Start
         {
             DatabaseProvider databaseProvider = new DatabaseProvider();
             services.AddControllersWithViews();
-            databaseProvider.dbSetup();
+            databaseProvider.setupDbConnection();
             
             
            // services.AddEntityFrameworkNpgsql().AddDbContext<DbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
