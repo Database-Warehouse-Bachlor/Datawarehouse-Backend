@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Datawarehouse_Backend.App_Data;
+using Datawarehouse_Backend.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,11 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 
 namespace Datawarehouse_Backend.App_Start
 {
     public class Startup
     {
+        private string logindb;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -25,9 +29,12 @@ namespace Datawarehouse_Backend.App_Start
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            DatabaseProvider databaseProvider = new DatabaseProvider();
             services.AddControllersWithViews();
-            databaseProvider.setupDbConnection();
+            logindb = Configuration["loginDatabase"];
+            
+            Console.WriteLine(logindb);
+            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(opt =>
+            opt.UseNpgsql(logindb));
             
             
            // services.AddEntityFrameworkNpgsql().AddDbContext<DbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
