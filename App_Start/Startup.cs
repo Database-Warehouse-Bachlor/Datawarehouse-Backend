@@ -36,7 +36,6 @@ namespace Datawarehouse_Backend.App_Start
                 opt.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials().Build());
             });
             
-            DatabaseProvider databaseProvider = new DatabaseProvider();
             services.AddControllersWithViews();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
