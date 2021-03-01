@@ -31,13 +31,9 @@ namespace Datawarehouse_Backend.App_Start
         {
             services.AddControllersWithViews();
             logindb = Configuration["loginDatabase"];
-            
             Console.WriteLine(logindb);
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(opt =>
             opt.UseNpgsql(logindb));
-            
-            
-           // services.AddEntityFrameworkNpgsql().AddDbContext<DbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DbContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +53,7 @@ namespace Datawarehouse_Backend.App_Start
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            
             app.UseAuthentication();
             
             app.UseAuthorization();
