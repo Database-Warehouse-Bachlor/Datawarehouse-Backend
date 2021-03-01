@@ -12,6 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Datawarehouse_Backend.App_Start
 {
@@ -29,7 +32,27 @@ namespace Datawarehouse_Backend.App_Start
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(opt => {
+                opt.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials().Build());
+            });
+            
             services.AddControllersWithViews();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt => 
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer=true,
+                        ValidateAudience=true,
+                        ValidateLifetime=true,
+                        ValidateIssuerSigningKey=true,
+                        ValidIssuer=Configuration["Jwt:Issuer"],
+                        ValidAudience=Configuration["Jwt:Issuer"],
+                        IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
+            services.AddMvc();
             logindb = Configuration["loginDatabase"];
             Console.WriteLine(logindb);
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(opt =>
@@ -50,12 +73,13 @@ namespace Datawarehouse_Backend.App_Start
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
             
             app.UseAuthentication();
-            
+           
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
