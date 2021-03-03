@@ -29,10 +29,10 @@ namespace Datawarehouse_Backend.Controllers
      [HttpPost]
      public IActionResult login(string orgNum, string pass)
      {
-        UserModel login = new UserModel();
+        User login = new User();
         JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
-        login.OrgNum = orgNum;
-        login.Password = pass;
+        login.orgNr = orgNum;
+        login.password = pass;
         IActionResult response = Unauthorized();
 
 
