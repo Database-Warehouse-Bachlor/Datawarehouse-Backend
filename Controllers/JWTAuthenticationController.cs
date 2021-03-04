@@ -20,14 +20,12 @@ namespace Datawarehouse_Backend.Controllers
 
  public class JWTAuthenticationController : ControllerBase
  {
-     private readonly UserManager<User> userManager;
-     private readonly RoleManager<User> roleManager;
+
      private readonly IConfiguration _config;
 
-     public JWTAuthenticationController(IConfiguration config, UserManager<User> userManager, RoleManager<User> roleManager)
+     public JWTAuthenticationController(IConfiguration config)
      {
-         this.userManager = userManager;
-         this.roleManager = roleManager;
+
          _config = config;
      }
     
