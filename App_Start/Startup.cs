@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Datawarehouse_Backend.App_Data;
 using Datawarehouse_Backend.Models;
+using Datawarehouse_Backend.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -22,6 +23,7 @@ namespace Datawarehouse_Backend.App_Start
     public class Startup
     {
         private string logindb;
+        private string warehousedb;
 
         public Startup(IConfiguration configuration)
         {
@@ -58,10 +60,17 @@ namespace Datawarehouse_Backend.App_Start
                     };
                 });
             services.AddMvc();
+            
+            // Configures database connection. One setup for the login database and one for the warehouse.  
             logindb = Configuration["loginDatabase"];
             Console.WriteLine(logindb);
-            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(opt =>
+            services.AddDbContext<LoginDatabaseContext>(opt =>
             opt.UseNpgsql(logindb));
+
+            warehousedb = Configuration["warehouseDatabase"];
+            Console.WriteLine(warehousedb);
+            services.AddDbContext<WarehouseContext>(opt =>
+            opt.UseNpgsql(warehousedb));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

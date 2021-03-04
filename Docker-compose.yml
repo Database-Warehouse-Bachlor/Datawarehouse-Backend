@@ -4,5 +4,5 @@ services:
   logindb:
     image: postgres:alpine
 
-  postgreswarehouse:
+  warehousedb:
     image: postgres:alpine
