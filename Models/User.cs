@@ -1,14 +1,14 @@
+using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Datawarehouse_Backend.Models
 {
     
-    public class User {
+    public class User : IdentityUser<Guid>{
 
         [Key]
-        [MaxLength(9)]
-        [MinLength(9)]
-        public int Id {get; set;}
+        public int id {get; set;}
 
         [Required]
         public string orgNr {get; set;}

@@ -11,7 +11,7 @@ using Datawarehouse_Backend;
 namespace SecureAPI.Controllers
 {
     [ApiController]
-    [Route("[Controller]")]
+    [Route("api/[controller]")]
     public class WebController : ControllerBase
     {
         private static readonly string[] Employee = new[]

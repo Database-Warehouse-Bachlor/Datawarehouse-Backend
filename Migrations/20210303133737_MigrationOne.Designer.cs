@@ -9,8 +9,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210226140412_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20210303133737_MigrationOne")]
+    partial class MigrationOne
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,10 +24,15 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasMaxLength(9)
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("orgNr")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("password")

@@ -22,10 +22,15 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasMaxLength(9)
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("orgNr")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("password")

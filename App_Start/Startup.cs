@@ -15,6 +15,7 @@ using Npgsql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace Datawarehouse_Backend.App_Start
 {
@@ -37,6 +38,10 @@ namespace Datawarehouse_Backend.App_Start
             });
             
             services.AddControllersWithViews();
+
+            services.AddIdentity<User, IdentityRole>()
+            .AddUserStore<DatabaseContext>()
+            .AddDefaultTokenProviders();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt => 

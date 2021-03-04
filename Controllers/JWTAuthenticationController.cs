@@ -11,21 +11,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 
 namespace Datawarehouse_Backend.Controllers
 {
- [Route("api/[controller]")]
+ [Route("api/login")]
  [ApiController]
 
  public class JWTAuthenticationController : ControllerBase
  {
-     private IConfiguration _config;
+     private readonly UserManager<User> userManager;
+     private readonly RoleManager<User> roleManager;
+     private readonly IConfiguration _config;
 
-     public JWTAuthenticationController(IConfiguration config)
+     public JWTAuthenticationController(IConfiguration config, UserManager<User> userManager, RoleManager<User> roleManager)
      {
+         this.userManager = userManager;
+         this.roleManager = roleManager;
          _config = config;
      }
-
+    
      [HttpPost]
      public IActionResult login(string orgNum, string pass)
      {
@@ -56,15 +61,6 @@ namespace Datawarehouse_Backend.Controllers
          var orgNum = claim[0].Value;
          return "Welcome to: " + orgNum;
      }
-
-    [Authorize]
-    [HttpGet ("GetValue")]
-     public ActionResult<IEnumerable<String>> Get()
-         {
-             return new string[] { "Value1","value2","value" };
-         }
-     
-
  }
 
 }
