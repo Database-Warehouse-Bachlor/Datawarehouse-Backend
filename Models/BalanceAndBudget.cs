@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Datawarehouse_Backend
+namespace Datawarehouse_Backend.Models
 {
     public class BalanceAndBudget {
         [Key]

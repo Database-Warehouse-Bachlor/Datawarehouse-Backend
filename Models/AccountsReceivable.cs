@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Datawarehouse_Backend
+namespace Datawarehouse_Backend.Models
 {
-    public class Acountsreceivable
+    public class Accountsreceivable
     {
         [Key]
         public long id { get; set;}
