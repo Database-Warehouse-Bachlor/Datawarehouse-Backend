@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using MyMusic.Core.Models;
 
 namespace Datawarehouse_Backend.App_Start
 {
@@ -41,9 +42,7 @@ namespace Datawarehouse_Backend.App_Start
             
             services.AddControllersWithViews();
 
-            services.AddIdentity<User, IdentityRole>()
-            .AddUserStore<DatabaseContext>()
-            .AddDefaultTokenProviders();
+
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt => 
@@ -71,6 +70,10 @@ namespace Datawarehouse_Backend.App_Start
             Console.WriteLine(warehousedb);
             services.AddDbContext<WarehouseContext>(opt =>
             opt.UseNpgsql(warehousedb));
+
+            //services.AddIdentity<User, Role>()
+            //.AddUserStore<LoginDatabaseContext>()
+            //.AddDefaultTokenProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
