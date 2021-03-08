@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
+using Datawarehouse_Backend.Context;
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -22,29 +23,32 @@ namespace Datawarehouse_Backend.Controllers
  {
 
      private readonly IConfiguration _config;
+     private readonly LoginDatabaseContext _db;
 
-     public JWTAuthenticationController(IConfiguration config)
+     public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
      {
 
          _config = config;
+         _db = db;
      }
     
      [HttpPost]
-     public IActionResult login(string orgNum, string pass)
+     public IActionResult login(string email, string pass)
      {
-        User login = new User();
+        
+        var loginUser = _db.users
+        .Where(e => e.Email == email)
+        .FirstOrDefault<User>();
+        
+        Console.WriteLine("USER:" + loginUser.Email);
+        IActionResult response;
+
+        if(loginUser.Email != null && loginUser.password == pass) {
         JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
-        login.orgNr = orgNum;
-        login.password = pass;
-        IActionResult response = Unauthorized();
-
-
-        var user = jwtTokenGenerate.authenticateUser(login);
-
-        if (user != null)
-        {
-            var tokenStr = jwtTokenGenerate.generateJSONWebToken(user,_config).ToString();
-            response = Ok(tokenStr);
+        var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser,_config).ToString();
+        response = Ok(tokenStr);
+        } else {
+         response = Unauthorized();
         }
         return response;
      }

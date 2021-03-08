@@ -45,14 +45,5 @@ namespace Datawarehouse_Backend.Authentication
         return encodeToken;
 
     }
-    public User authenticateUser(User login)
-    {
-        User user = null;
-        if (login.orgNr == "1234" && login.password == "admin")
-        {
-            user = new User { orgNr = "1234", Email = "tenant@mail.com", password = "admin" };
-        }
-        return user;
-    }
 }
 }
