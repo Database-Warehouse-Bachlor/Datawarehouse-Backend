@@ -16,7 +16,7 @@ using Datawarehouse_Backend.Context;
 
 namespace Datawarehouse_Backend.Controllers
 {
- [Route("api/login")]
+ [Route("api/")]
  [ApiController]
 
  public class JWTAuthenticationController : ControllerBase
@@ -32,8 +32,10 @@ namespace Datawarehouse_Backend.Controllers
          _db = db;
      }
     
-     [HttpPost]
-     public IActionResult login(string email, string pass)
+        
+     [HttpPost("login")]
+     [Consumes("application/x-www-form-urlencoded")] //funker også uten,
+     public IActionResult login([FromForm]string email, [FromForm]string pass)
      {
         
         var loginUser = _db.users
@@ -53,7 +55,25 @@ namespace Datawarehouse_Backend.Controllers
         return response;
      }
 
+    /* [Authorize]
+    [HttpPut("AddUser")]
+    public IActionResult register(string orgnr, string email, string pw){
+        
+        var userCheck = _db.users
+        .Where(e => e.Email == email)
+        .FirstOrDefault<User>();
+        if(userCheck == null) {
+            User newUser = new User(orgnr, email, pw);
 
+
+        }
+        IActionResult response;
+
+        return response;
+    } */
+
+
+    
     [Authorize]
     [HttpPost("Post")]
      public string post()

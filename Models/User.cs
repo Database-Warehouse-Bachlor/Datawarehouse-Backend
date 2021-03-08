@@ -12,6 +12,7 @@ namespace Datawarehouse_Backend.Models
         
         public int id {get; set;}
 
+//orgnr er string i tilfelle et orgnr starter med 0..
         [Required]
         [Column(TypeName = "varchar(10)")] 
         public string orgNr {get; set;}
