@@ -35,7 +35,7 @@ namespace Datawarehouse_Backend.Controllers
         
      [HttpPost("login")]
      [Consumes("application/x-www-form-urlencoded")] //funker også uten,
-     public IActionResult login([FromForm]string email, [FromForm]string pass)
+     public IActionResult login([FromForm]string email, [FromForm]string pwd)
      {
         
         var loginUser = _db.users
@@ -45,7 +45,7 @@ namespace Datawarehouse_Backend.Controllers
         Console.WriteLine("USER:" + loginUser.Email);
         IActionResult response;
 
-        if(loginUser.Email != null && loginUser.password == pass) {
+        if(loginUser.Email != null && loginUser.password == pwd) {
         JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
         var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser,_config).ToString();
         response = Ok(tokenStr);
