@@ -42,16 +42,23 @@ namespace Datawarehouse_Backend.Controllers
         .Where(e => e.Email == email)
         .FirstOrDefault<User>();
         
-        Console.WriteLine("USER:" + loginUser.Email);
         IActionResult response;
 
-        if(loginUser.Email != null && loginUser.password == pwd) {
+        try {
+            if(loginUser.Email != null && loginUser.password == pwd) {
         JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
         var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser,_config).ToString();
         response = Ok(tokenStr);
         } else {
          response = Unauthorized();
         }
+
+            //Sets response to Unauthorized if the user is not registered in the database
+        } catch(NullReferenceException) {
+            response = Unauthorized();
+        }
+
+        
         return response;
      }
 
