@@ -63,8 +63,9 @@ namespace Datawarehouse_Backend.Controllers
         return response;
      }
 
-    
+ 
     [HttpPost("AddUser")]
+    
     public IActionResult register([FromForm]string orgnr, [FromForm]string email, [FromForm]string pwd){
         IActionResult response;
         var userCheck = _db.users
@@ -84,6 +85,19 @@ namespace Datawarehouse_Backend.Controllers
         }
         return response;
     }
+
+
+    [Authorize]
+    [HttpGet("AllUsers")]
+    public List<User> getAllUsers() {
+        var users = _db.users.ToList();
+        return users;
+        //Hvis vi gjør om Users til en relasjon av Organisations/Tennants
+        //var org = _db.organisations
+        //.include(u => u.User)
+        //.ToList();
+    }
+
 
 
     
