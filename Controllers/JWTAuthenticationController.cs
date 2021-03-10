@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Datawarehouse_Backend.Context;
+using System.Security.Cryptography;
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -37,7 +38,7 @@ namespace Datawarehouse_Backend.Controllers
      [Consumes("application/x-www-form-urlencoded")] //funker også uten,
      public IActionResult login([FromForm]string email, [FromForm]string pwd)
      {
-        
+        Console.WriteLine("EMAIL: {0} PWD: {1}" , email, pwd);
         var loginUser = _db.users
         .Where(e => e.Email == email)
         .FirstOrDefault<User>();
@@ -62,22 +63,27 @@ namespace Datawarehouse_Backend.Controllers
         return response;
      }
 
-    /* [Authorize]
-    [HttpPut("AddUser")]
-    public IActionResult register(string orgnr, string email, string pw){
-        
+    
+    [HttpPost("AddUser")]
+    public IActionResult register([FromForm]string orgnr, [FromForm]string email, [FromForm]string pwd){
+        IActionResult response;
         var userCheck = _db.users
         .Where(e => e.Email == email)
         .FirstOrDefault<User>();
         if(userCheck == null) {
-            User newUser = new User(orgnr, email, pw);
-
-
+            User newUser = new User();
+            newUser.orgNr = orgnr;
+            newUser.Email = email;
+            newUser.password = pwd;
+            _db.users.Add(newUser);
+            _db.SaveChanges();
+            Console.WriteLine(newUser.Email);
+            response = Ok("User created");
+        } else {
+            response = BadRequest("User already exist");
         }
-        IActionResult response;
-
         return response;
-    } */
+    }
 
 
     

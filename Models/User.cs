@@ -8,8 +8,12 @@ namespace Datawarehouse_Backend.Models
     
     public class User{
 
-        [Key]
-        
+        public User()
+        {
+
+        }
+
+        [Key]      
         public int id {get; set;}
 
 //orgnr er string i tilfelle et orgnr starter med 0..
