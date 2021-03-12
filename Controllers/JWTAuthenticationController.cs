@@ -11,60 +11,121 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
+using Datawarehouse_Backend.Context;
+using System.Security.Cryptography;
 
 namespace Datawarehouse_Backend.Controllers
 {
- [Route("api/[controller]")]
- [ApiController]
+    [Route("api/")]
+    [ApiController]
 
- public class JWTAuthenticationController : ControllerBase
- {
-     private IConfiguration _config;
+    public class JWTAuthenticationController : ControllerBase
+    {
 
-     public JWTAuthenticationController(IConfiguration config)
-     {
-         _config = config;
-     }
+        private readonly IConfiguration _config;
+        private readonly LoginDatabaseContext _db;
 
-     [HttpPost]
-     public IActionResult login(string orgNum, string pass)
-     {
-        UserModel login = new UserModel();
-        JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
-        login.OrgNum = orgNum;
-        login.Password = pass;
-        IActionResult response = Unauthorized();
-
-
-        var user = jwtTokenGenerate.authenticateUser(login);
-
-        if (user != null)
+        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
         {
-            var tokenStr = jwtTokenGenerate.generateJSONWebToken(user,_config).ToString();
-            response = Ok(tokenStr);
+
+            _config = config;
+            _db = db;
         }
-        return response;
-     }
 
 
-    [Authorize]
-    [HttpPost("Post")]
-     public string post()
-     {
-         var identity = HttpContext.User.Identity as ClaimsIdentity;
-         IList<Claim> claim = identity.Claims.ToList();
-         var orgNum = claim[0].Value;
-         return "Welcome to: " + orgNum;
-     }
+        [HttpPost("login")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult login([FromForm] string email, [FromForm] string pwd)
+        {
+            var loginUser = _db.users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
 
-    [Authorize]
-    [HttpGet ("GetValue")]
-     public ActionResult<IEnumerable<String>> Get()
-         {
-             return new string[] { "Value1","value2","value" };
-         }
-     
+            IActionResult response;
 
- }
+
+            try
+            {
+                if (loginUser.Email != null && BCrypt.Net.BCrypt.Verify(pwd, loginUser.password))
+                {
+                    JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
+                    var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser, _config).ToString();
+                    response = Ok(tokenStr);
+                }
+                else
+                {
+                    response = Unauthorized();
+                }
+
+                //Sets response to Unauthorized if the user is not registered in the database
+            }
+            catch (NullReferenceException)
+            {
+                response = Unauthorized();
+            }
+
+
+            return response;
+        }
+
+        // TODO: Authorize must be implemented at some point
+        //[Authorize]
+        [HttpPost("register")]
+        public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
+        {
+            IActionResult response;
+            var userCheck = _db.users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+            if (userCheck == null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
+
+                User newUser = new User();
+                newUser.orgNr = orgnr;
+                newUser.Email = email;
+                newUser.password = hashedPassword;
+
+                // Adds and saves changes to the database
+                _db.users.Add(newUser);
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
+        }
+
+
+        [Authorize]
+        [HttpGet("users")]
+        public List<User> getAllUsers()
+        {
+            var users = _db.users.ToList();
+            return users;
+            // TODO: Passord må ikke vises
+            // TODO: Hvis vi gjør om Users til en relasjon av Organisations/Tennants
+            //var org = _db.organisations
+            //.include(u => u.User)
+            //.ToList();
+        }
+
+
+
+
+        [Authorize]
+        [HttpPost("Post")]
+        public string post()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            var orgNum = claim[0].Value;
+            return "Welcome to: " + orgNum;
+        }
+    }
 
 }
