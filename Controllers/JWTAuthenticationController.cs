@@ -17,99 +17,114 @@ using System.Security.Cryptography;
 
 namespace Datawarehouse_Backend.Controllers
 {
- [Route("api/")]
- [ApiController]
+    [Route("api/")]
+    [ApiController]
 
- public class JWTAuthenticationController : ControllerBase
- {
+    public class JWTAuthenticationController : ControllerBase
+    {
 
-     private readonly IConfiguration _config;
-     private readonly LoginDatabaseContext _db;
+        private readonly IConfiguration _config;
+        private readonly LoginDatabaseContext _db;
 
-     public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
-     {
+        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
+        {
 
-         _config = config;
-         _db = db;
-     }
-    
-        
-     [HttpPost("login")]
-     [Consumes("application/x-www-form-urlencoded")] //funker også uten,
-     public IActionResult login([FromForm]string email, [FromForm]string pwd)
-     {
-        Console.WriteLine("EMAIL: {0} PWD: {1}" , email, pwd);
-        var loginUser = _db.users
-        .Where(e => e.Email == email)
-        .FirstOrDefault<User>();
-        
-        IActionResult response;
-
-        try {
-            if(loginUser.Email != null && loginUser.password == pwd) {
-        JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
-        var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser,_config).ToString();
-        response = Ok(tokenStr);
-        } else {
-         response = Unauthorized();
+            _config = config;
+            _db = db;
         }
 
-            //Sets response to Unauthorized if the user is not registered in the database
-        } catch(NullReferenceException) {
-            response = Unauthorized();
+
+        [HttpPost("login")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult login([FromForm] string email, [FromForm] string pwd)
+        {
+            var loginUser = _db.users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+
+            IActionResult response;
+
+
+            try
+            {
+                if (loginUser.Email != null && BCrypt.Net.BCrypt.Verify(pwd, loginUser.password))
+                {
+                    JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
+                    var tokenStr = jwtTokenGenerate.generateJSONWebToken(loginUser, _config).ToString();
+                    response = Ok(tokenStr);
+                }
+                else
+                {
+                    response = Unauthorized();
+                }
+
+                //Sets response to Unauthorized if the user is not registered in the database
+            }
+            catch (NullReferenceException)
+            {
+                response = Unauthorized();
+            }
+
+
+            return response;
         }
 
-        
-        return response;
-     }
+        // TODO: Authorize must be implemented at some point
+        //[Authorize]
+        [HttpPost("AddUser")]
+        public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
+        {
+            IActionResult response;
+            var userCheck = _db.users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+            if (userCheck == null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
 
- 
-    [HttpPost("AddUser")]
-    
-    public IActionResult register([FromForm]string orgnr, [FromForm]string email, [FromForm]string pwd){
-        IActionResult response;
-        var userCheck = _db.users
-        .Where(e => e.Email == email)
-        .FirstOrDefault<User>();
-        if(userCheck == null) {
-            User newUser = new User();
-            newUser.orgNr = orgnr;
-            newUser.Email = email;
-            newUser.password = pwd;
-            _db.users.Add(newUser);
-            _db.SaveChanges();
-            Console.WriteLine(newUser.Email);
-            response = Ok("User created");
-        } else {
-            response = BadRequest("User already exist");
+                User newUser = new User();
+                newUser.orgNr = orgnr;
+                newUser.Email = email;
+                newUser.password = hashedPassword;
+
+                // Adds and saves changes to the database
+                _db.users.Add(newUser);
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
         }
-        return response;
+
+
+        [Authorize]
+        [HttpGet("AllUsers")]
+        public List<User> getAllUsers()
+        {
+            var users = _db.users.ToList();
+            return users;
+            //Hvis vi gjør om Users til en relasjon av Organisations/Tennants
+            //var org = _db.organisations
+            //.include(u => u.User)
+            //.ToList();
+        }
+
+
+
+
+        [Authorize]
+        [HttpPost("Post")]
+        public string post()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            var orgNum = claim[0].Value;
+            return "Welcome to: " + orgNum;
+        }
     }
-
-
-    [Authorize]
-    [HttpGet("AllUsers")]
-    public List<User> getAllUsers() {
-        var users = _db.users.ToList();
-        return users;
-        //Hvis vi gjør om Users til en relasjon av Organisations/Tennants
-        //var org = _db.organisations
-        //.include(u => u.User)
-        //.ToList();
-    }
-
-
-
-    
-    [Authorize]
-    [HttpPost("Post")]
-     public string post()
-     {
-         var identity = HttpContext.User.Identity as ClaimsIdentity;
-         IList<Claim> claim = identity.Claims.ToList();
-         var orgNum = claim[0].Value;
-         return "Welcome to: " + orgNum;
-     }
- }
 
 }

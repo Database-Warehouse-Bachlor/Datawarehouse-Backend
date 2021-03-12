@@ -29,7 +29,7 @@ namespace Datawarehouse_Backend.Models
         [Required]        
         [DataType(DataType.Password)]
         [MinLength(4)]
-        [MaxLength(50)]
+        [MaxLength(255)]
         public string password {get; set;}
     }
 }
