@@ -71,7 +71,7 @@ namespace Datawarehouse_Backend.Controllers
 
         // TODO: Authorize must be implemented at some point
         //[Authorize]
-        [HttpPost("AddUser")]
+        [HttpPost("register")]
         public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
@@ -102,12 +102,13 @@ namespace Datawarehouse_Backend.Controllers
 
 
         [Authorize]
-        [HttpGet("AllUsers")]
+        [HttpGet("users")]
         public List<User> getAllUsers()
         {
             var users = _db.users.ToList();
             return users;
-            //Hvis vi gjør om Users til en relasjon av Organisations/Tennants
+            // TODO: Passord må ikke vises
+            // TODO: Hvis vi gjør om Users til en relasjon av Organisations/Tennants
             //var org = _db.organisations
             //.include(u => u.User)
             //.ToList();
