@@ -17,7 +17,7 @@ using System.Security.Cryptography;
 
 namespace Datawarehouse_Backend.Controllers
 {
-    [Route("api/")]
+    [Route("auth/")]
     [ApiController]
 
     public class JWTAuthenticationController : ControllerBase
@@ -25,12 +25,13 @@ namespace Datawarehouse_Backend.Controllers
 
         private readonly IConfiguration _config;
         private readonly LoginDatabaseContext _db;
+        private readonly WarehouseContext _warehousedb;
 
-        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
+        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db, WarehouseContext warehousedb)
         {
-
             _config = config;
             _db = db;
+            _warehousedb = warehousedb;
         }
 
 
@@ -43,8 +44,6 @@ namespace Datawarehouse_Backend.Controllers
             .FirstOrDefault<User>();
 
             IActionResult response;
-
-
             try
             {
                 if (loginUser.Email != null && BCrypt.Net.BCrypt.Verify(pwd, loginUser.password))
@@ -72,19 +71,24 @@ namespace Datawarehouse_Backend.Controllers
         // TODO: Authorize must be implemented at some point
         //[Authorize]
         [HttpPost("register")]
-        public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult register([FromForm] string businessId, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
             var userCheck = _db.users
             .Where(e => e.Email == email)
             .FirstOrDefault<User>();
-            if (userCheck == null)
+
+            var tennant = _warehousedb.Tennants
+            .Where(o => o.businessId == businessId)
+            .FirstOrDefault<Tennant>();
+            if (userCheck == null && tennant != null)
             {
                 // Hashing password with a generated salt.
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
 
                 User newUser = new User();
-                newUser.orgNr = orgnr;
+                Console.WriteLine("Tennant: " + tennant);
+                newUser.tennant = tennant;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
 
@@ -126,6 +130,8 @@ namespace Datawarehouse_Backend.Controllers
             var orgNum = claim[0].Value;
             return "Welcome to: " + orgNum;
         }
+
+
     }
 
 }

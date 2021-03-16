@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Datawarehouse_Backend.Models
@@ -10,6 +11,7 @@ namespace Datawarehouse_Backend.Models
          public string address { get; set; }
          public int zipcode { get; set; }
          public string city { get; set; }
-         public long businessId { get; set; }
+         public string businessId { get; set; }
+         public ICollection<User> users { get; set; } = new List<User>();
     }
 }

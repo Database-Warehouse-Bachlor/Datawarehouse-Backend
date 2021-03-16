@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [Migration("20210316110040_addallTables")]
+    partial class addallTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,8 +405,8 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("address")
                         .HasColumnType("text");
 
-                    b.Property<string>("businessId")
-                        .HasColumnType("text");
+                    b.Property<long>("businessId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("city")
                         .HasColumnType("text");
@@ -502,49 +504,6 @@ namespace Datawarehouse_Backend.Migrations
                     b.HasKey("id");
 
                     b.ToTable("timeRegisters");
-                });
-
-            modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<long>("tennantid")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("tennantid");
-
-                    b.ToTable("User");
-                });
-
-            modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
-                {
-                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
-                        .WithMany("users")
-                        .HasForeignKey("tennantid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("tennant");
-                });
-
-            modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
-                {
-                    b.Navigation("users");
                 });
 #pragma warning restore 612, 618
         }
