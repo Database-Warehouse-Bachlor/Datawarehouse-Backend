@@ -126,7 +126,7 @@ namespace Datawarehouse_Backend.Controllers
             var orgNum = claim[0].Value;
             return "Welcome to: " + orgNum;
         }
-        
+        [Authorize]
         [HttpGet("getOrgNr")]
         public string getOrgNr()
         {
