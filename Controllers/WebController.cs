@@ -36,9 +36,6 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("inbound")]
         public List<InvoiceInbound> getInboundInvoice()
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            var currentUser = claimsIdentity.FindFirst(ClaimTypes.Email).Value;
-            Console.WriteLine(currentUser);
             var inboundInvoices = warehouseDb.InvoiceInbounds.ToList();
             return inboundInvoices;
 
