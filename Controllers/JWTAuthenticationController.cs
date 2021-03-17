@@ -70,7 +70,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         // TODO: Authorize must be implemented at some point
-        //[Authorize]
+        [Authorize]
         [HttpPost("register")]
         public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
         {
@@ -125,6 +125,16 @@ namespace Datawarehouse_Backend.Controllers
             IList<Claim> claim = identity.Claims.ToList();
             var orgNum = claim[0].Value;
             return "Welcome to: " + orgNum;
+        }
+        
+        [HttpGet("getOrgNr")]
+        public string getOrgNr()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            var orgNum = claim[0].Value;
+            return orgNum;
+        
         }
     }
 
