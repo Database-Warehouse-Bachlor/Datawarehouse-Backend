@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
 namespace Datawarehouse_Backend.Models {
 
     public class InvoiceInbound {
@@ -17,4 +17,5 @@ namespace Datawarehouse_Backend.Models {
         public string invoicePdf { get; set; }
         
     }
+
 }
