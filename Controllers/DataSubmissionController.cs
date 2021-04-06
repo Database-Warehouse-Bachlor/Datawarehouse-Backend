@@ -42,15 +42,12 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/json")]
         public IActionResult addData([FromBody] dynamic data) {
 
-            
+            string jsonDataAsString = data + "";
 
-            string dataM = data + "";
+            ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(jsonDataAsString);
+            //DeserializeObject<InvoiceList>(jsonDataAsString);
 
-
-
-            ContentsList dataFull = JsonConvert.DeserializeObject<ContentsList>(dataM);
-            //DeserializeObject<InvoiceList>(dataM);
-
+            addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
 
             //-------------------------------------------------
             //Er dette fin kode? Eller burde jeg endre på noe?
@@ -60,25 +57,25 @@ namespace Datawarehouse_Backend.Controllers
             
             //Adds Invoice inbound to datawarehouse
             
-            for(int i = 0; i < dataFull.InvoiceInbound.Count; i++) {
+            for(int i = 0; i < contentsList.InvoiceInbound.Count; i++) {
                 InvoiceInbound invoice = new InvoiceInbound();
-                invoice = dataFull.InvoiceInbound[i];
+                invoice = contentsList.InvoiceInbound[i];
                 _db.InvoiceInbounds.Add(invoice);
                 _db.SaveChanges();
                 }
 
             //Adds Invoice outbound to datawarehouse
-            for(int i = 0; i < dataFull.InvoiceOutbound.Count; i++) {
+            for(int i = 0; i < contentsList.InvoiceOutbound.Count; i++) {
                 InvoiceOutbound outbound = new InvoiceOutbound();
-                outbound = dataFull.InvoiceOutbound[i];
+                outbound = contentsList.InvoiceOutbound[i];
                 _db.InvoiceOutbounds.Add(outbound);
                 _db.SaveChanges();
             }
             
             //Adds custumer to datawarehouse
-            for(int i = 0; i < dataFull.Customer.Count; i++) {
+            for(int i = 0; i < contentsList.Customer.Count; i++) {
                 Customer customer = new Customer();
-                customer = dataFull.Customer[i];
+                customer = contentsList.Customer[i];
                 _db.Customers.Add(customer);
                 _db.SaveChanges();
             }
@@ -99,16 +96,17 @@ namespace Datawarehouse_Backend.Controllers
             return Ok();
         }
 
-        private void addTennant(string bId, string bName){
+
+        private void addTennant(string bId, string bName, string apiKey){
             var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
             if(business == null) {
                 Tennant tennant = new Tennant();
                 tennant.businessId = bId;
                 tennant.tennantName = bName;
+                tennant.apiKey = apiKey;
                 _db.Tennants.Add(tennant);
                 _db.SaveChanges();
             }
         }
     }
-
 }

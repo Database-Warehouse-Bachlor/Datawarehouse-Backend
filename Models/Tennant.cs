@@ -9,6 +9,7 @@ namespace Datawarehouse_Backend.Models
          public long id { get; set; }
          public string tennantName { get; set; }
          public string businessId { get; set; }
+         public string apiKey { get; set; }
          public ICollection<User> users { get; set; } = new List<User>();
     }
 }
