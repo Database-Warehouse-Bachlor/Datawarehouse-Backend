@@ -42,7 +42,7 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/json")]
         public IActionResult addData([FromBody] dynamic data) {
 
-
+            
 
             string dataM = data + "";
 
@@ -59,6 +59,7 @@ namespace Datawarehouse_Backend.Controllers
             //List<InvoiceInbound> invoices = [];
             
             //Adds Invoice inbound to datawarehouse
+            
             for(int i = 0; i < dataFull.InvoiceInbound.Count; i++) {
                 InvoiceInbound invoice = new InvoiceInbound();
                 invoice = dataFull.InvoiceInbound[i];
@@ -98,8 +99,16 @@ namespace Datawarehouse_Backend.Controllers
             return Ok();
         }
 
-
-
-
+        private void addTennant(string bId, string bName){
+            var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
+            if(business == null) {
+                Tennant tennant = new Tennant();
+                tennant.businessId = bId;
+                tennant.tennantName = bName;
+                _db.Tennants.Add(tennant);
+                _db.SaveChanges();
+            }
+        }
     }
+
 }
