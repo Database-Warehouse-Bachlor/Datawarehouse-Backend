@@ -46,8 +46,12 @@ namespace Datawarehouse_Backend.Controllers
 
             ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(jsonDataAsString);
             //DeserializeObject<InvoiceList>(jsonDataAsString);
-
+            try{
             addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
+            }
+            catch (Exception e) {
+                Console.WriteLine("{0} Exception caught.", e);
+            }
 
             //-------------------------------------------------
             //Er dette fin kode? Eller burde jeg endre på noe?
