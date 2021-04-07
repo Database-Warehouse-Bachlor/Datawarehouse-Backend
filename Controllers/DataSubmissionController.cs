@@ -42,28 +42,21 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/json")]
         public IActionResult addData([FromBody] dynamic data) {
 
-
-
             string dataM = data + "";
-
-
-
-            ContentsList dataFull = JsonConvert.DeserializeObject<ContentsList>(dataM);
-            //DeserializeObject<InvoiceList>(dataM);
-
 
             //-------------------------------------------------
             //Er dette fin kode? Eller burde jeg endre på noe?
             //-------------------------------------------------
 
-            //List<InvoiceInbound> invoices = [];
-            
+            try{
+
+            ContentsList dataFull = JsonConvert.DeserializeObject<ContentsList>(dataM);
+
             //Adds Invoice inbound to datawarehouse
             for(int i = 0; i < dataFull.InvoiceInbound.Count; i++) {
                 InvoiceInbound invoice = new InvoiceInbound();
                 invoice = dataFull.InvoiceInbound[i];
                 _db.InvoiceInbounds.Add(invoice);
-                _db.SaveChanges();
                 }
 
             //Adds Invoice outbound to datawarehouse
@@ -71,7 +64,6 @@ namespace Datawarehouse_Backend.Controllers
                 InvoiceOutbound outbound = new InvoiceOutbound();
                 outbound = dataFull.InvoiceOutbound[i];
                 _db.InvoiceOutbounds.Add(outbound);
-                _db.SaveChanges();
             }
             
             //Adds custumer to datawarehouse
@@ -79,21 +71,50 @@ namespace Datawarehouse_Backend.Controllers
                 Customer customer = new Customer();
                 customer = dataFull.Customer[i];
                 _db.Customers.Add(customer);
-                _db.SaveChanges();
             }
 
+            for(int i = 0; i < dataFull.BalanceAndBudget.Count; i++) {
+                BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
+                balanceAndBudget = dataFull.BalanceAndBudget[i];
+                _db.BalanceAndBudgets.Add(balanceAndBudget);
+            }
 
-                
+            for(int i = 0; i < dataFull.AbsenceRegister.Count; i++) {
+                AbsenceRegister absenceRegister = new AbsenceRegister();
+                absenceRegister = dataFull.AbsenceRegister[i];
+                _db.AbsenceRegisters.Add(absenceRegister);
+            }
 
-                //invoice.invoiceId       =   invoices.InvoiceInbound[i].invoiceId;
-                //invoice.tennantId       =   invoices.InvoiceInbound[i].tennantId;
-                //invoice.jobId           =   invoices.InvoiceInbound[i].jobId;
-                //invoice.supplierId      =   invoices.InvoiceInbound[i].supplierId;
-                //invoice.wholesalerId    =   invoices.InvoiceInbound[i].wholesalerId;
-                //invoice.invoiceDate     =   invoices.InvoiceInbound[i].invoiceDate;
-                //invoice.amountTotal     =   invoices.InvoiceInbound[i].amountTotal;
-                //invoice.specification   =   invoices.InvoiceInbound[i].specification;
-                //invoice.invoicePdf      =   invoices.InvoiceInbound[i].invoicePdf;
+            for(int i = 0; i < dataFull.Accountsreceivable.Count; i++) {
+                Accountsreceivable accountsreceivable = new Accountsreceivable();
+                accountsreceivable = dataFull.Accountsreceivable[i];
+                _db.Accountsreceivables.Add(accountsreceivable);
+            }
+
+            for(int i = 0; i < dataFull.Employee.Count; i++) {
+                Employee employee = new Employee();
+                employee = dataFull.Employee[i];
+                _db.Employees.Add(employee);
+            }
+
+            for(int i = 0; i < dataFull.Order.Count; i++) {
+                Order order = new Order();
+                order = dataFull.Order[i];
+                _db.Orders.Add(order);
+            }
+
+            for(int i = 0; i < dataFull.TimeRegister.Count; i++) {
+                TimeRegister timeRegister = new TimeRegister();
+                timeRegister = dataFull.TimeRegister[i];
+                _db.timeRegisters.Add(timeRegister);
+            }
+
+            //Saves changes to DB if everything is OK
+            _db.SaveChanges();
+
+            } catch (Exception e) {
+                Console.WriteLine(e);
+            }
 
             return Ok();
         }
