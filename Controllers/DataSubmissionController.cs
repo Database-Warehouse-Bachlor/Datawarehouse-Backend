@@ -97,15 +97,26 @@ namespace Datawarehouse_Backend.Controllers
         }
 
 
+        /* 
+        This function is called whenever the datawarehouse receives data.
+        If the incoming data doesn't have a tennant to connect the data to, it will create a tennant based on
+        the incoming information (businessname, businessID and API-key).
+         */
         private void addTennant(string bId, string bName, string apiKey){
             var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
-            if(business == null) {
+            if(business == null && bId != null && apiKey != null) {  
                 Tennant tennant = new Tennant();
                 tennant.businessId = bId;
                 tennant.tennantName = bName;
                 tennant.apiKey = apiKey;
                 _db.Tennants.Add(tennant);
                 _db.SaveChanges();
+            } else if(bId == null) {
+                Console.WriteLine("BusinessID is either empty or not presented properly");
+            } else if(apiKey == null){
+                Console.WriteLine("API-key is either empty or not presented properly");
+            } else if(business != null) {
+                Console.WriteLine("Tennant found, submitting data..");
             }
         }
     }
