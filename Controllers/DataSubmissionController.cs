@@ -50,7 +50,14 @@ namespace Datawarehouse_Backend.Controllers
             addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
             }
             catch (Exception e) {
-                Console.WriteLine("{0} Exception caught.", e);
+                ErrorLog errorLog = new ErrorLog();
+                string errorMessage = e + " Exception caught.";
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = DateTime.Now;
+                Console.WriteLine(errorLog.errorMessage + " " + errorLog.timeOfError);
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+                Console.WriteLine();
             }
 
             //-------------------------------------------------
@@ -61,28 +68,28 @@ namespace Datawarehouse_Backend.Controllers
             
             //Adds Invoice inbound to datawarehouse
             
-            for(int i = 0; i < contentsList.InvoiceInbound.Count; i++) {
-                InvoiceInbound invoice = new InvoiceInbound();
-                invoice = contentsList.InvoiceInbound[i];
-                _db.InvoiceInbounds.Add(invoice);
-                _db.SaveChanges();
-                }
+            // for(int i = 0; i < contentsList.InvoiceInbound.Count; i++) {
+            //     InvoiceInbound invoice = new InvoiceInbound();
+            //     invoice = contentsList.InvoiceInbound[i];
+            //     _db.InvoiceInbounds.Add(invoice);
+            //     _db.SaveChanges();
+            //     }
 
-            //Adds Invoice outbound to datawarehouse
-            for(int i = 0; i < contentsList.InvoiceOutbound.Count; i++) {
-                InvoiceOutbound outbound = new InvoiceOutbound();
-                outbound = contentsList.InvoiceOutbound[i];
-                _db.InvoiceOutbounds.Add(outbound);
-                _db.SaveChanges();
-            }
+            // //Adds Invoice outbound to datawarehouse
+            // for(int i = 0; i < contentsList.InvoiceOutbound.Count; i++) {
+            //     InvoiceOutbound outbound = new InvoiceOutbound();
+            //     outbound = contentsList.InvoiceOutbound[i];
+            //     _db.InvoiceOutbounds.Add(outbound);
+            //     _db.SaveChanges();
+            // }
             
-            //Adds custumer to datawarehouse
-            for(int i = 0; i < contentsList.Customer.Count; i++) {
-                Customer customer = new Customer();
-                customer = contentsList.Customer[i];
-                _db.Customers.Add(customer);
-                _db.SaveChanges();
-            }
+            // //Adds custumer to datawarehouse
+            // for(int i = 0; i < contentsList.Customer.Count; i++) {
+            //     Customer customer = new Customer();
+            //     customer = contentsList.Customer[i];
+            //     _db.Customers.Add(customer);
+            //     _db.SaveChanges();
+            // }
 
 
                 
@@ -107,20 +114,30 @@ namespace Datawarehouse_Backend.Controllers
         the incoming information (businessname, businessID and API-key).
          */
         private void addTennant(string bId, string bName, string apiKey){
+            ErrorLog errorLog = new ErrorLog();
             var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
-            if(business == null && bId != null && apiKey != null) {  
+            if(business == null && bId != null && apiKey != null && bId != "" && apiKey != "") {  
                 Tennant tennant = new Tennant();
                 tennant.businessId = bId;
                 tennant.tennantName = bName;
                 tennant.apiKey = apiKey;
                 _db.Tennants.Add(tennant);
                 _db.SaveChanges();
-            } else if(bId == null) {
+            } else if(bId == null || bId == "") {
+                string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId; 
+                errorLog.errorMessage = businessIdError;
+                errorLog.timeOfError = DateTime.Now; 
                 Console.WriteLine("BusinessID is either empty or not presented properly");
-            } else if(apiKey == null){
-                Console.WriteLine("API-key is either empty or not presented properly");
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+            } else if(apiKey == null || apiKey == "") {
+                string apiKeyError = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
+                errorLog.errorMessage = apiKeyError;
+                errorLog.timeOfError = DateTime.Now;
+                _db.ErrorLogs.Add(errorLog);
+                Console.WriteLine("API-key er enten tom eller ikke presentert på riktig måte.");
             } else if(business != null) {
-                Console.WriteLine("Tennant found, submitting data..");
+                Console.WriteLine("Tennant found, submitting data...");
             }
         }
     }

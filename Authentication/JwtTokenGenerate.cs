@@ -43,7 +43,6 @@ namespace Datawarehouse_Backend.Authentication
 
         var encodeToken = new JwtSecurityTokenHandler().WriteToken(token);
         return encodeToken;
-
     }
 }
 }
