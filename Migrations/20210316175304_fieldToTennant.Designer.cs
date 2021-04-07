@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [Migration("20210316175304_fieldToTennant")]
+    partial class fieldToTennant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,25 +233,6 @@ namespace Datawarehouse_Backend.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Datawarehouse_Backend.Models.ErrorLog", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("errorMessage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("timeOfError")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ErrorLogs");
-                });
-
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceInbound", b =>
                 {
                     b.Property<long>("id")
@@ -419,16 +402,20 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("apiKey")
-                        .IsRequired()
+                    b.Property<string>("address")
                         .HasColumnType("text");
 
                     b.Property<string>("businessId")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("city")
                         .HasColumnType("text");
 
                     b.Property<string>("tennantName")
                         .HasColumnType("text");
+
+                    b.Property<int>("zipcode")
+                        .HasColumnType("integer");
 
                     b.HasKey("id");
 
@@ -536,7 +523,7 @@ namespace Datawarehouse_Backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<long>("tennantid")
+                    b.Property<long?>("tennantid")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
@@ -549,17 +536,15 @@ namespace Datawarehouse_Backend.Migrations
             modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
-                        .WithMany("users")
-                        .HasForeignKey("tennantid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("user")
+                        .HasForeignKey("tennantid");
 
                     b.Navigation("tennant");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
                 {
-                    b.Navigation("users");
+                    b.Navigation("user");
                 });
 #pragma warning restore 612, 618
         }

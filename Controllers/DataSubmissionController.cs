@@ -42,16 +42,30 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/json")]
         public IActionResult addData([FromBody] dynamic data) {
 
-            string dataM = data + "";
+            string jsonDataAsString = data + "";
+
+            ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(jsonDataAsString);
+            //DeserializeObject<InvoiceList>(jsonDataAsString);
+            try{
+            addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
+            }
+            catch (Exception e) {
+                ErrorLog errorLog = new ErrorLog();
+                string errorMessage = e + " Exception caught.";
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = DateTime.Now;
+                Console.WriteLine(errorLog.errorMessage + " " + errorLog.timeOfError);
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+                Console.WriteLine();
+            }
 
             //-------------------------------------------------
             //Er dette fin kode? Eller burde jeg endre på noe?
             //-------------------------------------------------
 
-            try{
-
-            ContentsList dataFull = JsonConvert.DeserializeObject<ContentsList>(dataM);
-
+            //List<InvoiceInbound> invoices = [];
+            
             //Adds Invoice inbound to datawarehouse
             for(int i = 0; i < dataFull.InvoiceInbound.Count; i++) {
                 InvoiceInbound invoice = new InvoiceInbound();
@@ -120,7 +134,37 @@ namespace Datawarehouse_Backend.Controllers
         }
 
 
-
-
+        /* 
+        This function is called whenever the datawarehouse receives data.
+        If the incoming data doesn't have a tennant to connect the data to, it will create a tennant based on
+        the incoming information (businessname, businessID and API-key).
+         */
+        private void addTennant(string bId, string bName, string apiKey){
+            ErrorLog errorLog = new ErrorLog();
+            var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
+            if(business == null && bId != null && apiKey != null && bId != "" && apiKey != "") {  
+                Tennant tennant = new Tennant();
+                tennant.businessId = bId;
+                tennant.tennantName = bName;
+                tennant.apiKey = apiKey;
+                _db.Tennants.Add(tennant);
+                _db.SaveChanges();
+            } else if(bId == null || bId == "") {
+                string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId; 
+                errorLog.errorMessage = businessIdError;
+                errorLog.timeOfError = DateTime.Now; 
+                Console.WriteLine("BusinessID is either empty or not presented properly");
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+            } else if(apiKey == null || apiKey == "") {
+                string apiKeyError = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
+                errorLog.errorMessage = apiKeyError;
+                errorLog.timeOfError = DateTime.Now;
+                _db.ErrorLogs.Add(errorLog);
+                Console.WriteLine("API-key er enten tom eller ikke presentert på riktig måte.");
+            } else if(business != null) {
+                Console.WriteLine("Tennant found, submitting data...");
+            }
+        }
     }
 }

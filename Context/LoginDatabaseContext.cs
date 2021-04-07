@@ -10,7 +10,12 @@ namespace Datawarehouse_Backend.Context {
 
          // Define databse tables
         public DbSet<User> users { get; set; }
-    
-    }
 
-}
+           protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>().HasOne(u => u.tennant) 
+            .WithMany(a => a.users) 
+            .HasForeignKey(u => u.tennant.id);
+    }
+    }
+    }
