@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.LoginDatabase
+namespace Datawarehouse_Backend.Migrations
 {
-    [DbContext(typeof(LoginDatabaseContext))]
-    partial class LoginDatabaseContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(WarehouseContext))]
+    [Migration("20210408122906_invoiceChange")]
+    partial class invoiceChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +58,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("employeeid");
 
-                    b.ToTable("AbsenceRegister");
+                    b.ToTable("AbsenceRegisters");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Accountsreceivable", b =>
@@ -103,7 +105,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("customerid");
 
-                    b.ToTable("Accountsreceivable");
+                    b.ToTable("Accountsreceivables");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.BalanceAndBudget", b =>
@@ -141,7 +143,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("tennantid");
 
-                    b.ToTable("BalanceAndBudget");
+                    b.ToTable("BalanceAndBudgets");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Customer", b =>
@@ -176,7 +178,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("tennantid");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Employee", b =>
@@ -238,7 +240,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("tennantid");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceInbound", b =>
@@ -269,7 +271,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<long>("supplierId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("wholesalerId")
@@ -277,9 +279,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
-                    b.ToTable("InvoiceInbound");
+                    b.ToTable("InvoiceInbounds");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceOutbound", b =>
@@ -329,7 +331,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.HasIndex("orderId")
                         .IsUnique();
 
-                    b.ToTable("InvoiceOutbound");
+                    b.ToTable("InvoiceOutbounds");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Order", b =>
@@ -411,7 +413,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("tennantid");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
@@ -434,7 +436,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasKey("id");
 
-                    b.ToTable("Tennant");
+                    b.ToTable("Tennants");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.TimeRegister", b =>
@@ -520,7 +522,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("employeeid");
 
-                    b.ToTable("TimeRegister");
+                    b.ToTable("timeRegisters");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
@@ -547,7 +549,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasIndex("tennantid");
 
-                    b.ToTable("users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.AbsenceRegister", b =>
@@ -601,7 +603,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("invoicesInbound")
-                        .HasForeignKey("tennantid");
+                        .HasForeignKey("tennantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("tennant");
                 });

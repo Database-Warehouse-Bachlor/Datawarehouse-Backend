@@ -10,6 +10,7 @@ using Datawarehouse_Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -19,25 +20,42 @@ namespace Datawarehouse_Backend.Controllers
     public class WebController : ControllerBase
     {
 
-        SecurityContext security;
+        //SecurityContext security;
 
         private readonly IConfiguration config;
-        private readonly WarehouseContext warehouseDb;
-        private readonly LoginDatabaseContext logindb;
+        private readonly WarehouseContext _warehouseDb;
+        private readonly LoginDatabaseContext _db;
 
         public WebController(IConfiguration config, WarehouseContext warehouseDb, LoginDatabaseContext logindb)
         {
             this.config = config;
-            this.warehouseDb = warehouseDb;
-            this.logindb = logindb;
+            this._warehouseDb = warehouseDb;
+            this._db = logindb;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice()
-        {
-            var inboundInvoices = warehouseDb.InvoiceInbounds.ToList();
+        public List<InvoiceInbound> getInboundInvoice([FromForm] long tennantId) {
+            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            .Where(i => i.tennantId == tennantId)
+            .ToList();
             return inboundInvoices;
+        }
+
+        
+            
+            
+        [Authorize]
+        [HttpGet("absence")]
+        public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)
+        {
+            var tennant = _warehouseDb.Tennants.
+            Where(t => t.businessId == businessId)
+            .FirstOrDefault<Tennant>();
+            var absence = _warehouseDb.AbsenceRegisters
+            .Where(i => i.employee.tennant == tennant)
+            .ToList();
+            return absence;
 
         }
 

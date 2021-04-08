@@ -6,7 +6,7 @@ namespace Datawarehouse_Backend.Models
     public class TimeRegister {
         [Key]
          public long id { get; set; }
-         public long employeeId { get; set; }
+         public Employee employee {get; set;}
          public Boolean isCaseworker { get; set; }
          public string personName { get; set; }
          public string personDepartment { get; set; }
