@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Datawarehouse_Backend
@@ -9,7 +10,10 @@ namespace Datawarehouse_Backend
         [Key]
         public long id { get; set; }
         public long employeeId { get; set; }
-        public long tennantId { get; set; }
+        public Tennant tennant {get; set;}
+
+         public ICollection<AbsenceRegister> absence { get; set; } = new List<AbsenceRegister>();
+         public ICollection<TimeRegister> timeRegisters { get; set; } = new List<TimeRegister>();
         public string employeeName { get; set; }
         public DateTime birthdate { get; set; }
         public long posistionCategoryId { get; set; }
@@ -24,6 +28,8 @@ namespace Datawarehouse_Backend
         public string statusText { get; set; }
         public Boolean isCaseworker { get; set; }
         public string employmentType { get; set; }
+
+
     }
 
 }

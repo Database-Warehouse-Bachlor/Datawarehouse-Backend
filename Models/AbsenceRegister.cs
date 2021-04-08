@@ -8,8 +8,9 @@ namespace Datawarehouse_Backend
         [Key]
         public long id { get; set;}
         public long absenceId { get; set;}
-        public long employeeId { get; set; }
-
+        [Required]
+        public Employee employee {get; set;}
+        [Required]
         public DateTime fromDate { get; set; }
         
         public DateTime toDate { get; set; }
