@@ -22,22 +22,29 @@ namespace Datawarehouse_Backend.Controllers
         SecurityContext security;
 
         private readonly IConfiguration config;
-        private readonly WarehouseContext warehouseDb;
-        private readonly LoginDatabaseContext logindb;
+        private readonly WarehouseContext _warehouseDb;
+        private readonly LoginDatabaseContext _db;
 
         public WebController(IConfiguration config, WarehouseContext warehouseDb, LoginDatabaseContext logindb)
         {
             this.config = config;
-            this.warehouseDb = warehouseDb;
-            this.logindb = logindb;
+            this._warehouseDb = warehouseDb;
+            this._db = logindb;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice()
+        public List<InvoiceInbound> getInboundInvoice([FromForm] string businessId)
         {
-            var inboundInvoices = warehouseDb.InvoiceInbounds.ToList();
+            var tennant = _warehouseDb.Tennants
+            .Where(t => t.businessId == businessId)
+            .FirstOrDefault<Tennant>();
+            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            .Where(i => i.tennantId == tennant.id)
+            .ToList();
             return inboundInvoices;
+            
+            
 
         }
 
