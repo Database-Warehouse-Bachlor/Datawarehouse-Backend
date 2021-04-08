@@ -10,6 +10,7 @@ using Datawarehouse_Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -34,13 +35,14 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice([FromForm] string businessId) {
-   
+        public List<InvoiceInbound> getInboundInvoice([FromForm] long tennantId) {
             var inboundInvoices = _warehouseDb.InvoiceInbounds
-            .Where(i => i.tennant.businessId == businessId)
+            .Where(i => i.tennantId == tennantId)
             .ToList();
             return inboundInvoices;
         }
+
+        
             
             
         [Authorize]

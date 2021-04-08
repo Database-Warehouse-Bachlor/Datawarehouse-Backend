@@ -74,7 +74,7 @@ namespace Datawarehouse_Backend.Controllers
         Then hashes and salts the password and stores it in the DB. 
         */
         // TODO: Authorize must be implemented at some point
-        [Authorize]
+        //[Authorize]
         [HttpPost("register")]
         public IActionResult register([FromForm] string businessId, [FromForm] string email, [FromForm] string pwd)
         {
