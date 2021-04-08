@@ -40,7 +40,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("duration")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("employeeId")
+                    b.Property<long>("employeeid")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
@@ -53,6 +53,8 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
+
+                    b.HasIndex("employeeid");
 
                     b.ToTable("AbsenceRegisters");
                 });
@@ -70,11 +72,11 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("amountDue")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("customerId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("customerName")
                         .HasColumnType("text");
+
+                    b.Property<long?>("customerid")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("dueDate")
                         .HasColumnType("timestamp without time zone");
@@ -98,6 +100,8 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("id");
+
+                    b.HasIndex("customerid");
 
                     b.ToTable("Accountsreceivables");
                 });
@@ -130,10 +134,12 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("startBalance")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long?>("tennantid")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
+
+                    b.HasIndex("tennantid");
 
                     b.ToTable("BalanceAndBudgets");
                 });
@@ -148,9 +154,6 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("address")
                         .HasColumnType("text");
 
-                    b.Property<long>("businessId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("city")
                         .HasColumnType("text");
 
@@ -163,10 +166,15 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<bool>("isInactive")
                         .HasColumnType("boolean");
 
+                    b.Property<long?>("tennantid")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("zipcode")
                         .HasColumnType("integer");
 
                     b.HasKey("id");
+
+                    b.HasIndex("tennantid");
 
                     b.ToTable("Customers");
                 });
@@ -223,10 +231,12 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("statusText")
                         .HasColumnType("text");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long?>("tennantid")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
+
+                    b.HasIndex("tennantid");
 
                     b.ToTable("Employees");
                 });
@@ -259,13 +269,15 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("supplierId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long?>("tennantid")
                         .HasColumnType("bigint");
 
                     b.Property<long>("wholesalerId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
+
+                    b.HasIndex("tennantid");
 
                     b.ToTable("InvoiceInbounds");
                 });
@@ -286,7 +298,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("amountTotal")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("customerId")
+                    b.Property<long?>("customerid")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("invoiceDate")
@@ -312,6 +324,11 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("customerid");
+
+                    b.HasIndex("orderId")
+                        .IsUnique();
+
                     b.ToTable("InvoiceOutbounds");
                 });
 
@@ -328,11 +345,11 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("confimedDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("customerId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("customerName")
                         .HasColumnType("text");
+
+                    b.Property<long?>("customerid")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("description")
                         .HasColumnType("text");
@@ -382,13 +399,17 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("startedDelivery")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long?>("tennantid")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("warrantyDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
+
+                    b.HasIndex("customerid");
+
+                    b.HasIndex("tennantid");
 
                     b.ToTable("Orders");
                 });
@@ -400,20 +421,16 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("address")
+                    b.Property<string>("apiKey")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("businessId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("city")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("tennantName")
                         .HasColumnType("text");
-
-                    b.Property<int>("zipcode")
-                        .HasColumnType("integer");
 
                     b.HasKey("id");
 
@@ -433,7 +450,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("amount")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("employeeId")
+                    b.Property<long?>("employeeid")
                         .HasColumnType("bigint");
 
                     b.Property<string>("invoiceRate")
@@ -501,6 +518,8 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("employeeid");
+
                     b.ToTable("timeRegisters");
                 });
 
@@ -531,6 +550,103 @@ namespace Datawarehouse_Backend.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("Datawarehouse_Backend.Models.AbsenceRegister", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
+                        .WithMany("absence")
+                        .HasForeignKey("employeeid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("employee");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Accountsreceivable", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
+                        .WithMany("accountsreceivables")
+                        .HasForeignKey("customerid");
+
+                    b.Navigation("customer");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.BalanceAndBudget", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
+                        .WithMany("bnb")
+                        .HasForeignKey("tennantid");
+
+                    b.Navigation("tennant");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Customer", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
+                        .WithMany("customers")
+                        .HasForeignKey("tennantid");
+
+                    b.Navigation("tennant");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Employee", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
+                        .WithMany("employees")
+                        .HasForeignKey("tennantid");
+
+                    b.Navigation("tennant");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceInbound", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
+                        .WithMany("invoicesInbound")
+                        .HasForeignKey("tennantid");
+
+                    b.Navigation("tennant");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceOutbound", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
+                        .WithMany("invoicesOutbound")
+                        .HasForeignKey("customerid");
+
+                    b.HasOne("Datawarehouse_Backend.Models.Order", "order")
+                        .WithOne("invoiceOutbound")
+                        .HasForeignKey("Datawarehouse_Backend.Models.InvoiceOutbound", "orderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("customer");
+
+                    b.Navigation("order");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Order", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
+                        .WithMany("orders")
+                        .HasForeignKey("customerid");
+
+                    b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
+                        .WithMany("orders")
+                        .HasForeignKey("tennantid");
+
+                    b.Navigation("customer");
+
+                    b.Navigation("tennant");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.TimeRegister", b =>
+                {
+                    b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
+                        .WithMany("timeRegisters")
+                        .HasForeignKey("employeeid");
+
+                    b.Navigation("employee");
+                });
+
             modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
@@ -542,8 +658,39 @@ namespace Datawarehouse_Backend.Migrations
                     b.Navigation("tennant");
                 });
 
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Customer", b =>
+                {
+                    b.Navigation("accountsreceivables");
+
+                    b.Navigation("invoicesOutbound");
+
+                    b.Navigation("orders");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Employee", b =>
+                {
+                    b.Navigation("absence");
+
+                    b.Navigation("timeRegisters");
+                });
+
+            modelBuilder.Entity("Datawarehouse_Backend.Models.Order", b =>
+                {
+                    b.Navigation("invoiceOutbound");
+                });
+
             modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
                 {
+                    b.Navigation("bnb");
+
+                    b.Navigation("customers");
+
+                    b.Navigation("employees");
+
+                    b.Navigation("invoicesInbound");
+
+                    b.Navigation("orders");
+
                     b.Navigation("users");
                 });
 #pragma warning restore 612, 618

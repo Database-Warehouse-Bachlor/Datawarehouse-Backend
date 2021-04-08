@@ -34,25 +34,23 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice([FromForm] string businessId)
+        public List<InvoiceInbound> getInboundInvoice([FromForm] string businessId) {
+   
+            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            .Where(i => i.tennant.businessId == businessId)
+            .ToList();
+            return inboundInvoices;
+        }
+            
+            
         [Authorize]
         [HttpGet("absence")]
         public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)
         {
-            var tennant = _warehouseDb.Tennants
-            .Where(t => t.businessId == businessId)
-            .FirstOrDefault<Tennant>();
-            var inboundInvoices = _warehouseDb.InvoiceInbounds
-            .Where(i => i.tennantId == tennant.id)
-            .ToList();
-            return inboundInvoices;
-            
-            
-
-            var tennant = warehouseDb.Tennants.
+            var tennant = _warehouseDb.Tennants.
             Where(t => t.businessId == businessId)
             .FirstOrDefault<Tennant>();
-            var absence = warehouseDb.AbsenceRegisters
+            var absence = _warehouseDb.AbsenceRegisters
             .Where(i => i.employee.tennant == tennant)
             .ToList();
             return absence;

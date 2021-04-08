@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Datawarehouse_Backend.Models
 {
     public class Tennant {
-        [key]
+        [Key]
          public long id { get; set; }
          public string tennantName { get; set; }
          [Required]
