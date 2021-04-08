@@ -7,9 +7,9 @@ namespace Datawarehouse_Backend.Models {
     //Object that is used when handling incoming data
     public class ContentsList
     {
-        public string OrgNummer { get; set; }
-        public string API_key { get; set; }
-        public Tennant tennant{get; set;}
+        public string businessId { get; set; }
+        public string apiKey { get; set; }
+        public string tennantName { get; set; }
         public List<InvoiceInbound> InvoiceInbound { get; set; }
         public List<InvoiceOutbound> InvoiceOutbound { get; set;}
         public List<Customer> Customer { get; set; }
