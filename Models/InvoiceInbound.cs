@@ -7,7 +7,7 @@ namespace Datawarehouse_Backend.Models {
         [Key]
         public long id { get; set; }
         public long invoiceId { get; set; }
-        public long tennantId { get; set; }
+        public Tennant tennant { get; set; }
         public long jobId { get; set; }
         public long supplierId { get; set; }
         public long wholesalerId { get; set; }

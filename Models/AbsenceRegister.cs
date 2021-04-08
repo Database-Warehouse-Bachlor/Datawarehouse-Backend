@@ -10,7 +10,7 @@ namespace Datawarehouse_Backend.Models
         [Required]
         public long absenceId { get; set;}
         [Required]
-        public long employeeId { get; set; }
+        public Employee employee {get; set;}
         [Required]
         public DateTime fromDate { get; set; }
         [Required]

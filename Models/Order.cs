@@ -7,8 +7,9 @@ namespace Datawarehouse_Backend.Models
         [Key]
          public long id { get; set; }
          public long orderId { get; set; }
-         public long tennantId { get; set; }
-         public long customerId { get; set; }
+         public Tennant tennant { get; set; }
+         public InvoiceOutbound invoiceOutbound {get; set;}
+         public Customer customer { get; set; }
          public string orderType { get; set; }
          public DateTime orderDate { get; set; }
          public string caseHandler { get; set; }

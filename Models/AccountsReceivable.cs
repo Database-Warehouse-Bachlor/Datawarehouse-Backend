@@ -11,8 +11,8 @@ namespace Datawarehouse_Backend.Models
         public DateTime recordDate { get; set;}
         public DateTime dueDate { get; set;}
         public string recordType { get; set;}
+        public Customer customer { get; set;}
         public string customerName { get; set;}
-        public long customerId { get; set;}
         public double amount { get; set;}
         public double amountDue { get; set;}
         public string overdueNotice { get; set;}

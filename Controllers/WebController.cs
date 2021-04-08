@@ -19,7 +19,7 @@ namespace Datawarehouse_Backend.Controllers
     public class WebController : ControllerBase
     {
 
-        SecurityContext security;
+        //SecurityContext security;
 
         private readonly IConfiguration config;
         private readonly WarehouseContext _warehouseDb;
@@ -35,6 +35,9 @@ namespace Datawarehouse_Backend.Controllers
         //[Authorize]
         [HttpGet("inbound")]
         public List<InvoiceInbound> getInboundInvoice([FromForm] string businessId)
+        [Authorize]
+        [HttpGet("absence")]
+        public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)
         {
             var tennant = _warehouseDb.Tennants
             .Where(t => t.businessId == businessId)
@@ -45,6 +48,14 @@ namespace Datawarehouse_Backend.Controllers
             return inboundInvoices;
             
             
+
+            var tennant = warehouseDb.Tennants.
+            Where(t => t.businessId == businessId)
+            .FirstOrDefault<Tennant>();
+            var absence = warehouseDb.AbsenceRegisters
+            .Where(i => i.employee.tennant == tennant)
+            .ToList();
+            return absence;
 
         }
 
