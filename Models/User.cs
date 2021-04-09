@@ -26,8 +26,7 @@ namespace Datawarehouse_Backend.Models
         [MinLength(4)]
         [MaxLength(255)]
         public string password {get; set;}
-        [Required]
-
+        [ForeignKey("tennant")]
         public long tennantId { get; set; }
         public Tennant tennant { get; set; }
     }

@@ -28,7 +28,7 @@ namespace Datawarehouse_Backend.Authentication
         
         var claims = new[]
         {
-             new Claim(JwtRegisteredClaimNames.Sub,userinfo.tennant.businessId),
+             new Claim(JwtRegisteredClaimNames.Sub,userinfo.tennantId.ToString()),
              new Claim(JwtRegisteredClaimNames.Email,userinfo.Email),
              new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
          };

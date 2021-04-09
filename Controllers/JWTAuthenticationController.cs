@@ -92,7 +92,7 @@ namespace Datawarehouse_Backend.Controllers
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
 
                 User newUser = new User();
-                newUser.tennantId = tennantId;
+                newUser.tennant = tennant;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
 
