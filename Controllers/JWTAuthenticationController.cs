@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Datawarehouse_Backend.Context;
 using System.Security.Cryptography;
-
+using Microsoft.EntityFrameworkCore;
 namespace Datawarehouse_Backend.Controllers
 {
     [Route("auth/")]
@@ -74,9 +74,44 @@ namespace Datawarehouse_Backend.Controllers
         Then hashes and salts the password and stores it in the DB. 
         */
         // TODO: Authorize must be implemented at some point
-        //[Authorize]
+        // TODO: [Authorize]
         [HttpPost("register")]
         public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
+        {
+            IActionResult response;
+            var userCheck = _db.Users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+
+            var tennant = _warehousedb.Tennants
+            .Where(o => o.id == tennantId)
+            .FirstOrDefault<Tennant>();
+            if (userCheck == null && tennant != null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
+
+                User newUser = new User();
+                newUser.tennant = tennant;
+                newUser.Email = email;
+                newUser.password = hashedPassword;
+
+                // Adds and saves changes to the database
+                //_db.Users.Add(newUser);
+                _db.Entry(newUser).State = EntityState.Added;
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
+        }
+
+       // TODO: [Authorize(Roles = "Admin")]
+        [HttpPost("initregister")]
+        public IActionResult initRegister([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
             var userCheck = _db.Users
@@ -107,7 +142,6 @@ namespace Datawarehouse_Backend.Controllers
             }
             return response;
         }
-
 
         [Authorize]
         [HttpGet("users")]
@@ -142,7 +176,7 @@ namespace Datawarehouse_Backend.Controllers
             IList<Claim> claim = identity.Claims.ToList();
             var orgNum = claim[0].Value;
             return orgNum;
-        
+
         }
     }
 
