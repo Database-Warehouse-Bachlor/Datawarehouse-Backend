@@ -70,7 +70,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         // TODO: Authorize must be implemented at some point
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpPost("register")]
         public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
         {
@@ -87,6 +87,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.orgNr = orgnr;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
+                newUser.role = Role.User;
 
                 // Adds and saves changes to the database
                 _db.users.Add(newUser);
@@ -101,7 +102,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public List<User> getAllUsers()
         {
@@ -136,6 +137,9 @@ namespace Datawarehouse_Backend.Controllers
             return orgNum;
         
         }
+
+
+        
     }
 
 }
