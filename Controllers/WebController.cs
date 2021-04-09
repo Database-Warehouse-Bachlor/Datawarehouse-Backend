@@ -35,16 +35,15 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice([FromForm] long tennantId) {
+        public List<InvoiceInbound> getInboundInvoice([FromForm] long tennantId)
+        {
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantId == tennantId)
             .ToList();
             return inboundInvoices;
         }
 
-        
-            
-            
+
         [Authorize]
         [HttpGet("absence")]
         public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)
@@ -58,7 +57,6 @@ namespace Datawarehouse_Backend.Controllers
             return absence;
 
         }
-
     }
 
 

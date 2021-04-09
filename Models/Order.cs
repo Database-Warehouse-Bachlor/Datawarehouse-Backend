@@ -6,11 +6,7 @@ namespace Datawarehouse_Backend.Models
     public class Order {
         [Key]
          public long id { get; set; }
-         public long orderId { get; set; }
-         public Tennant tennant { get; set; }
-         public InvoiceOutbound invoiceOutbound {get; set;}
-         public Customer customer { get; set; }
-         public string orderType { get; set; }
+        /*  public string orderType { get; set; }
          public DateTime orderDate { get; set; }
          public string caseHandler { get; set; }
          public string customerName { get; set; }
@@ -28,7 +24,16 @@ namespace Datawarehouse_Backend.Models
          public double hoursOfWork { get; set; }
          public Boolean hasWarranty { get; set; }
          public DateTime warrantyDate { get; set; }
-         public string description { get; set; }
+         public string description { get; set; } */
+
+         public long tennantId { get; set; }
+         public Tennant tennant { get; set; }
+
+        public long invoiceOutboundId { get; set; }
+        public InvoiceOutbound invoiceOutbound {get; set;}
+
+         public long customerId { get; set; }
+         public Customer customer { get; set; }
 
     }
 }

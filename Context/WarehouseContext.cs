@@ -10,7 +10,7 @@ namespace Datawarehouse_Backend.Context {
 
         // Define database tables
         public DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
-        public DbSet<Accountsreceivable> Accountsreceivables { get; set; }
+        public DbSet<AccountsReceivable> AccountsReceivables { get; set; }
         public DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Employee> Employees { get; set; }

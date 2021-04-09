@@ -12,6 +12,7 @@ namespace Datawarehouse_Backend.Models
          public string businessId { get; set; }
          [Required]
          public string apiKey { get; set; }
+         
          public ICollection<User> users { get; set; } = new List<User>();
          public ICollection<Employee> employees { get; set; } = new List<Employee>();
          public ICollection<InvoiceInbound> invoicesInbound { get; set; } = new List<InvoiceInbound>();
