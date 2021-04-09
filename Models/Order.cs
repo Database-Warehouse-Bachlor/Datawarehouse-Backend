@@ -30,7 +30,7 @@ namespace Datawarehouse_Backend.Models
          public Tennant tennant { get; set; }
 
         public long invoiceOutboundId { get; set; }
-        public InvoiceOutbound invoiceOutbound {get; set;}
+        public virtual InvoiceOutbound invoiceOutbound {get; set;}
 
          public long customerId { get; set; }
          public Customer customer { get; set; }

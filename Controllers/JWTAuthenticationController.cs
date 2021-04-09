@@ -39,7 +39,7 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            var loginUser = _db.users
+            var loginUser = _db.Users
             .Where(e => e.Email == email)
             .FirstOrDefault<User>();
 
@@ -79,7 +79,7 @@ namespace Datawarehouse_Backend.Controllers
         public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
-            var userCheck = _db.users
+            var userCheck = _db.Users
             .Where(e => e.Email == email)
             .FirstOrDefault<User>();
 
@@ -97,7 +97,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.password = hashedPassword;
 
                 // Adds and saves changes to the database
-                _db.users.Add(newUser);
+                _db.Users.Add(newUser);
                 _db.SaveChanges();
                 response = Ok("User created");
             }
@@ -113,7 +113,7 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("users")]
         public List<User> getAllUsers()
         {
-            var users = _db.users.ToList();
+            var users = _db.Users.ToList();
             return users;
             // TODO: Passord må ikke vises
             // TODO: Hvis vi gjør om Users til en relasjon av Organisations/Tennants

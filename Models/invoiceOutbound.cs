@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Datawarehouse_Backend.Models {
 
@@ -15,8 +16,9 @@ namespace Datawarehouse_Backend.Models {
         public double amountIncVat { get; set; }
         public double amountTotal { get; set; } */
 
+        [ForeignKey("order")]
         public long orderId { get; set; }
-        public Order order { get; set; }
+        public virtual Order order { get; set; }
 
         public long customerId { get; set; }
         public Customer customer { get; set; }

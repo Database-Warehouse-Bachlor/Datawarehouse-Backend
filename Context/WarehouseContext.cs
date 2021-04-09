@@ -18,7 +18,7 @@ namespace Datawarehouse_Backend.Context {
         public DbSet<InvoiceOutbound> InvoiceOutbounds { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Tennant> Tennants { get; set; }
-        public DbSet<TimeRegister> timeRegisters { get; set; }
+        public DbSet<TimeRegister> TimeRegisters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }       
     }
 }
