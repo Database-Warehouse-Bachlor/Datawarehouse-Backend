@@ -135,6 +135,7 @@ namespace Datawarehouse_Backend.Controllers
                 errorLog.errorMessage = apiKeyError;
                 errorLog.timeOfError = DateTime.Now;
                 _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
                 Console.WriteLine("API-key er enten tom eller ikke presentert på riktig måte.");
             } else if(business != null) {
                 Console.WriteLine("Tennant found, submitting data...");
