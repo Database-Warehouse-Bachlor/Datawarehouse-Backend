@@ -43,7 +43,6 @@ namespace Datawarehouse_Backend.Controllers
             return inboundInvoices;
         }
 
-
         [Authorize]
         [HttpGet("absence")]
         public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)

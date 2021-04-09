@@ -74,9 +74,9 @@ namespace Datawarehouse_Backend.Controllers
         Then hashes and salts the password and stores it in the DB. 
         */
         // TODO: Authorize must be implemented at some point
-        [Authorize]
+        //[Authorize]
         [HttpPost("register")]
-        public IActionResult register([FromForm] string businessId, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
             var userCheck = _db.users
@@ -84,7 +84,7 @@ namespace Datawarehouse_Backend.Controllers
             .FirstOrDefault<User>();
 
             var tennant = _warehousedb.Tennants
-            .Where(o => o.businessId == businessId)
+            .Where(o => o.id == tennantId)
             .FirstOrDefault<Tennant>();
             if (userCheck == null && tennant != null)
             {
@@ -92,8 +92,7 @@ namespace Datawarehouse_Backend.Controllers
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
 
                 User newUser = new User();
-                Console.WriteLine("Tennant: " + tennant);
-                newUser.tennant = tennant;
+                newUser.tennantId = tennantId;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
 

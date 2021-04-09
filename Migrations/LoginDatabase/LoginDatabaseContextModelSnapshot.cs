@@ -166,7 +166,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<bool>("isInactive")
                         .HasColumnType("boolean");
 
-                    b.Property<long?>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("zipcode")
@@ -174,7 +174,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Customer");
                 });
@@ -269,7 +269,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<long>("supplierId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("wholesalerId")
@@ -277,7 +277,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("InvoiceInbound");
                 });
@@ -540,12 +540,12 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<long>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("users");
                 });
@@ -583,7 +583,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("customers")
-                        .HasForeignKey("tennantid");
+                        .HasForeignKey("tennantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("tennant");
                 });
@@ -601,7 +603,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("invoicesInbound")
-                        .HasForeignKey("tennantid");
+                        .HasForeignKey("tennantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("tennant");
                 });
@@ -651,7 +655,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("users")
-                        .HasForeignKey("tennantid")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

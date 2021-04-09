@@ -166,7 +166,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<bool>("isInactive")
                         .HasColumnType("boolean");
 
-                    b.Property<long?>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("zipcode")
@@ -174,7 +174,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Customers");
                 });
@@ -559,12 +559,12 @@ namespace Datawarehouse_Backend.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<long>("tennantid")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantid");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("User");
                 });
@@ -602,7 +602,9 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("customers")
-                        .HasForeignKey("tennantid");
+                        .HasForeignKey("tennantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("tennant");
                 });
@@ -672,7 +674,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("users")
-                        .HasForeignKey("tennantid")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
