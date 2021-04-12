@@ -48,31 +48,33 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("orders")]
         public List<Order> getAllOrders([FromForm] long tennantId)
         {
-           var orders = _warehouseDb.Orders
-           .Where(o => o.tennantId == tennantId)
-           .ToList();
-           return orders;
+            var orders = _warehouseDb.Orders
+            .Where(o => o.tennantId == tennantId)
+            .ToList();
+            return orders;
         }
 
         [Authorize]
         [HttpGet("customers")]
-        public List<Customer> getCustomers([FromForm] long tennantId) {
+        public List<Customer> getCustomers([FromForm] long tennantId)
+        {
             var customers = _warehouseDb.Customers
             .Where(c => c.tennantId == tennantId)
             .ToList();
             return customers;
         }
-        
+
         [Authorize]
         [HttpGet("balance")]
-        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId) {
+        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId)
+        {
             var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
             .Where(b => b.tennantId == tennantId)
             .ToList();
             return balanceAndBudgets;
         }
 
-        
+
         [Authorize]
         [HttpGet("absence")]
         public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId)
@@ -95,15 +97,22 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("accrecieve")]
-        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId) {
+        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId)
+        {
             var accountsReceivable = _warehouseDb.AccountsReceivables
             .Where(a => a.customerId == customerId)
             .ToList();
             return accountsReceivable;
         }
 
+        [Authorize]
+        [HttpGet("outbound")]
+        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long customerId)
+        {
+            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
+            .Where(a => a.customerId == customerId)
+            .ToList();
+            return invoiceOutbounds;
+        }
     }
-
-
-
 }
