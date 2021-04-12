@@ -56,11 +56,11 @@ namespace Datawarehouse_Backend.Controllers
                 
             if (time == lastThirtyDays)
             {
-                comparisonDate = dateTimeNow.Date.AddDays(-30);
+                comparisonDate = dateTimeNow.Date.AddDays(-30).AddHours(-tempHour);
             }
             else if (time == lastTwelveMonths)
             {
-                comparisonDate = dateTimeNow.Date.AddYears(-1);
+                comparisonDate = dateTimeNow.Date.AddYears(-1).AddHours(-tempHour);
             }
             else if (time == thisMonth)
             {
@@ -68,14 +68,14 @@ namespace Datawarehouse_Backend.Controllers
             }
             else if (time == thisYear)
             {
-                comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1);
+                comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1).AddHours(-tempHour);
             }
             else if (time == thisWeek)
             {
                 comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
                 // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
-                Console.WriteLine(tempWeek + " " + tempHour);
             }
+            Console.WriteLine("Filtering by date: " + comparisonDate);
             return comparisonDate;
         }
 
