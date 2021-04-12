@@ -70,7 +70,7 @@ namespace Datawarehouse_Backend.Controllers
             {
                 int tempWeek = (int)dateTimeNow.DayOfWeek;
                 int tempHour = dateTimeNow.Hour;
-                comparisonDate = dateTimeNow.Date.AddDays(-tempWeek).AddHours(-tempHour);
+                comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
             }
             return comparisonDate;
         }
