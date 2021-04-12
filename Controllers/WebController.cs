@@ -70,7 +70,8 @@ namespace Datawarehouse_Backend.Controllers
             {
                 int tempWeek = (int)dateTimeNow.DayOfWeek;
                 int tempHour = dateTimeNow.Hour;
-                comparisonDate = dateTimeNow.Date.AddDays(-tempWeek).AddHours(-tempHour);
+                Console.WriteLine(tempWeek + " " + tempHour);
+                comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 2).AddHours(-tempHour);
             }
             return comparisonDate;
         }
@@ -156,7 +157,7 @@ namespace Datawarehouse_Backend.Controllers
          }*/
 
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("inbound30")]
         public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string time)
         {
