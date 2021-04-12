@@ -26,6 +26,7 @@ namespace Datawarehouse_Backend.Controllers
     {
 
         //SecurityContext security;
+       // private enum time { lastThirtyDays, lastTwelveMonths, thisMonth, thisYear, thisWeek}
         private string lastThirtyDays = "30";
         private string lastTwelveMonths = "12";
         private string thisMonth = "thisMonth";
@@ -41,11 +42,18 @@ namespace Datawarehouse_Backend.Controllers
             this._warehouseDb = warehouseDb;
             this._db = logindb;
         }
-
+        /*
+        * Consider converting to switch-case if there's more than 5 options needed.
+        */
         private DateTime compareDates(string time)
         {
             DateTime dateTimeNow = DateTime.Now;
             DateTime comparisonDate = dateTimeNow;
+                int tempMonth = dateTimeNow.Month;
+                int tempWeek = (int)dateTimeNow.DayOfWeek;
+                int tempDay = dateTimeNow.Day;
+                int tempHour = dateTimeNow.Hour;
+                
             if (time == lastThirtyDays)
             {
                 comparisonDate = dateTimeNow.Date.AddDays(-30);
@@ -56,20 +64,14 @@ namespace Datawarehouse_Backend.Controllers
             }
             else if (time == thisMonth)
             {
-                int temp = dateTimeNow.Day;
-                int tempHour = dateTimeNow.Hour;
-                comparisonDate = dateTimeNow.Date.AddDays(-temp + 1).AddHours(-tempHour);
+                comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1).AddHours(-tempHour);
             }
             else if (time == thisYear)
             {
-                int tempMonth = dateTimeNow.Month;
-                int tempDays = dateTimeNow.Day;
-                comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDays + 1);
+                comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1);
             }
             else if (time == thisWeek)
             {
-                int tempWeek = (int)dateTimeNow.DayOfWeek;
-                int tempHour = dateTimeNow.Hour;
                 comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
                 // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
                 Console.WriteLine(tempWeek + " " + tempHour);
