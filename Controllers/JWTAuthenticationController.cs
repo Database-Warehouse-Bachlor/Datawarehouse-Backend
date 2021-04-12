@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Identity;
 using Datawarehouse_Backend.Context;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+
+/*
+*This controller is mainly for authenticating users and registering new users.
+*/ 
 namespace Datawarehouse_Backend.Controllers
 {
     [Route("auth/")]

@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
+/*
+* This controller handles API-calls from logged in users on the website. The calls handled by this controller
+* is mainly calls to fetch data from the warehouse, to be displayed in the dashboard of the website.
+*/ 
+
 namespace Datawarehouse_Backend.Controllers
 {
     [Route("web/")]
@@ -33,6 +38,10 @@ namespace Datawarehouse_Backend.Controllers
             this._db = logindb;
         }
 
+        /*
+        * A method to fetch all inbound invoices from a specific tennant.
+        */
+
         [Authorize]
         [HttpGet("inbound")]
         public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId)
@@ -43,6 +52,9 @@ namespace Datawarehouse_Backend.Controllers
             return inboundInvoices;
         }
 
+         /*
+        * A method to fetch all orders from a specific tennant.
+        */
 
         [Authorize]
         [HttpGet("orders")]
@@ -54,6 +66,10 @@ namespace Datawarehouse_Backend.Controllers
             return orders;
         }
 
+         /*
+        * A method to fetch all inbound invoices from a specific tennant.
+        */
+
         [Authorize]
         [HttpGet("customers")]
         public List<Customer> getCustomers([FromForm] long tennantId)
@@ -63,6 +79,10 @@ namespace Datawarehouse_Backend.Controllers
             .ToList();
             return customers;
         }
+
+         /*
+        * A method to fetch all inbound invoices from a specific tennant.
+        */
 
         [Authorize]
         [HttpGet("balance")]
@@ -84,6 +104,34 @@ namespace Datawarehouse_Backend.Controllers
             .ToList();
             return absence;
         }
+
+       /* [Authorize]
+        [HttpGet("absence30")]
+        public List<AbsenceRegister> getAbsenceRegisterLastThirtyDays([FromForm] long tennantId)
+        {
+            DateTime dateTimeNow = DateTime.Now;
+            DateTime comparisonDate = dateTimeNow.Date.AddDays(-30);
+            var absence = _warehouseDb.AbsenceRegisters
+            .Where(i => i.employee.tennantId == tennantId)
+            .Where(d => d.)
+            .ToList();
+            return absence;
+        }*/
+
+        
+        [Authorize]
+        [HttpGet("inbound30")]
+        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId)
+        {
+            DateTime dateTimeNow = DateTime.Now;
+            DateTime comparisonDate = dateTimeNow.Date.AddDays(-30);
+            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            .Where(i => i.tennantId == tennantId)
+            .Where(d => d.invoiceDate >= comparisonDate)
+            .ToList();
+            return inboundInvoices;
+        }
+
 
         [Authorize]
         [HttpGet("timeregister")]

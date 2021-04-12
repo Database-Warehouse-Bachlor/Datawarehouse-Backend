@@ -18,6 +18,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
+/*
+* This controller handles the automated inputs sent from Cordel's systems every night.
+*/ 
 
 namespace Datawarehouse_Backend.Controllers
 {
