@@ -72,6 +72,7 @@ namespace Datawarehouse_Backend.Controllers
                 int tempHour = dateTimeNow.Hour;
                 comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
                 // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
+                Console.WriteLine(tempWeek + " " + tempHour);
             }
             return comparisonDate;
         }
@@ -157,7 +158,7 @@ namespace Datawarehouse_Backend.Controllers
          }*/
 
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("inbound30")]
         public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string time)
         {
