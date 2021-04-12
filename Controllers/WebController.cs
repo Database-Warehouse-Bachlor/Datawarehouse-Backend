@@ -71,6 +71,7 @@ namespace Datawarehouse_Backend.Controllers
                 int tempWeek = (int)dateTimeNow.DayOfWeek;
                 int tempHour = dateTimeNow.Hour;
                 comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
+                // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
             }
             return comparisonDate;
         }
