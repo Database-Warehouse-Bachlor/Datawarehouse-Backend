@@ -33,9 +33,9 @@ namespace Datawarehouse_Backend.Controllers
             this._db = logindb;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getInboundInvoice([FromForm] long tennantId)
+        public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId)
         {
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantId == tennantId)
@@ -43,19 +43,65 @@ namespace Datawarehouse_Backend.Controllers
             return inboundInvoices;
         }
 
+
+        [Authorize]
+        [HttpGet("orders")]
+        public List<Order> getAllOrders([FromForm] long tennantId)
+        {
+           var orders = _warehouseDb.Orders
+           .Where(o => o.tennantId == tennantId)
+           .ToList();
+           return orders;
+        }
+
+        [Authorize]
+        [HttpGet("customers")]
+        public List<Customer> getCustomers([FromForm] long tennantId) {
+            var customers = _warehouseDb.Customers
+            .Where(c => c.tennantId == tennantId)
+            .ToList();
+            return customers;
+        }
+        
+        [Authorize]
+        [HttpGet("balance")]
+        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId) {
+            var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
+            .Where(b => b.tennantId == tennantId)
+            .ToList();
+            return balanceAndBudgets;
+        }
+
+        
         [Authorize]
         [HttpGet("absence")]
-        public List<AbsenceRegister> getAbsenceRegister([FromForm] string businessId)
+        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId)
         {
-            var tennant = _warehouseDb.Tennants.
-            Where(t => t.businessId == businessId)
-            .FirstOrDefault<Tennant>();
             var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennant == tennant)
+            .Where(i => i.employee.tennantId == tennantId)
             .ToList();
             return absence;
-
         }
+
+        [Authorize]
+        [HttpGet("timeregister")]
+        public List<TimeRegister> getTimeRegisters([FromForm] long tennantId)
+        {
+            var timeRegisters = _warehouseDb.TimeRegisters
+            .Where(t => t.employee.tennantId == tennantId)
+            .ToList();
+            return timeRegisters;
+        }
+
+        [Authorize]
+        [HttpGet("accrecieve")]
+        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId) {
+            var accountsReceivable = _warehouseDb.AccountsReceivables
+            .Where(a => a.customerId == customerId)
+            .ToList();
+            return accountsReceivable;
+        }
+
     }
 
 
