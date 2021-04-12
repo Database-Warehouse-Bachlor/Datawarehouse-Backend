@@ -26,7 +26,8 @@ namespace Datawarehouse_Backend.Controllers
     {
 
         //SecurityContext security;
-
+        private string lastThirtyDays = "30";
+        private string lastTwelveMonths = "12";
         private readonly IConfiguration config;
         private readonly WarehouseContext _warehouseDb;
         private readonly LoginDatabaseContext _db;
@@ -36,6 +37,17 @@ namespace Datawarehouse_Backend.Controllers
             this.config = config;
             this._warehouseDb = warehouseDb;
             this._db = logindb;
+        }
+
+        private DateTime compareDates(string time) {
+            DateTime dateTimeNow = DateTime.Now;
+            DateTime comparisonDate = dateTimeNow;
+            if(time == lastThirtyDays) {
+            comparisonDate = dateTimeNow.Date.AddDays(-30);
+            } else if(time == lastTwelveMonths){
+            comparisonDate = dateTimeNow.Date.AddYears(-1);
+            }
+            return comparisonDate;
         }
 
         /*
@@ -121,13 +133,13 @@ namespace Datawarehouse_Backend.Controllers
         
         [Authorize]
         [HttpGet("inbound30")]
-        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId)
+        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string time)
         {
-            DateTime dateTimeNow = DateTime.Now;
-            DateTime comparisonDate = dateTimeNow.Date.AddDays(-30);
+            DateTime comparisonDate = compareDates(time);
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantId == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
+            .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return inboundInvoices;
         }
