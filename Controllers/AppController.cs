@@ -1,13 +1,18 @@
 using System;
 using System.Linq;
 using Datawarehouse_Backend.Context;
+using Datawarehouse_Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
-namespace Datawarehouse_Backend.Controllers {
-    
+namespace Datawarehouse_Backend.Controllers
+{
+
     [Route("app/")]
     [ApiController]
-    public class AppController : ControllerBase {
+    public class AppController : ControllerBase
+    {
 
         public readonly WarehouseContext _warehouseDb;
 
@@ -16,26 +21,36 @@ namespace Datawarehouse_Backend.Controllers {
             _warehouseDb = warehouseDb;
         }
 
+        // [Authorize]
         [HttpGet("homeinfo")]
-        public IActionResult getNumberOfTennantsAndLog() {
-            IActionResult response; 
+        public IActionResult getNumberOfTennantsAndErrorsAsJson()
+        {
+            IActionResult response;
 
-            response = Ok();
+            AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
+
+            appInfoHomeMenu.numberOfTennants = getNumberOfTennants();
+            appInfoHomeMenu.numberOfErrors = getNumberOfErrors(); 
+            
+            var dataToJson = JsonConvert.SerializeObject(appInfoHomeMenu);
+            
+            response = Ok(dataToJson);
+
             return response;
-        } 
+        }
 
-        public int getNumberOfTennants() {
+        public int getNumberOfTennants()
+        {
             var numberOfTennants = _warehouseDb.Tennants
             .Count();
-            Console.WriteLine(numberOfTennants);
             return numberOfTennants;
         }
-        public int getNumOfErrors() {
+        public int getNumberOfErrors()
+        {
             var numberOfErrors = _warehouseDb.ErrorLogs
             .Count();
-            Console.WriteLine(numberOfErrors);
             return numberOfErrors;
         }
-    
+
     }
 }
