@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.Warehouse
+namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20210409103000_initMigration")]
-    partial class initMigration
+    [Migration("20210413090729_switch")]
+    partial class @switch
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,6 +30,12 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("fromDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("toDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
 
@@ -135,6 +141,9 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("invoiceDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
@@ -154,6 +163,9 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.Property<long>("customerId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("invoiceDue")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<long>("orderId")
                         .HasColumnType("bigint");

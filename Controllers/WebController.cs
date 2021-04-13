@@ -26,12 +26,12 @@ namespace Datawarehouse_Backend.Controllers
     {
 
         //SecurityContext security;
-       // private enum time { lastThirtyDays, lastTwelveMonths, thisMonth, thisYear, thisWeek}
-        private string lastThirtyDays = "30";
+        // private enum time { lastThirtyDays, lastTwelveMonths, thisMonth, thisYear, thisWeek}
+   /*      private string lastThirtyDays = "30";
         private string lastTwelveMonths = "12";
         private string thisMonth = "thisMonth";
         private string thisYear = "thisYear";
-        private string thisWeek = "thisWeek";
+        private string thisWeek = "thisWeek"; */
         private readonly IConfiguration config;
         private readonly WarehouseContext _warehouseDb;
         private readonly LoginDatabaseContext _db;
@@ -43,41 +43,43 @@ namespace Datawarehouse_Backend.Controllers
             this._db = logindb;
         }
         /*
-        * Consider converting to switch-case if there's more than 5 options needed.
+        * Sets the filter to a pre-defined option based on what's requested, if no option is specified, all will be selected.
+        * When modifying days, years or months, the timer for that day will allways be set to 00:00:00, so there is no need to
+        * remove the hours aswell.
         */
         private DateTime compareDates(string time)
         {
             DateTime dateTimeNow = DateTime.Now;
             DateTime comparisonDate = dateTimeNow;
-                int tempMonth = dateTimeNow.Month;
-                int tempWeek = (int)dateTimeNow.DayOfWeek;
-                int tempDay = dateTimeNow.Day;
-                int tempHour = dateTimeNow.Hour;
-                
-            if (time == lastThirtyDays)
+            int tempMonth = dateTimeNow.Month;
+            int tempWeek = (int)dateTimeNow.DayOfWeek;
+            int tempDay = dateTimeNow.Day;
+
+            switch (time)
             {
-                comparisonDate = dateTimeNow.Date.AddDays(-30).AddHours(-tempHour);
+                case "lastThirtyDays":
+                    comparisonDate = dateTimeNow.Date.AddDays(-30);//.AddHours(-tempHour);
+                    break;
+                case "lastTwelveMonths":
+                    comparisonDate = dateTimeNow.Date.AddYears(-1); //.AddHours(-tempHour);
+                    break;
+                case "thisMonth":
+                    comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1); //.AddHours(-tempHour);
+                    break;
+                case "thisYear":
+                    comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1); //.AddHours(-tempHour);
+                    break;
+                case "thisWeek":
+                    comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1); //.AddHours(-tempHour);
+                    break;
+                default:
+                    Console.WriteLine("No filter added, listing all..");
+                    comparisonDate = dateTimeNow.Date.AddYears(-30);
+                    break;
             }
-            else if (time == lastTwelveMonths)
-            {
-                comparisonDate = dateTimeNow.Date.AddYears(-1).AddHours(-tempHour);
-            }
-            else if (time == thisMonth)
-            {
-                comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1).AddHours(-tempHour);
-            }
-            else if (time == thisYear)
-            {
-                comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1).AddHours(-tempHour);
-            }
-            else if (time == thisWeek)
-            {
-                comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
-                // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
-            } else {
-                comparisonDate = dateTimeNow.Date.AddYears(-30);
-            }
-            Console.WriteLine("Filtering by date: " + comparisonDate);
+            Console.WriteLine("Filter selected: " +time);
+            Console.WriteLine("current date: " +dateTimeNow);
+            Console.WriteLine("Filtering by: " +comparisonDate);
             return comparisonDate;
         }
 
@@ -85,7 +87,7 @@ namespace Datawarehouse_Backend.Controllers
         * A method to fetch all inbound invoices from a specific tennant.
         */
 
-        [Authorize]
+       // [Authorize]
         [HttpGet("inbound")]
         public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId, [FromForm] string filter)
         {
@@ -98,17 +100,46 @@ namespace Datawarehouse_Backend.Controllers
             return inboundInvoices;
         }
 
-        [Authorize]
+        /*
+        * Getting invoice outbound based on it's duedate and filter given.
+        */
+       // [Authorize]
         [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long customerId, [FromForm] string filter)
+        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long tennantId, [FromForm] string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customerId == customerId)
-            //.Where(d => d.invoiceDate >= comparisonDate)
-           // .OrderByDescending(d => d.invoiceDate)
+            .Where(a => a.customer.tennantId == tennantId)
+            .Where(d => d.invoiceDue >= comparisonDate)
+            .OrderByDescending(d => d.invoiceDue)
             .ToList();
             return invoiceOutbounds;
+        }
+
+        [Authorize]
+        [HttpGet("absence")]
+        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
+        {
+            DateTime comparisonDate = compareDates(filter);
+            var absence = _warehouseDb.AbsenceRegisters
+            .Where(i => i.employee.tennantId == tennantId)
+            .Where(d => d.fromDate >= comparisonDate)
+            .OrderByDescending(d => d.fromDate)
+            .ToList();
+            return absence;
+        }
+
+        [Authorize]
+        [HttpGet("timeregister")]
+        public List<TimeRegister> getTimeRegisters([FromForm] long tennantId, [FromForm] string filter)
+        {
+            DateTime comparisonDate = compareDates(filter);
+            var timeRegisters = _warehouseDb.TimeRegisters
+            .Where(t => t.employee.tennantId == tennantId)
+            .Where(d => d.recordDate >= comparisonDate)
+            .OrderByDescending(d => d.recordDate)
+            .ToList();
+            return timeRegisters;
         }
         /*
        * A method to fetch all orders from a specific tennant.
@@ -121,7 +152,7 @@ namespace Datawarehouse_Backend.Controllers
             DateTime comparisonDate = compareDates(filter);
             var orders = _warehouseDb.Orders
             .Where(o => o.tennantId == tennantId)
-           // .Where(d => d.invoiceDate >= comparisonDate)
+            // .Where(d => d.invoiceDate >= comparisonDate)
             //.OrderByDescending(d => d.invoiceDate)
             .ToList();
             return orders;
@@ -139,7 +170,7 @@ namespace Datawarehouse_Backend.Controllers
             var customers = _warehouseDb.Customers
             .Where(c => c.tennantId == tennantId)
             //.Where(d => d.invoiceDate >= comparisonDate)
-           // .OrderByDescending(d => d.invoiceDate)
+            // .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return customers;
         }
@@ -156,48 +187,11 @@ namespace Datawarehouse_Backend.Controllers
             var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
             .Where(b => b.tennantId == tennantId)
             //.Where(d => d.invoiceDate >= comparisonDate)
-           // .OrderByDescending(d => d.invoiceDate)
+            // .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return balanceAndBudgets;
         }
 
-
-        [Authorize]
-        [HttpGet("absence")]
-        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
-        {
-            DateTime comparisonDate = compareDates(filter);
-            var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennantId == tennantId)
-            //.Where(d => d.invoiceDate >= comparisonDate)
-          //  .OrderByDescending(d => d.invoiceDate)
-            .ToList();
-            return absence;
-        }
-
-        /*//[Authorize]
-        [HttpGet("inbound30")]
-        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string filter)
-        {
-            DateTime comparisonDate = compareDates(filter);
-            var inboundInvoices = _warehouseDb.InvoiceInbounds
-            .Where(i => i.tennantId == tennantId)
-            .Where(d => d.invoiceDate >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDate)
-            .ToList();
-            return inboundInvoices;
-        } */
-
-
-        [Authorize]
-        [HttpGet("timeregister")]
-        public List<TimeRegister> getTimeRegisters([FromForm] long tennantId, [FromForm] string filter)
-        {
-            var timeRegisters = _warehouseDb.TimeRegisters
-            .Where(t => t.employee.tennantId == tennantId)
-            .ToList();
-            return timeRegisters;
-        }
 
         [Authorize]
         [HttpGet("accrecieve")]

@@ -6,12 +6,12 @@ namespace Datawarehouse_Backend.Models
     public class TimeRegister {
         [Key]
          public long id { get; set; }
+         public DateTime recordDate { get; set; }
         /*  public Boolean isCaseworker { get; set; }
          public string personName { get; set; }
          public string personDepartment { get; set; }
          public string personDepartmentName { get; set; }
          public int year { get; set; }
-         public DateTime recordDate { get; set; }
          public string recordDepartment { get; set; }
          public string recordDepartmentName { get; set; }
          public string payType { get; set; }
