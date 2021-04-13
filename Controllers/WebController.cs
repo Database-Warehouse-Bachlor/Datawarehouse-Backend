@@ -74,6 +74,8 @@ namespace Datawarehouse_Backend.Controllers
             {
                 comparisonDate = dateTimeNow.Date.AddDays(-tempWeek+2).AddHours(-tempHour);
                 // Add +2 because +1 since metadata starts on sunday, and another +1 because we subtract all the days.
+            } else {
+                comparisonDate = dateTimeNow.Date.AddYears(-30);
             }
             Console.WriteLine("Filtering by date: " + comparisonDate);
             return comparisonDate;
@@ -85,24 +87,42 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId)
+        public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId, [FromForm] string filter)
         {
+            DateTime comparisonDate = compareDates(filter);
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantId == tennantId)
+            .Where(d => d.invoiceDate >= comparisonDate)
+            .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return inboundInvoices;
         }
 
+        [Authorize]
+        [HttpGet("outbound")]
+        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long customerId, [FromForm] string filter)
+        {
+            DateTime comparisonDate = compareDates(filter);
+            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
+            .Where(a => a.customerId == customerId)
+            //.Where(d => d.invoiceDate >= comparisonDate)
+           // .OrderByDescending(d => d.invoiceDate)
+            .ToList();
+            return invoiceOutbounds;
+        }
         /*
        * A method to fetch all orders from a specific tennant.
        */
 
         [Authorize]
         [HttpGet("orders")]
-        public List<Order> getAllOrders([FromForm] long tennantId)
+        public List<Order> getAllOrders([FromForm] long tennantId, [FromForm] string filter)
         {
+            DateTime comparisonDate = compareDates(filter);
             var orders = _warehouseDb.Orders
             .Where(o => o.tennantId == tennantId)
+           // .Where(d => d.invoiceDate >= comparisonDate)
+            //.OrderByDescending(d => d.invoiceDate)
             .ToList();
             return orders;
         }
@@ -113,10 +133,13 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("customers")]
-        public List<Customer> getCustomers([FromForm] long tennantId)
+        public List<Customer> getCustomers([FromForm] long tennantId, [FromForm] string filter)
         {
+            DateTime comparisonDate = compareDates(filter);
             var customers = _warehouseDb.Customers
             .Where(c => c.tennantId == tennantId)
+            //.Where(d => d.invoiceDate >= comparisonDate)
+           // .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return customers;
         }
@@ -127,10 +150,13 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("balance")]
-        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId)
+        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId, [FromForm] string filter)
         {
+            DateTime comparisonDate = compareDates(filter);
             var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
             .Where(b => b.tennantId == tennantId)
+            //.Where(d => d.invoiceDate >= comparisonDate)
+           // .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return balanceAndBudgets;
         }
@@ -138,45 +164,34 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("absence")]
-        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId)
+        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
         {
+            DateTime comparisonDate = compareDates(filter);
             var absence = _warehouseDb.AbsenceRegisters
             .Where(i => i.employee.tennantId == tennantId)
+            //.Where(d => d.invoiceDate >= comparisonDate)
+          //  .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return absence;
         }
 
-        /* [Authorize]
-         [HttpGet("absence30")]
-         public List<AbsenceRegister> getAbsenceRegisterLastThirtyDays([FromForm] long tennantId)
-         {
-             DateTime dateTimeNow = DateTime.Now;
-             DateTime comparisonDate = dateTimeNow.Date.AddDays(-30);
-             var absence = _warehouseDb.AbsenceRegisters
-             .Where(i => i.employee.tennantId == tennantId)
-             .Where(d => d.)
-             .ToList();
-             return absence;
-         }*/
-
-
-        //[Authorize]
+        /*//[Authorize]
         [HttpGet("inbound30")]
-        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string time)
+        public List<InvoiceInbound> getAllInboundInvoiceLastThirtyDays([FromForm] long tennantId, [FromForm] string filter)
         {
-            DateTime comparisonDate = compareDates(time);
+            DateTime comparisonDate = compareDates(filter);
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantId == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return inboundInvoices;
-        }
+        } */
 
 
         [Authorize]
         [HttpGet("timeregister")]
-        public List<TimeRegister> getTimeRegisters([FromForm] long tennantId)
+        public List<TimeRegister> getTimeRegisters([FromForm] long tennantId, [FromForm] string filter)
         {
             var timeRegisters = _warehouseDb.TimeRegisters
             .Where(t => t.employee.tennantId == tennantId)
@@ -186,7 +201,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("accrecieve")]
-        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId)
+        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId, [FromForm] string filter)
         {
             var accountsReceivable = _warehouseDb.AccountsReceivables
             .Where(a => a.customerId == customerId)
@@ -194,14 +209,5 @@ namespace Datawarehouse_Backend.Controllers
             return accountsReceivable;
         }
 
-        [Authorize]
-        [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long customerId)
-        {
-            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customerId == customerId)
-            .ToList();
-            return invoiceOutbounds;
-        }
     }
 }
