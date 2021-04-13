@@ -25,7 +25,6 @@ namespace Datawarehouse_Backend.Models
         [Required]
         //public string abcenseTypeText { get; set; }
         //public string comment { get; set; }
-
         public string degreeDisability { get; set; }
 
     }
