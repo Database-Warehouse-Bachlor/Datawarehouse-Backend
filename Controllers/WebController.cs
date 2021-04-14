@@ -25,14 +25,6 @@ namespace Datawarehouse_Backend.Controllers
 
     public class WebController : ControllerBase
     {
-
-        //SecurityContext security;
-        // private enum time { lastThirtyDays, lastTwelveMonths, thisMonth, thisYear, thisWeek}
-   /*      private string lastThirtyDays = "30";
-        private string lastTwelveMonths = "12";
-        private string thisMonth = "thisMonth";
-        private string thisYear = "thisYear";
-        private string thisWeek = "thisWeek"; */
         private readonly IConfiguration config;
         private readonly WarehouseContext _warehouseDb;
         private readonly LoginDatabaseContext _db;
@@ -59,19 +51,19 @@ namespace Datawarehouse_Backend.Controllers
             switch (time)
             {
                 case "lastThirtyDays":
-                    comparisonDate = dateTimeNow.Date.AddDays(-30);//.AddHours(-tempHour);
+                    comparisonDate = dateTimeNow.Date.AddDays(-30);
                     break;
                 case "lastTwelveMonths":
-                    comparisonDate = dateTimeNow.Date.AddYears(-1); //.AddHours(-tempHour);
+                    comparisonDate = dateTimeNow.Date.AddYears(-1);
                     break;
                 case "thisMonth":
-                    comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1); //.AddHours(-tempHour);
+                    comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1);
                     break;
                 case "thisYear":
-                    comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1); //.AddHours(-tempHour);
+                    comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1);
                     break;
                 case "thisWeek":
-                    comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1); //.AddHours(-tempHour);
+                    comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1);
                     break;
                 default:
                     Console.WriteLine("No filter added, listing all..");
@@ -130,19 +122,24 @@ namespace Datawarehouse_Backend.Controllers
             
             Console.WriteLine("Number of objects found: " + absence.Count);
             List<AbsenceView> absenceViews = new List<AbsenceView>();
-            double totalAbsence = 0;  
+            double totalAbsence = 0; 
+
+            /*
+            *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
+            *  only tracks year, month and total absence for that month. 
+            *  So instead of getting a list of all absences, it gives a list of total absences per month.
+            */
             try{
             for(int i = 0; i < absence.Count; i++) {
                 Console.WriteLine("i value: " + i);
                 if(i != absence.Count -1) {
-                if(absence[i].fromDate.Month == absence[i+1].fromDate.Month){ //if current month
+                if(absence[i].fromDate.Month == absence[i+1].fromDate.Month){ //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
                     totalAbsence += absence[i].duration;
                     Console.WriteLine("Adding days.." + "\nCurrent total: "+ totalAbsence);
                     Console.WriteLine("Next absence is: " +absence[i+1].id);
                 } 
-                else { // absence.next is either != same month or null.
+                else { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
                     totalAbsence += absence[i].duration;
-                    Console.WriteLine("IM HERE!");
                     AbsenceView view = new AbsenceView();
                     view.year = absence[i].fromDate.Year;
                     view.month = absence[i].fromDate.Month;
@@ -152,9 +149,8 @@ namespace Datawarehouse_Backend.Controllers
                     absenceViews.Add(view);
                     totalAbsence = 0;
                 }
-                } else if(absence[i].fromDate.Month == absence[i-1].fromDate.Month){ //last absence has the same month as the one previously
+                } else if(absence[i].fromDate.Month == absence[i-1].fromDate.Month){ //last absence has the same month as the one previously added absence
                     totalAbsence += absence[i].duration;
-                    Console.WriteLine("IM HERE!");
                     AbsenceView view = new AbsenceView();
                     view.year = absence[i].fromDate.Year;
                     view.month = absence[i].fromDate.Month;
@@ -165,7 +161,6 @@ namespace Datawarehouse_Backend.Controllers
                     totalAbsence = 0;
                 } else { //last absence is in a new month
                     totalAbsence += absence[i].duration;
-                    Console.WriteLine("IM HERE!");
                     AbsenceView view = new AbsenceView();
                     view.year = absence[i].fromDate.Year;
                     view.month = absence[i].fromDate.Month;
