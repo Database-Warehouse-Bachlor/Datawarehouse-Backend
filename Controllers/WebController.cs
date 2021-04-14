@@ -7,6 +7,7 @@ using System.Security;
 using System.Security.Claims;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Models;
+using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -116,17 +117,69 @@ namespace Datawarehouse_Backend.Controllers
             return invoiceOutbounds;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("absence")]
-        public List<AbsenceRegister> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
+        public List<AbsenceView> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             var absence = _warehouseDb.AbsenceRegisters
             .Where(i => i.employee.tennantId == tennantId)
             .Where(d => d.fromDate >= comparisonDate)
-            .OrderByDescending(d => d.fromDate)
+            .OrderBy(d => d.fromDate)
             .ToList();
-            return absence;
+            
+            Console.WriteLine("Number of objects found: " + absence.Count);
+            List<AbsenceView> absenceViews = new List<AbsenceView>();
+            double totalAbsence = 0;  
+            try{
+            for(int i = 0; i < absence.Count; i++) {
+                Console.WriteLine("i value: " + i);
+                if(i != absence.Count -1) {
+                if(absence[i].fromDate.Month == absence[i+1].fromDate.Month){ //if current month
+                    totalAbsence += absence[i].duration;
+                    Console.WriteLine("Adding days.." + "\nCurrent total: "+ totalAbsence);
+                    Console.WriteLine("Next absence is: " +absence[i+1].id);
+                } 
+                else { // absence.next is either != same month or null.
+                    totalAbsence += absence[i].duration;
+                    Console.WriteLine("IM HERE!");
+                    AbsenceView view = new AbsenceView();
+                    view.year = absence[i].fromDate.Year;
+                    view.month = absence[i].fromDate.Month;
+                    view.totalDuration = totalAbsence;
+                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
+                    Console.WriteLine("Total Duration: " +view.totalDuration);
+                    absenceViews.Add(view);
+                    totalAbsence = 0;
+                }
+                } else if(absence[i].fromDate.Month == absence[i-1].fromDate.Month){ //last absence has the same month as the one previously
+                    totalAbsence += absence[i].duration;
+                    Console.WriteLine("IM HERE!");
+                    AbsenceView view = new AbsenceView();
+                    view.year = absence[i].fromDate.Year;
+                    view.month = absence[i].fromDate.Month;
+                    view.totalDuration = totalAbsence;
+                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
+                    Console.WriteLine("Total Duration: " +view.totalDuration);
+                    absenceViews.Add(view);
+                    totalAbsence = 0;
+                } else { //last absence is in a new month
+                    totalAbsence += absence[i].duration;
+                    Console.WriteLine("IM HERE!");
+                    AbsenceView view = new AbsenceView();
+                    view.year = absence[i].fromDate.Year;
+                    view.month = absence[i].fromDate.Month;
+                    view.totalDuration = absence[i].duration;
+                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
+                    Console.WriteLine("Total Duration: " +view.totalDuration);
+                    absenceViews.Add(view);
+                    totalAbsence = 0;
+                }
+            }
+        }catch (Exception e) {
+            Console.WriteLine("Error: " +e);
+        }
+        return absenceViews;
         }
 
         [Authorize]
