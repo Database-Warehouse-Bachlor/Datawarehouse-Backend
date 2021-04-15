@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Models;
@@ -22,7 +23,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         // [Authorize]
-        [HttpGet("homeinfo")]
+        [HttpPost("homeinfo")]
         public IActionResult getNumberOfTennantsAndErrorsAsJson()
         {
             IActionResult response;
@@ -30,7 +31,7 @@ namespace Datawarehouse_Backend.Controllers
             AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
 
             appInfoHomeMenu.numberOfTennants = getNumberOfTennants();
-            appInfoHomeMenu.numberOfErrors = getNumberOfErrors(); 
+            appInfoHomeMenu.numberOfErrors = getNumberOfErrorsLastTwentyFour(); 
             
             var dataToJson = JsonConvert.SerializeObject(appInfoHomeMenu);
             
@@ -39,15 +40,25 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
+        //[Authorize(Roles = "Admin")]
+        [HttpPost("tennants")]
+        public List<Tennant> getAllTennants() {
+            var tennants = _warehouseDb.Tennants
+            .ToList();
+            return tennants;
+        }
+
         public int getNumberOfTennants()
         {
             var numberOfTennants = _warehouseDb.Tennants
             .Count();
             return numberOfTennants;
         }
-        public int getNumberOfErrors()
+        public int getNumberOfErrorsLastTwentyFour()
         {
+            DateTime currentTime = DateTime.Now;
             var numberOfErrors = _warehouseDb.ErrorLogs
+            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
             .Count();
             return numberOfErrors;
         }
