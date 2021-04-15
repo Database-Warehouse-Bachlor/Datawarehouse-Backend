@@ -68,6 +68,9 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Customer customer = new Customer();
                         customer = contentsList.Customer[i];
+
+                        long custumerFK = addCustomer(customer, tennantId);
+
                         customer.tennantFK = tennantId;
                         _db.Customers.Add(customer);
                     }
@@ -316,6 +319,32 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
+        private long addCustomer(Customer customer, long tennantFK) {
 
+            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
+            ErrorLog errorLog = new ErrorLog();
+            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
+            Customer databaseCustomer  = _db.Customers.Where(c => c.tennantId == customer.tennantId).FirstOrDefault<Customer>();
+            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
+            if (databaseCustomer == null)
+            {
+                Customer customer1 = new Customer();
+                customer1 = customer;
+                _db.Customers.Add(customer1);
+
+                _db.SaveChanges();
+
+                Console.WriteLine(customer1.tennantFK);
+                return customer1.tennantFK;
+
+            }
+
+
+
+            return 0;
+        }
     }
+
+    
+
 }

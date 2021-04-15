@@ -16,6 +16,8 @@ namespace Datawarehouse_Backend.Models
         public Boolean isInactive {get; set;} 
 
         public long tennantId { get; set; }
+        public long tennantFK { get; set; }
+
         public Tennant tennant {get; set;}
 
         public ICollection<InvoiceOutbound> invoicesOutbound { get; set; } = new List<InvoiceOutbound>();
