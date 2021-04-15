@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations
+namespace Datawarehouse_Backend.Migrations.Warehouse
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20210414073959_absenceTest")]
-    partial class absenceTest
+    [Migration("20210415084456_UserRoleFieldNew")]
+    partial class UserRoleFieldNew
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -267,6 +267,9 @@ namespace Datawarehouse_Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("role")
+                        .HasColumnType("text");
 
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
