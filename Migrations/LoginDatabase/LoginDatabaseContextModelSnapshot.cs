@@ -244,6 +244,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("role")
+                        .HasColumnType("text");
+
                     b.HasKey("id");
 
                     b.HasIndex("tennantId");
