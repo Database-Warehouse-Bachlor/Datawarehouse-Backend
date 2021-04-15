@@ -70,9 +70,9 @@ namespace Datawarehouse_Backend.Controllers
                     comparisonDate = dateTimeNow.Date.AddYears(-30);
                     break;
             }
-            Console.WriteLine("Filter selected: " +time);
-            Console.WriteLine("current date: " +dateTimeNow);
-            Console.WriteLine("Filtering by: " +comparisonDate);
+            Console.WriteLine("Filter selected: " + time);
+            Console.WriteLine("current date: " + dateTimeNow);
+            Console.WriteLine("Filtering by: " + comparisonDate);
             return comparisonDate;
         }
 
@@ -80,7 +80,7 @@ namespace Datawarehouse_Backend.Controllers
         * A method to fetch all inbound invoices from a specific tennant.
         */
 
-       // [Authorize]
+        // [Authorize]
         [HttpGet("inbound")]
         public List<InvoiceInbound> getAllInboundInvoice([FromForm] long tennantId, [FromForm] string filter)
         {
@@ -96,7 +96,7 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * Getting invoice outbound based on it's duedate and filter given.
         */
-       // [Authorize]
+        // [Authorize]
         [HttpGet("outbound")]
         public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long tennantId, [FromForm] string filter)
         {
@@ -119,62 +119,70 @@ namespace Datawarehouse_Backend.Controllers
             .Where(d => d.fromDate >= comparisonDate)
             .OrderBy(d => d.fromDate)
             .ToList();
-            
+
             Console.WriteLine("Number of objects found: " + absence.Count);
             List<AbsenceView> absenceViews = new List<AbsenceView>();
-            double totalAbsence = 0; 
+            double totalAbsence = 0;
 
             /*
             *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
             *  only tracks year, month and total absence for that month. 
             *  So instead of getting a list of all absences, it gives a list of total absences per month.
             */
-            try{
-            for(int i = 0; i < absence.Count; i++) {
-                Console.WriteLine("i value: " + i);
-                if(i != absence.Count -1) {
-                if(absence[i].fromDate.Month == absence[i+1].fromDate.Month){ //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
-                    totalAbsence += absence[i].duration;
-                    Console.WriteLine("Adding days.." + "\nCurrent total: "+ totalAbsence);
-                    Console.WriteLine("Next absence is: " +absence[i+1].id);
-                } 
-                else { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
-                    totalAbsence += absence[i].duration;
-                    AbsenceView view = new AbsenceView();
-                    view.year = absence[i].fromDate.Year;
-                    view.month = absence[i].fromDate.Month;
-                    view.totalDuration = totalAbsence;
-                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
-                    Console.WriteLine("Total Duration: " +view.totalDuration);
-                    absenceViews.Add(view);
-                    totalAbsence = 0;
-                }
-                } else if(absence[i].fromDate.Month == absence[i-1].fromDate.Month){ //last absence has the same month as the one previously added absence
-                    totalAbsence += absence[i].duration;
-                    AbsenceView view = new AbsenceView();
-                    view.year = absence[i].fromDate.Year;
-                    view.month = absence[i].fromDate.Month;
-                    view.totalDuration = totalAbsence;
-                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
-                    Console.WriteLine("Total Duration: " +view.totalDuration);
-                    absenceViews.Add(view);
-                    totalAbsence = 0;
-                } else { //last absence is in a new month
-                    totalAbsence += absence[i].duration;
-                    AbsenceView view = new AbsenceView();
-                    view.year = absence[i].fromDate.Year;
-                    view.month = absence[i].fromDate.Month;
-                    view.totalDuration = absence[i].duration;
-                    Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year);
-                    Console.WriteLine("Total Duration: " +view.totalDuration);
-                    absenceViews.Add(view);
-                    totalAbsence = 0;
+            try
+            {
+                for (int i = 0; i < absence.Count; i++)
+                {
+                    Console.WriteLine("i value: " + i);
+                    if (i != absence.Count - 1)
+                    {
+                        if (absence[i].fromDate.Month == absence[i + 1].fromDate.Month)
+                        { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
+                            totalAbsence += absence[i].duration;
+                            Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
+                            Console.WriteLine("Next absence is: " + absence[i + 1].id);
+                        }
+                        else
+                        { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
+                            totalAbsence += absence[i].duration;
+                            AbsenceView view = new AbsenceView();
+                            view.year = absence[i].fromDate.Year;
+                            view.month = absence[i].fromDate.Month;
+                            view.totalDuration = totalAbsence;
+                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            absenceViews.Add(view);
+                            totalAbsence = 0;
+                        }
+                    }
+                    else if (absence[i].fromDate.Month == absence[i - 1].fromDate.Month)
+                    { //last absence has the same month as the one previously added absence
+                        totalAbsence += absence[i].duration;
+                        AbsenceView view = new AbsenceView();
+                        view.year = absence[i].fromDate.Year;
+                        view.month = absence[i].fromDate.Month;
+                        view.totalDuration = totalAbsence;
+                        Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                        absenceViews.Add(view);
+                        totalAbsence = 0;
+                    }
+                    else
+                    { //last absence is in a new month
+                        totalAbsence += absence[i].duration;
+                        AbsenceView view = new AbsenceView();
+                        view.year = absence[i].fromDate.Year;
+                        view.month = absence[i].fromDate.Month;
+                        view.totalDuration = absence[i].duration;
+                        Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                        absenceViews.Add(view);
+                        totalAbsence = 0;
+                    }
                 }
             }
-        }catch (Exception e) {
-            Console.WriteLine("Error: " +e);
-        }
-        return absenceViews;
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
+            return absenceViews;
         }
 
         [Authorize]
