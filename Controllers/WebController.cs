@@ -96,10 +96,11 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * Getting invoice outbound based on it's duedate and filter given.
         */
-        // [Authorize]
+        [Authorize]
         [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] long tennantId, [FromForm] string filter)
+        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] string filter)
         {
+            long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
             .Where(a => a.customer.tennantId == tennantId)
@@ -259,5 +260,12 @@ namespace Datawarehouse_Backend.Controllers
             return accountsReceivable;
         }
 
+        private long getTennantId()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            long tennantId = long.Parse(claim[0].Value);
+            return tennantId;
+        }
     }
 }
