@@ -7,7 +7,6 @@ namespace Datawarehouse_Backend.Context {
         public WarehouseContext(DbContextOptions<WarehouseContext> options) : base(options) {
             
         }
-
         // Define database tables
         public DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
         public DbSet<AccountsReceivable> AccountsReceivables { get; set; }

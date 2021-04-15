@@ -127,6 +127,10 @@ namespace Datawarehouse_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("errorType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("timeOfError")
                         .HasColumnType("timestamp without time zone");
 
