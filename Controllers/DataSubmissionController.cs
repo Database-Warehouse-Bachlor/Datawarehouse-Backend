@@ -63,7 +63,23 @@ namespace Datawarehouse_Backend.Controllers
                 //This happend once but never again, and we dont know why or what caused it
                 if (tennantId > 0)
                 {
-
+                    //Adds custumer to datawarehouse
+                    for (int i = 0; i < contentsList.Customer.Count; i++)
+                    {
+                        Customer customer = new Customer();
+                        customer = contentsList.Customer[i];
+                        customer.tennantFK = tennantId;
+                        _db.Customers.Add(customer);
+                    }
+                    
+                    //Adds Employee to datawarehouse
+                    for (int i = 0; i < contentsList.Employee.Count; i++)
+                    {
+                        Employee employee = new Employee();
+                        employee = contentsList.Employee[i];
+                        employee.tennantId = tennantId;
+                        _db.Employees.Add(employee);
+                    }
                     //Adds Invoice inbound to datawarehouse
                     for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
                     {
@@ -77,17 +93,12 @@ namespace Datawarehouse_Backend.Controllers
                     for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
                     {
                         InvoiceOutbound outbound = new InvoiceOutbound();
+
                         outbound = contentsList.InvoiceOutbound[i];
                         _db.InvoiceOutbounds.Add(outbound);
                     }
 
-                    //Adds custumer to datawarehouse
-                    for (int i = 0; i < contentsList.Customer.Count; i++)
-                    {
-                        Customer customer = new Customer();
-                        customer = contentsList.Customer[i];
-                        _db.Customers.Add(customer);
-                    }
+                    
 
                     //Adds Balance and Budget to datawarehouse
                     for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
@@ -111,14 +122,6 @@ namespace Datawarehouse_Backend.Controllers
                         AccountsReceivable accountsReceivable = new AccountsReceivable();
                         accountsReceivable = contentsList.Accountsreceivable[i];
                         _db.AccountsReceivables.Add(accountsReceivable);
-                    }
-
-                    //Adds Employee to datawarehouse
-                    for (int i = 0; i < contentsList.Employee.Count; i++)
-                    {
-                        Employee employee = new Employee();
-                        employee = contentsList.Employee[i];
-                        _db.Employees.Add(employee);
                     }
 
                     //Adds Order to datawarehouse
@@ -313,5 +316,6 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
+
     }
 }
