@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.Warehouse
+namespace Datawarehouse_Backend.Migrations
 {
-    public partial class initMigration : Migration
+    public partial class @switch : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -101,6 +101,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    invoiceDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     tennantId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -187,6 +188,8 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    fromDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    toDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     employeeId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -225,6 +228,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    invoiceDue = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     orderId = table.Column<long>(type: "bigint", nullable: false),
                     customerId = table.Column<long>(type: "bigint", nullable: false)
                 },

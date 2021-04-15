@@ -7,8 +7,8 @@ namespace Datawarehouse_Backend.Models {
     public class InvoiceOutbound {
         [Key]
         public long id { get; set; }
-       /*  public long jobId { get; set; }
         public DateTime invoiceDue { get; set; }
+       /*  public long jobId { get; set; }
         public DateTime invoiceDate { get; set; }
         public double invoiceExVat { get; set; }
         public double invoiceIncVat { get; set; }

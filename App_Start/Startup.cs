@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using MyMusic.Core.Models;
+
 
 namespace Datawarehouse_Backend.App_Start
 {
@@ -71,6 +71,7 @@ namespace Datawarehouse_Backend.App_Start
             services.AddDbContext<WarehouseContext>(opt =>
             opt.UseNpgsql(warehousedb));
 
+            
             //services.AddIdentity<User, Role>()
             //.AddUserStore<LoginDatabaseContext>()
             //.AddDefaultTokenProviders();

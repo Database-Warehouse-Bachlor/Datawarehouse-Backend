@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.Warehouse
+namespace Datawarehouse_Backend.Migrations.LoginDatabase
 {
-    [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(LoginDatabaseContext))]
+    partial class LoginDatabaseContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -29,11 +29,17 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("fromDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("toDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("id");
 
                     b.HasIndex("employeeId");
 
-                    b.ToTable("AbsenceRegisters");
+                    b.ToTable("AbsenceRegister");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.AccountsReceivable", b =>
@@ -50,7 +56,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("customerId");
 
-                    b.ToTable("AccountsReceivables");
+                    b.ToTable("AccountsReceivable");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.BalanceAndBudget", b =>
@@ -67,7 +73,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("BalanceAndBudgets");
+                    b.ToTable("BalanceAndBudget");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Customer", b =>
@@ -84,7 +90,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Employee", b =>
@@ -104,26 +110,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("Datawarehouse_Backend.Models.ErrorLog", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("errorMessage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("timeOfError")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ErrorLogs");
+                    b.ToTable("Employee");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceInbound", b =>
@@ -133,6 +120,9 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("invoiceDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
@@ -140,7 +130,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("InvoiceInbounds");
+                    b.ToTable("InvoiceInbound");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceOutbound", b =>
@@ -153,6 +143,9 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                     b.Property<long>("customerId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("invoiceDue")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<long>("orderId")
                         .HasColumnType("bigint");
 
@@ -163,7 +156,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                     b.HasIndex("orderId")
                         .IsUnique();
 
-                    b.ToTable("InvoiceOutbounds");
+                    b.ToTable("InvoiceOutbound");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Order", b =>
@@ -188,7 +181,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
@@ -211,7 +204,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasKey("id");
 
-                    b.ToTable("Tennants");
+                    b.ToTable("Tennant");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.TimeRegister", b =>
@@ -228,7 +221,7 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
 
                     b.HasIndex("employeeId");
 
-                    b.ToTable("TimeRegisters");
+                    b.ToTable("TimeRegister");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
@@ -251,11 +244,14 @@ namespace Datawarehouse_Backend.Migrations.Warehouse
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("role")
+                        .HasColumnType("text");
+
                     b.HasKey("id");
 
                     b.HasIndex("tennantId");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.AbsenceRegister", b =>

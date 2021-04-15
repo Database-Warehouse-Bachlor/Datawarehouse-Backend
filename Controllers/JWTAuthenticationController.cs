@@ -94,7 +94,7 @@ namespace Datawarehouse_Backend.Controllers
         * To use this function, the tennant need to allready have a user connected to the tennant.
         */
 
-        // TODO: [Authorize]
+        [Authorize(Roles = "User")]
         [HttpPost("register")]
         public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
         {
@@ -112,6 +112,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.tennant = tennant;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
+                newUser.role = Role.User;
 
                 // Adds and saves changes to the database
                 _db.Entry(newUser).State = EntityState.Added;
@@ -162,7 +163,7 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public List<User> getAllUsers()
         {
@@ -197,6 +198,9 @@ namespace Datawarehouse_Backend.Controllers
             return orgNum;
 
         }
+
+
+        
     }
 
 }

@@ -30,6 +30,7 @@ namespace Datawarehouse_Backend.Authentication
         {
              new Claim(JwtRegisteredClaimNames.Sub,userinfo.tennantId.ToString()),
              new Claim(JwtRegisteredClaimNames.Email,userinfo.Email),
+             new Claim(ClaimTypes.Role, userinfo.role),
              new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
          };
 
