@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.LoginDatabase
+namespace Datawarehouse_Backend.Migrations
 {
-    public partial class switchL : Migration
+    public partial class UserRoleField : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -109,6 +109,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Email = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     password = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    role = table.Column<string>(type: "text", nullable: true),
                     tennantId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -176,6 +177,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     fromDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     toDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    duration = table.Column<double>(type: "double precision", nullable: false),
                     employeeId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -195,6 +197,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    recordDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     employeeId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>

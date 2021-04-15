@@ -3,17 +3,15 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations
+namespace Datawarehouse_Backend.Migrations.Warehouse
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20210413090729_switch")]
-    partial class @switch
+    partial class WarehouseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,6 +25,9 @@ namespace Datawarehouse_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<double>("duration")
+                        .HasColumnType("double precision");
 
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
@@ -123,6 +124,10 @@ namespace Datawarehouse_Backend.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("errorMessage")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("errorType")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -238,6 +243,9 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("recordDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("id");
 
                     b.HasIndex("employeeId");
@@ -261,6 +269,9 @@ namespace Datawarehouse_Backend.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("role")
+                        .HasColumnType("text");
 
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");

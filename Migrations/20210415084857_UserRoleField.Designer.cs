@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.LoginDatabase
+namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(LoginDatabaseContext))]
-    [Migration("20210413090743_switchL")]
-    partial class switchL
+    [Migration("20210415084857_UserRoleField")]
+    partial class UserRoleField
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,6 +27,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<double>("duration")
+                        .HasColumnType("double precision");
 
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
@@ -219,6 +222,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("recordDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("id");
 
                     b.HasIndex("employeeId");
@@ -242,6 +248,9 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("role")
+                        .HasColumnType("text");
 
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
