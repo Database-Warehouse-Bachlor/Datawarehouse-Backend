@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [Migration("20210415091555_ModelUpdate")]
+    partial class ModelUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +45,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("duration")
                         .HasColumnType("double precision");
 
-                    b.Property<long?>("employeeId")
+                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
@@ -273,32 +275,11 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<double>("amountExVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("amountIncVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("amountTotal")
-                        .HasColumnType("double precision");
-
                     b.Property<long>("customerId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("invoiceDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime>("invoiceDue")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<double>("invoiceExVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("invoiceIncVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("jobId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("orderId")
                         .HasColumnType("bigint");
@@ -320,71 +301,14 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("caseHandler")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("confimedDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<long>("customerId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("customerName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("description")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("endDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<double>("fixedPriceAmount")
-                        .HasColumnType("double precision");
-
-                    b.Property<bool>("hasWarranty")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("hoursOfWork")
-                        .HasColumnType("double precision");
 
                     b.Property<long>("invoiceOutboundId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("isFixedPrice")
-                        .HasColumnType("boolean");
-
-                    b.Property<long>("jobId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("jobName")
-                        .HasColumnType("text");
-
-                    b.Property<long>("jobSiteId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("lastChanged")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("materials")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("orderDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("orderType")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("plannedDelivery")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("startedDelivery")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("warrantyDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
 
@@ -538,7 +462,9 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
                         .WithMany("absenceRegisters")
-                        .HasForeignKey("employeeId");
+                        .HasForeignKey("employeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("employee");
                 });

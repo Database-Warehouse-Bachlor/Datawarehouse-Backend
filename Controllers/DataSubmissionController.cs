@@ -21,9 +21,6 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
-/*
-* This controller handles the automated inputs sent from Cordel's systems every night.
-*/ 
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -67,7 +64,6 @@ namespace Datawarehouse_Backend.Controllers
                 if (tennantId > 0)
                 {
 
-                    Console.WriteLine("1111111111111111111111111111111111111111111111");
                     //Adds Invoice inbound to datawarehouse
                     for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
                     {
@@ -112,9 +108,9 @@ namespace Datawarehouse_Backend.Controllers
                     //Adds Accountsreceivable to datawarehouse
                     for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
                     {
-                        Accountsreceivable accountsreceivable = new Accountsreceivable();
-                        accountsreceivable = contentsList.Accountsreceivable[i];
-                        _db.Accountsreceivables.Add(accountsreceivable);
+                        AccountsReceivable accountsReceivable = new AccountsReceivable();
+                        accountsReceivable = contentsList.Accountsreceivable[i];
+                        _db.AccountsReceivables.Add(accountsReceivable);
                     }
 
                     //Adds Employee to datawarehouse
@@ -138,7 +134,7 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         TimeRegister timeRegister = new TimeRegister();
                         timeRegister = contentsList.TimeRegister[i];
-                        _db.timeRegisters.Add(timeRegister);
+                        _db.TimeRegisters.Add(timeRegister);
                     }
 
                 }

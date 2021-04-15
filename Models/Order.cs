@@ -6,7 +6,7 @@ namespace Datawarehouse_Backend.Models
     public class Order {
         [Key]
          public long id { get; set; }
-        /*  public string orderType { get; set; }
+         public string orderType { get; set; }
          public DateTime orderDate { get; set; }
          public DateTime plannedDelivery { get; set; }
          public DateTime startedDelivery { get; set; }
@@ -24,7 +24,7 @@ namespace Datawarehouse_Backend.Models
          public string materials { get; set; }
          public double hoursOfWork { get; set; }
          public Boolean hasWarranty { get; set; }
-         public string description { get; set; } */
+         public string description { get; set; } 
 
          public long tennantId { get; set; }
          public Tennant tennant { get; set; }

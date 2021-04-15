@@ -7,7 +7,7 @@ namespace Datawarehouse_Backend.Models
         [Key]
          public long id { get; set; }
          public DateTime recordDate { get; set; }
-        /*  public Boolean isCaseworker { get; set; }
+        public Boolean isCaseworker { get; set; }
          public string personName { get; set; }
          public string personDepartment { get; set; }
          public string personDepartmentName { get; set; }
@@ -28,7 +28,7 @@ namespace Datawarehouse_Backend.Models
          public string recordTypeName { get; set; }
          public string processingCode { get; set; }
          public string viaType { get; set; }
-         public string summaryType { get; set; } */
+         public string summaryType { get; set; } 
          
          public long employeeId { get; set; }
          public Employee employee {get; set;}
