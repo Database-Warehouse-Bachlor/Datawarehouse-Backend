@@ -58,9 +58,6 @@ namespace Datawarehouse_Backend.Controllers
 
                 tennantId = addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
 
-                //-------------------------------------------------
-                //Er dette fin kode? Eller burde jeg endre på noe?
-                //-------------------------------------------------
 
                 //Failsafe if addtennant dont update the tennantId
                 //This happend once but never again, and we dont know why or what caused it
@@ -93,6 +90,7 @@ namespace Datawarehouse_Backend.Controllers
                         _db.Customers.Add(customer);
                     }
 
+                    //Adds Balance and Budget to datawarehouse
                     for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
                     {
                         BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
@@ -100,19 +98,15 @@ namespace Datawarehouse_Backend.Controllers
                         _db.BalanceAndBudgets.Add(balanceAndBudget);
                     }
 
-                    Console.WriteLine("2222222222222222222222222222222222222222222");
-
+                    //Adds Absence Register to datawarehouse
                     for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
                     {
-                        Console.WriteLine("3333333333333333333333333333333333333333");
                         AbsenceRegister absenceRegister = new AbsenceRegister();
                         absenceRegister = contentsList.AbsenceRegister[i];
                         _db.AbsenceRegisters.Add(absenceRegister);
                     }
 
-                    Console.WriteLine("444444444444444444444444444444444444444444");
-
-
+                    //Adds Accountsreceivable to datawarehouse
                     for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
                     {
                         Accountsreceivable accountsreceivable = new Accountsreceivable();
@@ -120,6 +114,7 @@ namespace Datawarehouse_Backend.Controllers
                         _db.Accountsreceivables.Add(accountsreceivable);
                     }
 
+                    //Adds Employee to datawarehouse
                     for (int i = 0; i < contentsList.Employee.Count; i++)
                     {
                         Employee employee = new Employee();
@@ -127,6 +122,7 @@ namespace Datawarehouse_Backend.Controllers
                         _db.Employees.Add(employee);
                     }
 
+                    //Adds Order to datawarehouse
                     for (int i = 0; i < contentsList.Order.Count; i++)
                     {
                         Order order = new Order();
@@ -134,27 +130,28 @@ namespace Datawarehouse_Backend.Controllers
                         _db.Orders.Add(order);
                     }
 
+                    //Adds TimeRegister to datawarehouse
                     for (int i = 0; i < contentsList.TimeRegister.Count; i++)
                     {
                         TimeRegister timeRegister = new TimeRegister();
                         timeRegister = contentsList.TimeRegister[i];
                         _db.timeRegisters.Add(timeRegister);
                     }
-                    Console.WriteLine("WOWOWOWOWOWOWOWOWOWOWOWOWO");
 
                 }
                 else
                 {
                     ErrorLog errorLog = new ErrorLog();
-                    String errorMessage = "Tennant id ble ikke oppdatert i addData (DataSubmissionController.cs) før behandlingen av data skjedde";
+                    string errorType = "Tennant ID update fail";
+                    string errorMessage = "Tennant id ble ikke oppdatert i addData (DataSubmissionController.cs) før behandlingen av data skjedde";
+                    
+                    errorLog.errorType = errorType;
                     errorLog.errorMessage = errorMessage;
                     errorLog.timeOfError = DateTime.Now;
                     _db.ErrorLogs.Add(errorLog);
 
                     Console.WriteLine("tennantid was -1");
                 }
-
-                Console.WriteLine("5555555555555555555555555555555555555555");
 
                 //Saves changes to DB if everything is OK
                 _db.SaveChanges();
@@ -170,10 +167,11 @@ namespace Datawarehouse_Backend.Controllers
                 Console.WriteLine(e.GetType());
 
                 ErrorLog errorLog = new ErrorLog();
-
-                String errorMessage = e.GetType() + " : " + e.Message.ToString() + " businessId: " + OrgNummer;
+                string errorType = e.GetType().ToString();
+                string errorMessage = e.Message.ToString() + " businessId: " + OrgNummer;
                 DateTime timeOfError = DateTime.Now;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = errorMessage;
                 errorLog.timeOfError = timeOfError;
 
@@ -190,10 +188,12 @@ namespace Datawarehouse_Backend.Controllers
             catch (NullReferenceException e)
             {
                 ErrorLog errorLog = new ErrorLog();
-
-                String errorMessage = e.GetType() + " : " +  e.ToString() + " Tennant ID: " + tennantId;
+                
+                string errorType = e.GetType().ToString();
+                string errorMessage = e.ToString() + " Tennant ID: " + tennantId;
                 DateTime timeOfError = DateTime.Now;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = errorMessage;
                 errorLog.timeOfError = timeOfError;
 
@@ -217,18 +217,16 @@ namespace Datawarehouse_Backend.Controllers
             */
             catch (DbUpdateException e)
             {
-                Console.WriteLine(e.GetType());
-                Console.WriteLine("Ekstrem homofil ;))");
-
                 ErrorLog errorLog = new ErrorLog();
 
-                String errorMessage = 
-                e.GetType() + 
-                " : Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                string errorType = e.GetType().ToString();
+                string errorMessage = 
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
                 tennantId;
 
                 DateTime timeOfError = DateTime.Now;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = errorMessage;
                 errorLog.timeOfError = timeOfError;
 
@@ -239,17 +237,16 @@ namespace Datawarehouse_Backend.Controllers
             
             catch (Exception e) {
 
-                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
                 ErrorLog errorLog = new ErrorLog();
 
-                String errorMessage = 
-                e.GetType() + 
-                " : Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                string errorType = e.GetType().ToString();
+                string errorMessage = 
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
                 tennantId;
 
                 DateTime timeOfError = DateTime.Now;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = errorMessage;
                 errorLog.timeOfError = timeOfError;
 
@@ -285,8 +282,10 @@ namespace Datawarehouse_Backend.Controllers
             }
             else if (bId == null || bId == "")
             {
+                string errorType = "BusinessId fail";
                 string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = businessIdError;
                 errorLog.timeOfError = DateTime.Now;
 
@@ -297,8 +296,10 @@ namespace Datawarehouse_Backend.Controllers
             }
             else if (apiKey == null || apiKey == "")
             {
+                string errorType = "API-Key fail";
                 string apiKeyError = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
 
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = apiKeyError;
                 errorLog.timeOfError = DateTime.Now;
                 
