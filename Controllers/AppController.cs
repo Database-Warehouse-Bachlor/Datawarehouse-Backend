@@ -49,6 +49,13 @@ namespace Datawarehouse_Backend.Controllers
             return tennants;
         }
 
+        //[Authorize(Roles = "Admin")]
+        [HttpPost("errors")]
+        public List<ErrorLog> getAllErrors() {
+            var errors = _warehouseDb.ErrorLogs
+            .ToList();
+            return errors;
+        }
         // Returns a list of all tennants.
         public int getNumberOfTennants()
         {
