@@ -11,32 +11,58 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
+using Datawarehouse_Backend.Context;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 
+/*
+*This controller is mainly for authenticating users and registering new users.
+*/ 
 namespace Datawarehouse_Backend.Controllers
 {
- [Route("api/[controller]")]
- [ApiController]
+    [Route("auth/")]
+    [ApiController]
 
- public class JWTAuthenticationController : ControllerBase
- {
-     private IConfiguration _config;
+    public class JWTAuthenticationController : ControllerBase
+    {
 
-     public JWTAuthenticationController(IConfiguration config)
-     {
-         _config = config;
-     }
+        private readonly IConfiguration _config;
+        private readonly LoginDatabaseContext _db;
+        private readonly WarehouseContext _warehousedb;
 
-     [HttpPost]
-     public IActionResult login(string orgNum, string pass)
-     {
-        UserModel login = new UserModel();
-        JwtTokenGenerate jwtTokenGenerate = new JwtTokenGenerate();
-        login.OrgNum = orgNum;
-        login.Password = pass;
-        IActionResult response = Unauthorized();
+        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db, WarehouseContext warehousedb)
+        {
+            _config = config;
+            _db = db;
+            _warehousedb = warehousedb;
+        }
+        /*
+        * A function to find the correct User based on email.
+        */
+        private User findUserByMail(string email){
+            var user = _db.Users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+            return user;
+        }
+
+        /*
+        * A function to find the correct Tennant based on it's ID.
+        */
+        private Tennant findTennantById(long tennantId) {
+            var tennant = _warehousedb.Tennants
+            .Where(o => o.id == tennantId)
+            .FirstOrDefault<Tennant>();
+            return tennant;
+        }
 
 
-        var user = jwtTokenGenerate.authenticateUser(login);
+        [HttpPost("login")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult login([FromForm] string email, [FromForm] string pwd)
+        {
+            User loginUser = findUserByMail(email);
 
             IActionResult response;
             try
@@ -64,40 +90,109 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        This function registers users based on orgnr, email and pwd.  First it checks if there's allready an user with this email, if there is one it wont register a new.
-        If there's no users with this email, it will find the tennant based on the orgnr given, then create a new user with the given email and connect it to the tennant based on the orgnr.
-        Then hashes and salts the password and stores it in the DB. 
+        * This register-call is for the businesses to add additional users to their business.
+        * To use this function, the tennant need to allready have a user connected to the tennant.
         */
-        // TODO: Authorize must be implemented at some point
-        [Authorize]
+
+        [Authorize(Roles = "User")]
         [HttpPost("register")]
-        public IActionResult register([FromForm] string businessId, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult register([FromForm] string email, [FromForm] string pwd)
         {
-            var tokenStr = jwtTokenGenerate.generateJSONWebToken(user,_config).ToString();
-            response = Ok(tokenStr);
+            IActionResult response;
+
+            User userCheck = findUserByMail(email);
+            Tennant tennant = findTennantById(getTennantId());
+
+            if (userCheck == null && tennant != null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
+
+                User newUser = new User();
+                newUser.tennant = tennant;
+                newUser.Email = email;
+                newUser.password = hashedPassword;
+                newUser.role = Role.User;
+
+                // Adds and saves changes to the database
+                _db.Entry(newUser).State = EntityState.Added;
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
         }
-        return response;
-     }
 
+        /*
+        * This registration-call is for the administration to create the first user for the business.
+        * This sets up the first connection between tennant and user.
+        * After this connection is set up, the business can use the other registration-call to add additional users to it's business.
+        */
 
-    [Authorize]
-    [HttpPost("Post")]
-     public string post()
-     {
-         var identity = HttpContext.User.Identity as ClaimsIdentity;
-         IList<Claim> claim = identity.Claims.ToList();
-         var orgNum = claim[0].Value;
-         return "Welcome to: " + orgNum;
-     }
+       // TODO: [Authorize(Roles = "Admin")]
+        [HttpPost("initregister")]
+        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd)
+        {
+            IActionResult response;
 
-    [Authorize]
-    [HttpGet ("GetValue")]
-     public ActionResult<IEnumerable<String>> Get()
-         {
-             return new string[] { "Value1","value2","value" };
-         }
-     
+            User userCheck = findUserByMail(email);
+            Tennant tennant = findTennantById(getTennantId());
 
- }
+            if (userCheck == null && tennant != null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
+
+                User initUser = new User();
+                initUser.tennant = tennant;
+                initUser.Email = email;
+                initUser.password = hashedPassword;
+
+                // Adds and saves changes to the database
+                _db.Users.Add(initUser);
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("users")]
+        public List<User> getAllUsers()
+        {
+            var users = _db.Users.ToList();
+            return users;
+            // TODO: Passord må ikke vises
+            // TODO: Hvis vi gjør om Users til en relasjon av Organisations/Tennants
+            //var org = _db.organisations
+            //.include(u => u.User)
+            //.ToList();
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("tennantName")]
+        public string getTennantName()
+        {
+            Tennant tennant = findTennantById(getTennantId());
+            return tennant.tennantName;
+
+        }
+
+         private long getTennantId()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            long tennantId = long.Parse(claim[0].Value);
+            return tennantId;
+        }
+        
+    }
 
 }

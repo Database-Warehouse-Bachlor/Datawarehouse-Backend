@@ -21,15 +21,16 @@ namespace Datawarehouse_Backend.Authentication
 
      }
 
-    public string generateJSONWebToken(UserModel userinfo, IConfiguration config)
+    public string generateJSONWebToken(User userinfo, IConfiguration config)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         
         var claims = new[]
         {
-             new Claim(JwtRegisteredClaimNames.Sub,userinfo.OrgNum),
-             new Claim(JwtRegisteredClaimNames.Email,userinfo.EmailAdress),
+             new Claim(JwtRegisteredClaimNames.Sub,userinfo.tennantId.ToString()),
+             new Claim(JwtRegisteredClaimNames.Email,userinfo.Email),
+             new Claim(ClaimTypes.Role, userinfo.role),
              new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
          };
 
@@ -43,16 +44,6 @@ namespace Datawarehouse_Backend.Authentication
 
         var encodeToken = new JwtSecurityTokenHandler().WriteToken(token);
         return encodeToken;
-
-    }
-    public UserModel authenticateUser(UserModel login)
-    {
-        UserModel user = null;
-        if (login.OrgNum == "1234" && login.Password == "admin")
-        {
-            user = new UserModel { OrgNum = "1234", EmailAdress = "tenant@mail.com", Password = "admin" };
-        }
-        return user;
     }
 }
 }

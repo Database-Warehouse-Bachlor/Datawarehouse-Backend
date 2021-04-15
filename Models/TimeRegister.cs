@@ -1,18 +1,17 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Datawarehouse_Backend
+namespace Datawarehouse_Backend.Models
 {
     public class TimeRegister {
         [Key]
          public long id { get; set; }
-         public Employee employee {get; set;}
-         public Boolean isCaseworker { get; set; }
+         public DateTime recordDate { get; set; }
+        public Boolean isCaseworker { get; set; }
          public string personName { get; set; }
          public string personDepartment { get; set; }
          public string personDepartmentName { get; set; }
          public int year { get; set; }
-         public DateTime recordDate { get; set; }
          public string recordDepartment { get; set; }
          public string recordDepartmentName { get; set; }
          public string payType { get; set; }
@@ -29,6 +28,9 @@ namespace Datawarehouse_Backend
          public string recordTypeName { get; set; }
          public string processingCode { get; set; }
          public string viaType { get; set; }
-         public string summaryType { get; set; }
+         public string summaryType { get; set; } 
+         
+         public long employeeId { get; set; }
+         public Employee employee {get; set;}
     }
 }
