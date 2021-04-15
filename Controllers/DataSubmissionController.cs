@@ -69,10 +69,7 @@ namespace Datawarehouse_Backend.Controllers
                         Customer customer = new Customer();
                         customer = contentsList.Customer[i];
 
-                        long custumerFK = addCustomer(customer, tennantId);
-
-                        customer.tennantFK = tennantId;
-                        _db.Customers.Add(customer);
+                        addCustomer(customer, tennantId);
                     }
                     
                     //Adds Employee to datawarehouse
@@ -80,9 +77,18 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Employee employee = new Employee();
                         employee = contentsList.Employee[i];
-                        employee.tennantFK = tennantId;
-                        _db.Employees.Add(employee);
+
+                        addEmployee(employee, tennantId);
                     }
+
+                    //Adds Order to datawarehouse
+                    for (int i = 0; i < contentsList.Order.Count; i++)
+                    {
+                        Order order = new Order();
+                        order = contentsList.Order[i];
+                        _db.Orders.Add(order);
+                    }
+
                     //Adds Invoice inbound to datawarehouse
                     for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
                     {
@@ -125,14 +131,6 @@ namespace Datawarehouse_Backend.Controllers
                         AccountsReceivable accountsReceivable = new AccountsReceivable();
                         accountsReceivable = contentsList.Accountsreceivable[i];
                         _db.AccountsReceivables.Add(accountsReceivable);
-                    }
-
-                    //Adds Order to datawarehouse
-                    for (int i = 0; i < contentsList.Order.Count; i++)
-                    {
-                        Order order = new Order();
-                        order = contentsList.Order[i];
-                        _db.Orders.Add(order);
                     }
 
                     //Adds TimeRegister to datawarehouse
@@ -319,29 +317,40 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
-        private long addCustomer(Customer customer, long tennantFK) {
-
-            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
+        private long addCustomer(Customer customer, long tennantFK ) 
+        {
             ErrorLog errorLog = new ErrorLog();
-            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
-            Customer databaseCustomer  = _db.Customers.Where(c => c.tennantId == customer.tennantId).FirstOrDefault<Customer>();
-            Console.WriteLine("WOWOWOWOWOWOWOOWOWOWO");
+            Customer databaseCustomer  = _db.Customers.Where(c => c.custommerId == customer.custommerId).FirstOrDefault<Customer>();
             if (databaseCustomer == null)
             {
                 Customer customer1 = new Customer();
                 customer1 = customer;
+                customer1.tennantFK = tennantFK;
                 _db.Customers.Add(customer1);
 
                 _db.SaveChanges();
 
-                Console.WriteLine(customer1.tennantFK);
-                return customer1.tennantFK;
+                return customer1.id;
+            } 
+            return databaseCustomer.id;
+        }
 
-            }
+        private long addEmployee(Employee employee, long tennantFK ) 
+        {
+            ErrorLog errorLog = new ErrorLog();
+            Employee databaseEmployee  = _db.Employees.Where(c => c.employeeId == employee.employeeId).FirstOrDefault<Employee>();
+            if (databaseEmployee == null)
+            {
+                Employee employee1 = new Employee();
+                employee1 = employee;
+                employee1.tennantFK = tennantFK;
+                _db.Employees.Add(employee);
 
+                _db.SaveChanges();
 
-
-            return 0;
+                return employee.id;
+            } 
+            return databaseEmployee.id;
         }
     }
 

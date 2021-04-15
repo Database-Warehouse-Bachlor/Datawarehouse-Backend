@@ -3,17 +3,15 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    [Migration("20210415123235_AbsenceForeignKeyUpdateNullableEmployeeId2")]
-    partial class AbsenceForeignKeyUpdateNullableEmployeeId2
+    partial class WarehouseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,12 +26,13 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<long>("AbsenceRegisterId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("abcenseType")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("abcenseTypeText")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("comment")
@@ -45,7 +44,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("duration")
                         .HasColumnType("double precision");
 
-                    b.Property<long?>("employeeId")
+                    b.Property<long>("employeeFK")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
@@ -59,7 +58,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("employeeId");
+                    b.HasIndex("employeeFK");
 
                     b.ToTable("AbsenceRegisters");
                 });
@@ -71,13 +70,16 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<long>("AccountsReceivableId")
+                        .HasColumnType("bigint");
+
                     b.Property<double>("amount")
                         .HasColumnType("double precision");
 
                     b.Property<double>("amountDue")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("customerId")
+                    b.Property<long>("customerFK")
                         .HasColumnType("bigint");
 
                     b.Property<string>("customerName")
@@ -106,7 +108,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerId");
+                    b.HasIndex("customerFK");
 
                     b.ToTable("AccountsReceivables");
                 });
@@ -117,6 +119,9 @@ namespace Datawarehouse_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<long>("BalanceAndBudgetId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("account")
                         .HasColumnType("text");
@@ -139,12 +144,12 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("startBalance")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long>("tennantFK")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("BalanceAndBudgets");
                 });
@@ -165,13 +170,13 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("customerName")
                         .HasColumnType("text");
 
+                    b.Property<long>("custommerId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("isInactive")
                         .HasColumnType("boolean");
 
                     b.Property<long>("tennantFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("zipcode")
@@ -179,7 +184,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("Customers");
                 });
@@ -193,6 +198,9 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.Property<DateTime>("birthdate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("employeeId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("employeeName")
                         .HasColumnType("text");
@@ -233,12 +241,12 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("statusText")
                         .HasColumnType("text");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long>("tennantFK")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("Employees");
                 });
@@ -279,6 +287,9 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("invoiceDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<long>("invoiceInboundId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("invoicePdf")
                         .HasColumnType("text");
 
@@ -291,7 +302,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("supplierId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long>("tennantFK")
                         .HasColumnType("bigint");
 
                     b.Property<long>("wholesalerId")
@@ -299,7 +310,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("InvoiceInbounds");
                 });
@@ -320,7 +331,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("amountTotal")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("customerId")
+                    b.Property<long>("customerFK")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("invoiceDate")
@@ -335,17 +346,20 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("invoiceIncVat")
                         .HasColumnType("double precision");
 
+                    b.Property<long>("invoiceOutboundId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("jobId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("orderId")
+                    b.Property<long>("orderFK")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerId");
+                    b.HasIndex("customerFK");
 
-                    b.HasIndex("orderId")
+                    b.HasIndex("orderFK")
                         .IsUnique();
 
                     b.ToTable("InvoiceOutbounds");
@@ -364,7 +378,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("confimedDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("customerId")
+                    b.Property<long>("customerFK")
                         .HasColumnType("bigint");
 
                     b.Property<string>("customerName")
@@ -385,7 +399,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("hoursOfWork")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("invoiceOutboundId")
+                    b.Property<long>("invoiceOutboundFK")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("isFixedPrice")
@@ -409,6 +423,9 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("orderDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<long>("orderId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("orderType")
                         .HasColumnType("text");
 
@@ -418,7 +435,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<DateTime>("startedDelivery")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long>("tennantFK")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("warrantyDate")
@@ -426,9 +443,9 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerId");
+                    b.HasIndex("customerFK");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("Orders");
                 });
@@ -469,7 +486,7 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<double>("amount")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("employeeId")
+                    b.Property<long>("employeeFK")
                         .HasColumnType("bigint");
 
                     b.Property<string>("invoiceRate")
@@ -523,6 +540,9 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("summaryType")
                         .HasColumnType("text");
 
+                    b.Property<long>("timeRegisterId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("viaType")
                         .HasColumnType("text");
 
@@ -537,7 +557,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("employeeId");
+                    b.HasIndex("employeeFK");
 
                     b.ToTable("TimeRegisters");
                 });
@@ -562,12 +582,12 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("role")
                         .HasColumnType("text");
 
-                    b.Property<long>("tennantId")
+                    b.Property<long>("tennantFK")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantId");
+                    b.HasIndex("tennantFK");
 
                     b.ToTable("User");
                 });
@@ -576,7 +596,9 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
                         .WithMany("absenceRegisters")
-                        .HasForeignKey("employeeId");
+                        .HasForeignKey("employeeFK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("employee");
                 });
@@ -585,7 +607,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("accountsreceivables")
-                        .HasForeignKey("customerId")
+                        .HasForeignKey("customerFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -596,7 +618,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("bnb")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -607,7 +629,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("customers")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -618,7 +640,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("employees")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -629,7 +651,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("invoicesInbound")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -640,13 +662,13 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("invoicesOutbound")
-                        .HasForeignKey("customerId")
+                        .HasForeignKey("customerFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Datawarehouse_Backend.Models.Order", "order")
                         .WithOne("invoiceOutbound")
-                        .HasForeignKey("Datawarehouse_Backend.Models.InvoiceOutbound", "orderId")
+                        .HasForeignKey("Datawarehouse_Backend.Models.InvoiceOutbound", "orderFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -659,13 +681,13 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("orders")
-                        .HasForeignKey("customerId")
+                        .HasForeignKey("customerFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("orders")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -678,7 +700,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
                         .WithMany("timeRegisters")
-                        .HasForeignKey("employeeId")
+                        .HasForeignKey("employeeFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -689,7 +711,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("users")
-                        .HasForeignKey("tennantId")
+                        .HasForeignKey("tennantFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
