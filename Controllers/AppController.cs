@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Models;
+using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -22,22 +23,16 @@ namespace Datawarehouse_Backend.Controllers
             _warehouseDb = warehouseDb;
         }
 
-        // [Authorize]
+        // [Authorize(Roles = "Admin")]
         [HttpPost("homeinfo")]
-        public IActionResult getNumberOfTennantsAndErrorsAsJson()
+        public AppInfoHomeMenu getNumberOfTennantsAndErrorsAsJson()
         {
-            IActionResult response;
-
             AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
 
             appInfoHomeMenu.numberOfTennants = getNumberOfTennants();
             appInfoHomeMenu.numberOfErrors = getNumberOfErrorsLastTwentyFour(); 
-            
-            var dataToJson = JsonConvert.SerializeObject(appInfoHomeMenu);
-            
-            response = Ok(dataToJson);
 
-            return response;
+            return appInfoHomeMenu;
         }
 
         //[Authorize(Roles = "Admin")]
@@ -48,12 +43,15 @@ namespace Datawarehouse_Backend.Controllers
             return tennants;
         }
 
+        // Returns a list of all tennants.
         public int getNumberOfTennants()
         {
             var numberOfTennants = _warehouseDb.Tennants
             .Count();
             return numberOfTennants;
         }
+
+        // Returns number of errors the last 24 hours
         public int getNumberOfErrorsLastTwentyFour()
         {
             DateTime currentTime = DateTime.Now;
