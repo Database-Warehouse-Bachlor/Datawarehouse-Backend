@@ -10,8 +10,8 @@ namespace Datawarehouse_Backend.Models
          public string tennantName { get; set; }
          [Required]
          public string businessId { get; set; }
+         
          [Required]
-
          //Høre med ole om denne skal i login databasen
          public string apiKey { get; set; }
          

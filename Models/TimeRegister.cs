@@ -8,7 +8,7 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
-        public long timeRegisterId {get; set;}
+        public long timeRegisterId { get; set; }
         public DateTime recordDate { get; set; }
         public Boolean isCaseworker { get; set; }
         public string personName { get; set; }

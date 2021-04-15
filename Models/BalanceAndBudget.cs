@@ -8,7 +8,7 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
-        public long BalanceAndBudgetId {get; set;}
+        public long BalanceAndBudgetId { get; set; }
         public string name { get; set; }
         public string account { get; set; }
         public DateTime periodDate { get; set; }
@@ -18,7 +18,7 @@ namespace Datawarehouse_Backend.Models
         public string department { get; set; }
 
         [ForeignKey("tennant")]
-        public long tennantFK { get; set; } 
+        public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
     }
 }

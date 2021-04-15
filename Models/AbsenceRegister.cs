@@ -9,9 +9,9 @@ namespace Datawarehouse_Backend.Models
         [Key]
         public long id { get; set; }
 
-        public long AbsenceRegisterId {get; set;}
-       [Required]
-         public DateTime fromDate { get; set; }
+        public long AbsenceRegisterId { get; set; }
+        [Required]
+        public DateTime fromDate { get; set; }
         [Required]
         public DateTime toDate { get; set; }
         [Required]
@@ -20,11 +20,11 @@ namespace Datawarehouse_Backend.Models
         public string abcenseType { get; set; }
         public string abcenseTypeText { get; set; }
         public string comment { get; set; }
-        public string degreeDisability { get; set; } 
-        
+        public string degreeDisability { get; set; }
+
         [ForeignKey("employee")]
         public long employeeFK { get; set; }
-        public Employee employee { get; set; }    
+        public Employee employee { get; set; }
     }
-        
+
 }
