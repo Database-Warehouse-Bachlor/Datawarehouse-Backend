@@ -1,11 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Datawarehouse_Backend.Models
 {
     public class Order {
         [Key]
          public long id { get; set; }
+         public long orderId {get; set;}
          public string orderType { get; set; }
          public DateTime orderDate { get; set; }
          public DateTime plannedDelivery { get; set; }
@@ -26,13 +28,16 @@ namespace Datawarehouse_Backend.Models
          public Boolean hasWarranty { get; set; }
          public string description { get; set; } 
 
-         public long tennantId { get; set; }
+        [ForeignKey("tennant")]
+         public long tennantFK { get; set; }
          public Tennant tennant { get; set; }
 
-        public long invoiceOutboundId { get; set; }
+        [ForeignKey("invoiceOutBound")]
+        public long invoiceOutboundFK { get; set; }
         public virtual InvoiceOutbound invoiceOutbound {get; set;}
 
-         public long customerId { get; set; }
+        [ForeignKey("customer")]
+         public long customerFK { get; set; }
          public Customer customer { get; set; }
 
     }

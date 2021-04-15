@@ -86,7 +86,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var inboundInvoices = _warehouseDb.InvoiceInbounds
-            .Where(i => i.tennantId == tennantId)
+            .Where(i => i.tennantFK == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
@@ -103,7 +103,7 @@ namespace Datawarehouse_Backend.Controllers
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customer.tennantId == tennantId)
+            .Where(a => a.customer.tennantFK == tennantId)
             .Where(d => d.invoiceDue >= comparisonDate)
             .OrderByDescending(d => d.invoiceDue)
             .ToList();
@@ -116,7 +116,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennantId == tennantId)
+            .Where(i => i.employee.tennantFK == tennantId)
             .Where(d => d.fromDate >= comparisonDate)
             .OrderBy(d => d.fromDate)
             .ToList();
@@ -192,7 +192,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var timeRegisters = _warehouseDb.TimeRegisters
-            .Where(t => t.employee.tennantId == tennantId)
+            .Where(t => t.employee.tennantFK == tennantId)
             .Where(d => d.recordDate >= comparisonDate)
             .OrderByDescending(d => d.recordDate)
             .ToList();
@@ -208,7 +208,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var orders = _warehouseDb.Orders
-            .Where(o => o.tennantId == tennantId)
+            .Where(o => o.tennantFK == tennantId)
             // .Where(d => d.invoiceDate >= comparisonDate)
             //.OrderByDescending(d => d.invoiceDate)
             .ToList();
@@ -225,7 +225,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var customers = _warehouseDb.Customers
-            .Where(c => c.tennantId == tennantId)
+            .Where(c => c.tennantFK == tennantId)
             //.Where(d => d.invoiceDate >= comparisonDate)
             // .OrderByDescending(d => d.invoiceDate)
             .ToList();
@@ -242,7 +242,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
-            .Where(b => b.tennantId == tennantId)
+            .Where(b => b.tennantFK == tennantId)
             //.Where(d => d.invoiceDate >= comparisonDate)
             // .OrderByDescending(d => d.invoiceDate)
             .ToList();
@@ -255,7 +255,7 @@ namespace Datawarehouse_Backend.Controllers
         public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId, [FromForm] string filter)
         {
             var accountsReceivable = _warehouseDb.AccountsReceivables
-            .Where(a => a.customerId == customerId)
+            .Where(a => a.customerFK == customerId)
             .ToList();
             return accountsReceivable;
         }

@@ -8,24 +8,23 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
+
+        public long AbsenceRegisterId {get; set;}
        [Required]
          public DateTime fromDate { get; set; }
         [Required]
         public DateTime toDate { get; set; }
+        [Required]
         public double duration { get; set; }
-        [Required]
         public Boolean soleCaretaker { get; set; }
-        [Required]
         public string abcenseType { get; set; }
-        [Required]
         public string abcenseTypeText { get; set; }
         public string comment { get; set; }
-        public string degreeDisability { get; set; }
+        public string degreeDisability { get; set; } 
+        
         [ForeignKey("employee")]
-        public long? employeeId { get; set; }
-        public Employee employee { get; set; }
-        
-        
+        public long employeeFK { get; set; }
+        public Employee employee { get; set; }    
     }
         
 }

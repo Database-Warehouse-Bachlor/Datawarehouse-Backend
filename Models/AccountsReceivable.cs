@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Datawarehouse_Backend.Models
 {
@@ -7,7 +8,7 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set;}
-        
+        public long AccountsReceivableId {get; set;}
         public DateTime recordDate { get; set;}
         public DateTime dueDate { get; set;}
         public string recordType { get; set;}
@@ -19,7 +20,8 @@ namespace Datawarehouse_Backend.Models
         public long oderId { get; set;}
         public long jobId { get; set;} 
         
-        public long customerId {get; set;}
+        [ForeignKey("customer")]
+        public long customerFK {get; set;}
         public Customer customer { get; set;}
     }
 }
