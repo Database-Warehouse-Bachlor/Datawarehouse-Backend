@@ -56,6 +56,13 @@ namespace Datawarehouse_Backend.Controllers
             .FirstOrDefault<Tennant>();
             return tennant;
         }
+         private long getTennantId()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            long tennantId = long.Parse(claim[0].Value);
+            return tennantId;
+        }
 
 
         [HttpPost("login")]
@@ -182,15 +189,6 @@ namespace Datawarehouse_Backend.Controllers
         {
             Tennant tennant = findTennantById(getTennantId());
             return tennant.tennantName;
-
-        }
-
-         private long getTennantId()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            long tennantId = long.Parse(claim[0].Value);
-            return tennantId;
         }
         
     }

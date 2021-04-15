@@ -80,7 +80,7 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Employee employee = new Employee();
                         employee = contentsList.Employee[i];
-                        employee.tennantId = tennantId;
+                        employee.tennantFK = tennantId;
                         _db.Employees.Add(employee);
                     }
                     //Adds Invoice inbound to datawarehouse
@@ -88,7 +88,7 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         InvoiceInbound invoice = new InvoiceInbound();
                         invoice = contentsList.InvoiceInbound[i];
-                        invoice.tennantId = tennantId;
+                        invoice.tennantFK = tennantId;
                         _db.InvoiceInbounds.Add(invoice);
                     }
 
