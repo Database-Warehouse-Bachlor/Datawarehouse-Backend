@@ -25,14 +25,20 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize(Roles = "Admin")]
         [HttpPost("homeinfo")]
-        public AppInfoHomeMenu getNumberOfTennantsAndErrorsAsJson()
+        public IActionResult getNumberOfTennantsAndErrorsAsJson()
         {
+            IActionResult response;
+
             AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
 
             appInfoHomeMenu.numberOfTennants = getNumberOfTennants();
             appInfoHomeMenu.numberOfErrors = getNumberOfErrorsLastTwentyFour(); 
+            
+            var dataToJson = JsonConvert.SerializeObject(appInfoHomeMenu);
 
-            return appInfoHomeMenu;
+            response = Ok(dataToJson);
+
+            return response;
         }
 
         //[Authorize(Roles = "Admin")]
