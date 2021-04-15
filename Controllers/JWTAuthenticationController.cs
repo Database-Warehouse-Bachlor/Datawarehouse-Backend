@@ -176,6 +176,15 @@ namespace Datawarehouse_Backend.Controllers
             //.ToList();
         }
 
+        [Authorize(Roles = "User")]
+        [HttpGet("tennantName")]
+        public string getTennantName()
+        {
+            Tennant tennant = findTennantById(getTennantId());
+            return tennant.tennantName;
+
+        }
+
          private long getTennantId()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
