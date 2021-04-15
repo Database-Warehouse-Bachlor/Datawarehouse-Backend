@@ -28,7 +28,7 @@ namespace Datawarehouse_Backend.Authentication
         
         var claims = new[]
         {
-             new Claim(JwtRegisteredClaimNames.Sub,userinfo.orgNr),
+             new Claim(JwtRegisteredClaimNames.Sub,userinfo.tennantId.ToString()),
              new Claim(JwtRegisteredClaimNames.Email,userinfo.Email),
              new Claim(ClaimTypes.Role, userinfo.role),
              new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
@@ -44,7 +44,6 @@ namespace Datawarehouse_Backend.Authentication
 
         var encodeToken = new JwtSecurityTokenHandler().WriteToken(token);
         return encodeToken;
-
     }
 }
 }

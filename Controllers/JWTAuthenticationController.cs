@@ -14,10 +14,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Datawarehouse_Backend.Context;
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 
+/*
+*This controller is mainly for authenticating users and registering new users.
+*/ 
 namespace Datawarehouse_Backend.Controllers
 {
-    [Route("api/")]
+    [Route("auth/")]
     [ApiController]
 
     public class JWTAuthenticationController : ControllerBase
@@ -25,12 +29,32 @@ namespace Datawarehouse_Backend.Controllers
 
         private readonly IConfiguration _config;
         private readonly LoginDatabaseContext _db;
+        private readonly WarehouseContext _warehousedb;
 
-        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db)
+        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db, WarehouseContext warehousedb)
         {
-
             _config = config;
             _db = db;
+            _warehousedb = warehousedb;
+        }
+        /*
+        * A function to find the correct User based on email.
+        */
+        private User findUserByMail(string email){
+            var user = _db.Users
+            .Where(e => e.Email == email)
+            .FirstOrDefault<User>();
+            return user;
+        }
+
+        /*
+        * A function to find the correct Tennant based on it's ID.
+        */
+        private Tennant findTennantById(long tennantId) {
+            var tennant = _warehousedb.Tennants
+            .Where(o => o.id == tennantId)
+            .FirstOrDefault<Tennant>();
+            return tennant;
         }
 
 
@@ -38,13 +62,9 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            var loginUser = _db.users
-            .Where(e => e.Email == email)
-            .FirstOrDefault<User>();
+            User loginUser = findUserByMail(email);
 
             IActionResult response;
-
-
             try
             {
                 if (loginUser.Email != null && BCrypt.Net.BCrypt.Verify(pwd, loginUser.password))
@@ -69,28 +89,33 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
-        // TODO: Authorize must be implemented at some point
+        /*
+        * This register-call is for the businesses to add additional users to their business.
+        * To use this function, the tennant need to allready have a user connected to the tennant.
+        */
+
         [Authorize(Roles = "User")]
         [HttpPost("register")]
-        public IActionResult register([FromForm] string orgnr, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
-            var userCheck = _db.users
-            .Where(e => e.Email == email)
-            .FirstOrDefault<User>();
-            if (userCheck == null)
+
+            User userCheck = findUserByMail(email);
+            Tennant tennant = findTennantById(tennantId);
+
+            if (userCheck == null && tennant != null)
             {
                 // Hashing password with a generated salt.
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
 
                 User newUser = new User();
-                newUser.orgNr = orgnr;
+                newUser.tennant = tennant;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
                 newUser.role = Role.User;
 
                 // Adds and saves changes to the database
-                _db.users.Add(newUser);
+                _db.Entry(newUser).State = EntityState.Added;
                 _db.SaveChanges();
                 response = Ok("User created");
             }
@@ -101,12 +126,48 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
+        /*
+        * This registration-call is for the administration to create the first user for the business.
+        * This sets up the first connection between tennant and user.
+        * After this connection is set up, the business can use the other registration-call to add additional users to it's business.
+        */
+
+       // TODO: [Authorize(Roles = "Admin")]
+        [HttpPost("initregister")]
+        public IActionResult initRegister([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
+        {
+            IActionResult response;
+            
+            User userCheck = findUserByMail(email);
+            Tennant tennant = findTennantById(tennantId);
+
+            if (userCheck == null && tennant != null)
+            {
+                // Hashing password with a generated salt.
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pwd);
+
+                User initUser = new User();
+                initUser.tennant = tennant;
+                initUser.Email = email;
+                initUser.password = hashedPassword;
+
+                // Adds and saves changes to the database
+                _db.Users.Add(initUser);
+                _db.SaveChanges();
+                response = Ok("User created");
+            }
+            else
+            {
+                response = BadRequest("User already exist");
+            }
+            return response;
+        }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public List<User> getAllUsers()
         {
-            var users = _db.users.ToList();
+            var users = _db.Users.ToList();
             return users;
             // TODO: Passord må ikke vises
             // TODO: Hvis vi gjør om Users til en relasjon av Organisations/Tennants
@@ -135,7 +196,7 @@ namespace Datawarehouse_Backend.Controllers
             IList<Claim> claim = identity.Claims.ToList();
             var orgNum = claim[0].Value;
             return orgNum;
-        
+
         }
 
 

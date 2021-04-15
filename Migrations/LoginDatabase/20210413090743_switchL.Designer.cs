@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations.LoginDatabase
 {
     [DbContext(typeof(LoginDatabaseContext))]
-    partial class LoginDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210413090743_switchL")]
+    partial class switchL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,9 +245,6 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
 
                     b.Property<long>("tennantId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("role")
-                        .HasColumnType("text");
 
                     b.HasKey("id");
 

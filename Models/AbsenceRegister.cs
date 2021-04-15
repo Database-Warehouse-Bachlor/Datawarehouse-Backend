@@ -6,18 +6,14 @@ namespace Datawarehouse_Backend.Models
     public class AbsenceRegister
     {
         [Key]
-        public long id { get; set;}
-        [Required]
-        public long absenceId { get; set;}
-        [Required]
-        public long employeeId { get; set; }
-        [Required]
-        public DateTime fromDate { get; set; }
+        public long id { get; set; }
+       [Required]
+         public DateTime fromDate { get; set; }
         [Required]
         public DateTime toDate { get; set; }
-        //int?
-        [Required]
         public double duration { get; set; }
+     /*    //int?
+        [Required]
         [Required]
         public Boolean soleCaretaker { get; set; }
         [Required]
@@ -25,8 +21,12 @@ namespace Datawarehouse_Backend.Models
         [Required]
         //public string abcenseTypeText { get; set; }
         //public string comment { get; set; }
+        public string degreeDisability { get; set; } */
 
-        public string degreeDisability { get; set; }
-
+        public long employeeId { get; set; }
+        public Employee employee { get; set; }
+        
+        
     }
+        
 }

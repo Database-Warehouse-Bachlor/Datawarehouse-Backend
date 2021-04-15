@@ -16,11 +16,6 @@ namespace Datawarehouse_Backend.Models
         [Key]      
         public int id {get; set;}
 
-//orgnr er string i tilfelle et orgnr starter med 0..
-        [Required]
-        [Column(TypeName = "varchar(10)")] 
-        public string orgNr {get; set;}
-
         [Required]
         [DataType(DataType.EmailAddress)]
         [MaxLength(50)]
@@ -33,5 +28,8 @@ namespace Datawarehouse_Backend.Models
         public string password {get; set;}
 
         public string role {get; set;}
+        [ForeignKey("tennant")]
+        public long tennantId { get; set; }
+        public Tennant tennant { get; set; }
     }
 }
