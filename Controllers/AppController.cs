@@ -56,6 +56,17 @@ namespace Datawarehouse_Backend.Controllers
             .ToList();
             return errors;
         }
+
+        //[Authorize(Roles = "Admin")]
+        [HttpPost("lasterrors")]
+        public List<ErrorLog> getLatestErrors() {
+            DateTime currentTime = DateTime.Now;
+            var errors = _warehouseDb.ErrorLogs
+            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
+            .ToList();
+            return errors;
+        }
+
         // Returns a list of all tennants.
         public int getNumberOfTennants()
         {
