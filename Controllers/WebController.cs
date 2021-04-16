@@ -84,6 +84,7 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("inbound")]
         public List<InvoiceInbound> getAllInboundInvoice([FromForm] string filter)
         {
+            long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var inboundInvoices = _warehouseDb.InvoiceInbounds
             .Where(i => i.tennantFK == tennantId)
@@ -112,7 +113,7 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("absence")]
-        public List<AbsenceView> getAbsenceRegister([FromForm] long tennantId, [FromForm] string filter)
+        public List<AbsenceView> getAbsenceRegister([FromForm] string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
