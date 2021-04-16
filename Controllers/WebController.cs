@@ -113,7 +113,7 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("absence")]
-        public List<AbsenceView> getAbsenceRegister([FromForm] string filter)
+        public IList<AbsenceView> getAbsenceRegister([FromForm] string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -132,21 +132,99 @@ namespace Datawarehouse_Backend.Controllers
             *  only tracks year, month and total absence for that month. 
             *  So instead of getting a list of all absences, it gives a list of total absences per month.
             */
-            try
+            if (filter == "thisweek" || filter == "thisMonth" || filter == "lastThirtyDays")
             {
-                for (int i = 0; i < absence.Count; i++)
+                try
                 {
-                    Console.WriteLine("i value: " + i);
-                    if (i != absence.Count - 1)
+                    for (int i = 0; i < absence.Count; i++)
                     {
-                        if (absence[i].fromDate.Month == absence[i + 1].fromDate.Month)
-                        { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
+                        Console.WriteLine("i value: " + i);
+                        if (i != absence.Count - 1)
+                        {
+                            if (absence[i].fromDate.Day == absence[i + 1].fromDate.Day)
+                            { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
+                                totalAbsence += absence[i].duration;
+                                Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
+                                Console.WriteLine("Next absence is: " + absence[i + 1].id);
+                            }
+                            else
+                            { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
+                                totalAbsence += absence[i].duration;
+                                AbsenceView view = new AbsenceView();
+                                view.year = absence[i].fromDate.Year;
+                                view.month = absence[i].fromDate.Month;
+                                view.day = absence[i].fromDate.Day;
+                                view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
+                                view.totalDuration = totalAbsence;
+                                Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                absenceViews.Add(view);
+                                totalAbsence = 0;
+                            }
+                        }
+                        else if (absence[i].fromDate.Day == absence[i - 1].fromDate.Day)
+                        { //last absence has the same month as the one previously added absence
                             totalAbsence += absence[i].duration;
-                            Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
-                            Console.WriteLine("Next absence is: " + absence[i + 1].id);
+                            AbsenceView view = new AbsenceView();
+                            view.year = absence[i].fromDate.Year;
+                            view.month = absence[i].fromDate.Month;
+                            view.day = absence[i].fromDate.Day;
+                            view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
+                            view.totalDuration = totalAbsence;
+                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            absenceViews.Add(view);
+                            totalAbsence = 0;
                         }
                         else
-                        { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
+                        { //last absence is in a new month
+                            totalAbsence += absence[i].duration;
+                            AbsenceView view = new AbsenceView();
+                            view.year = absence[i].fromDate.Year;
+                            view.month = absence[i].fromDate.Month;
+                            view.day = absence[i].fromDate.Day;
+                            view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
+                            view.totalDuration = absence[i].duration;
+                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            absenceViews.Add(view);
+                            totalAbsence = 0;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error: " + e);
+                    //TODO: Create errorlogg
+                }
+                return absenceViews;
+            }
+            else
+            {
+                try
+                {
+                    for (int i = 0; i < absence.Count; i++)
+                    {
+                        Console.WriteLine("i value: " + i);
+                        if (i != absence.Count - 1)
+                        {
+                            if (absence[i].fromDate.Month == absence[i + 1].fromDate.Month)
+                            { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
+                                totalAbsence += absence[i].duration;
+                                Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
+                                Console.WriteLine("Next absence is: " + absence[i + 1].id);
+                            }
+                            else
+                            { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
+                                totalAbsence += absence[i].duration;
+                                AbsenceView view = new AbsenceView();
+                                view.year = absence[i].fromDate.Year;
+                                view.month = absence[i].fromDate.Month;
+                                view.totalDuration = totalAbsence;
+                                Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                absenceViews.Add(view);
+                                totalAbsence = 0;
+                            }
+                        }
+                        else if (absence[i].fromDate.Month == absence[i - 1].fromDate.Month)
+                        { //last absence has the same month as the one previously added absence
                             totalAbsence += absence[i].duration;
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
@@ -156,36 +234,26 @@ namespace Datawarehouse_Backend.Controllers
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
-                    }
-                    else if (absence[i].fromDate.Month == absence[i - 1].fromDate.Month)
-                    { //last absence has the same month as the one previously added absence
-                        totalAbsence += absence[i].duration;
-                        AbsenceView view = new AbsenceView();
-                        view.year = absence[i].fromDate.Year;
-                        view.month = absence[i].fromDate.Month;
-                        view.totalDuration = totalAbsence;
-                        Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
-                        absenceViews.Add(view);
-                        totalAbsence = 0;
-                    }
-                    else
-                    { //last absence is in a new month
-                        totalAbsence += absence[i].duration;
-                        AbsenceView view = new AbsenceView();
-                        view.year = absence[i].fromDate.Year;
-                        view.month = absence[i].fromDate.Month;
-                        view.totalDuration = absence[i].duration;
-                        Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
-                        absenceViews.Add(view);
-                        totalAbsence = 0;
+                        else
+                        { //last absence is in a new month
+                            totalAbsence += absence[i].duration;
+                            AbsenceView view = new AbsenceView();
+                            view.year = absence[i].fromDate.Year;
+                            view.month = absence[i].fromDate.Month;
+                            view.totalDuration = absence[i].duration;
+                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            absenceViews.Add(view);
+                            totalAbsence = 0;
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error: " + e);
+                    //TODO: Create errorlogg
+                }
+                return absenceViews;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: " + e);
-            }
-            return absenceViews;
         }
 
         [Authorize]
@@ -202,8 +270,8 @@ namespace Datawarehouse_Backend.Controllers
             return timeRegisters;
         }
         /*
-       * A method to fetch all orders from a specific tennant.
-       */
+        * A method to fetch all orders from a specific tennant.
+        */
 
         [Authorize]
         [HttpGet("orders")]
@@ -217,8 +285,8 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-       * A method to fetch all inbound invoices from a specific tennant.
-       */
+        * A method to fetch all inbound invoices from a specific tennant.
+        */
 
         [Authorize]
         [HttpGet("customers")]
@@ -232,8 +300,8 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-       * A method to fetch all inbound invoices from a specific tennant.
-       */
+        * A method to fetch all inbound invoices from a specific tennant.
+        */
 
         [Authorize]
         [HttpGet("balance")]
@@ -259,7 +327,7 @@ namespace Datawarehouse_Backend.Controllers
             return accountsReceivable;
         }
 
-         private Tennant getTennant()
+        private Tennant getTennant()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
