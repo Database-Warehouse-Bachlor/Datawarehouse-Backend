@@ -82,7 +82,7 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getAllInboundInvoice([FromForm] string filter)
+        public List<InvoiceInbound> getAllInboundInvoice( string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -99,7 +99,7 @@ namespace Datawarehouse_Backend.Controllers
         */
         [Authorize]
         [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds([FromForm] string filter)
+        public List<InvoiceOutbound> getInvoiceOutbounds(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -113,7 +113,7 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("absence")]
-        public IList<AbsenceView> getAbsenceRegister([FromForm] string filter)
+        public IList<AbsenceView> getAbsenceRegister(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -258,7 +258,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("timeregister")]
-        public List<TimeRegister> getTimeRegisters([FromForm] string filter)
+        public List<TimeRegister> getTimeRegisters(string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             long tennantId = getTennantId();
@@ -275,7 +275,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("orders")]
-        public List<Order> getAllOrders([FromForm] string filter)
+        public List<Order> getAllOrders(string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             var orders = getTennant().orders.ToList();
@@ -290,7 +290,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("customers")]
-        public List<Customer> getCustomers([FromForm] string filter)
+        public List<Customer> getCustomers(string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             var customers = getTennant().customers.ToList();
@@ -305,7 +305,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("balance")]
-        public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId, [FromForm] string filter)
+        public List<BalanceAndBudget> getBalanceAndBudget(string filter)
         {
             DateTime comparisonDate = compareDates(filter);
             var balanceAndBudgets = getTennant().bnb.ToList();
@@ -317,7 +317,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("accrecieve")]
-        public List<AccountsReceivable> getAccountsReceivables([FromForm] string filter)
+        public List<AccountsReceivable> getAccountsReceivables(string filter)
         {
             long tennantId = getTennantId();
             var accountsReceivable = _warehouseDb.Customers
