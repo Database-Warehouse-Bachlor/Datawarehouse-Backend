@@ -208,10 +208,8 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("orders")]
         public List<Order> getAllOrders([FromForm] string filter)
         {
-            Tennant tennant =  getTennant();
             DateTime comparisonDate = compareDates(filter);
-            var orders = _warehouseDb.Orders
-            .Where(o => o.tennantFK == tennantId)
+            var orders = getTennant().orders.ToList();
             // .Where(d => d.invoiceDate >= comparisonDate)
             //.OrderByDescending(d => d.invoiceDate)
             return orders;
@@ -223,14 +221,12 @@ namespace Datawarehouse_Backend.Controllers
 
         [Authorize]
         [HttpGet("customers")]
-        public List<Customer> getCustomers([FromForm] long tennantId, [FromForm] string filter)
+        public List<Customer> getCustomers([FromForm] string filter)
         {
             DateTime comparisonDate = compareDates(filter);
-            var customers = _warehouseDb.Customers
-            .Where(c => c.tennantFK == tennantId)
+            var customers = getTennant().customers.ToList();
             //.Where(d => d.invoiceDate >= comparisonDate)
             // .OrderByDescending(d => d.invoiceDate)
-            .ToList();
             return customers;
         }
 
@@ -243,25 +239,34 @@ namespace Datawarehouse_Backend.Controllers
         public List<BalanceAndBudget> getBalanceAndBudget([FromForm] long tennantId, [FromForm] string filter)
         {
             DateTime comparisonDate = compareDates(filter);
-            var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
-            .Where(b => b.tennantFK == tennantId)
+            var balanceAndBudgets = getTennant().bnb.ToList();
             //.Where(d => d.invoiceDate >= comparisonDate)
             // .OrderByDescending(d => d.invoiceDate)
-            .ToList();
             return balanceAndBudgets;
         }
 
 
         [Authorize]
         [HttpGet("accrecieve")]
-        public List<AccountsReceivable> getAccountsReceivables([FromForm] long customerId, [FromForm] string filter)
+        public List<AccountsReceivable> getAccountsReceivables([FromForm] string filter)
         {
-            var accountsReceivable = _warehouseDb.AccountsReceivables
-            .Where(a => a.customerFK == customerId)
+            long tennantId = getTennantId();
+            var accountsReceivable = _warehouseDb.Customers
+            .Where(c => c.tennantFK == tennantId).FirstOrDefault<Customer>()
+            .accountsreceivables
             .ToList();
             return accountsReceivable;
         }
 
+         private Tennant getTennant()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            long tennantId = long.Parse(claim[0].Value);
+            Tennant tennant = _warehouseDb.Tennants
+            .Where(t => t.id == tennantId).FirstOrDefault<Tennant>();
+            return tennant;
+        }
         private long getTennantId()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
