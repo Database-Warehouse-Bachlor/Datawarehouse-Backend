@@ -113,7 +113,7 @@ namespace Datawarehouse_Backend.Controllers
 
         //[Authorize]
         [HttpGet("absence")]
-        public IList<AbsenceView> getAbsenceRegister([FromForm] string filter)
+        public IList<AbsenceView> getAbsenceRegister(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -132,7 +132,7 @@ namespace Datawarehouse_Backend.Controllers
             *  only tracks year, month and total absence for that month. 
             *  So instead of getting a list of all absences, it gives a list of total absences per month.
             */
-            if (filter == "thisweek" || filter == "thisMonth" || filter == "lastThirtyDays")
+            if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays")
             {
                 try
                 {
@@ -156,7 +156,7 @@ namespace Datawarehouse_Backend.Controllers
                                 view.day = absence[i].fromDate.Day;
                                 view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                                 view.totalDuration = totalAbsence;
-                                Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                                 absenceViews.Add(view);
                                 totalAbsence = 0;
                             }
@@ -170,7 +170,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -183,7 +183,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
