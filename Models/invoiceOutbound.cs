@@ -18,6 +18,8 @@ namespace Datawarehouse_Backend.Models
         public double amountExVat { get; set; }
         public double amountIncVat { get; set; }
         public double amountTotal { get; set; }
+        public long orderId { get; set; }
+        public long customerId { get; set; }
 
         [ForeignKey("order")]
         public long orderFK { get; set; }

@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [Migration("20210416074106_OrderUpdate2")]
+    partial class OrderUpdate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +47,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<long>("employeeFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
@@ -85,9 +84,6 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("customerFK")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("customerId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("customerName")
                         .HasColumnType("text");
 
@@ -99,6 +95,9 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.Property<string>("note")
                         .HasColumnType("text");
+
+                    b.Property<long>("oderId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("overdueNotice")
                         .HasColumnType("text");
@@ -170,11 +169,11 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("city")
                         .HasColumnType("text");
 
-                    b.Property<long>("customerId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("customerName")
                         .HasColumnType("text");
+
+                    b.Property<long>("custommerId")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("isInactive")
                         .HasColumnType("boolean");
@@ -337,9 +336,6 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("customerFK")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("customerId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("invoiceDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -359,9 +355,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<long>("orderFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("orderId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
@@ -388,9 +381,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<long>("customerFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("customerId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("customerName")
@@ -496,9 +486,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<long>("employeeFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("invoiceRate")

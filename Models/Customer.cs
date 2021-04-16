@@ -9,7 +9,7 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
-        public long custommerId { get; set; }
+        public long customerId { get; set; }
         public String customerName { get; set; }
         public String address { get; set; }
         public int zipcode { get; set; }

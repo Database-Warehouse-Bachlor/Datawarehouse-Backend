@@ -55,6 +55,8 @@ namespace Datawarehouse_Backend.Controllers
                 ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(
                     jsonDataAsString);
 
+                Console.WriteLine(jsonDataAsString.ToString());
+
 
                 tennantId = addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
 
@@ -68,8 +70,9 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Customer customer = new Customer();
                         customer = contentsList.Customer[i];
-
+                        customer.tennantFK = tennantId;
                         addCustomer(customer, tennantId);
+                        _db.SaveChanges();
                     }
                     
                     //Adds Employee to datawarehouse
@@ -77,8 +80,11 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Employee employee = new Employee();
                         employee = contentsList.Employee[i];
+                        employee.tennantFK = tennantId;
 
                         addEmployee(employee, tennantId);
+                        _db.SaveChanges();
+
                     }
 
                     //Adds Order to datawarehouse
@@ -86,7 +92,21 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         Order order = new Order();
                         order = contentsList.Order[i];
-                        _db.Orders.Add(order);
+                        order.tennantFK = tennantId;
+                        Console.WriteLine("Cordel customerId: " + order.customerId);
+                        long customerFK = getCustomerId(order.customerId);
+                        Console.WriteLine("CustomerFK: " + customerFK);
+
+                        if(customerFK > -1) 
+                        {
+                            order.customerFK = customerFK;
+                            _db.Orders.Add(order);
+                            _db.SaveChanges();
+
+                        } else 
+                        {
+                            //TODO Logg feil
+                        }
                     }
 
                     //Adds Invoice inbound to datawarehouse
@@ -102,9 +122,22 @@ namespace Datawarehouse_Backend.Controllers
                     for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
                     {
                         InvoiceOutbound outbound = new InvoiceOutbound();
-
                         outbound = contentsList.InvoiceOutbound[i];
-                        _db.InvoiceOutbounds.Add(outbound);
+
+                        long orderFK = getOrderId(outbound.orderId);
+                        long customerFK = getCustomerId(outbound.customerId);
+
+                        if(orderFK > 0 || customerFK > 0) 
+                        {
+                            outbound.orderFK = orderFK;
+                            outbound.customerFK = customerFK;
+                            Console.WriteLine("GAYYY");
+                            _db.InvoiceOutbounds.Add(outbound);
+                            _db.SaveChanges();
+                        } else 
+                        {
+                            //TODO LOGGE FEIL
+                        }
                     }
 
                     
@@ -114,6 +147,7 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
                         balanceAndBudget = contentsList.BalanceAndBudget[i];
+                        balanceAndBudget.tennantFK = tennantId;
                         _db.BalanceAndBudgets.Add(balanceAndBudget);
                     }
 
@@ -122,7 +156,18 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         AbsenceRegister absenceRegister = new AbsenceRegister();
                         absenceRegister = contentsList.AbsenceRegister[i];
-                        _db.AbsenceRegisters.Add(absenceRegister);
+
+                        long employeeFK = getEmployeeId(absenceRegister.employeeId);
+
+                        if(employeeFK > -1) 
+                        {
+                            absenceRegister.employeeFK = employeeFK;
+                            _db.AbsenceRegisters.Add(absenceRegister);
+                        } else 
+                        {
+                            //TODO Logg feil
+                        }
+
                     }
 
                     //Adds Accountsreceivable to datawarehouse
@@ -130,7 +175,18 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         AccountsReceivable accountsReceivable = new AccountsReceivable();
                         accountsReceivable = contentsList.Accountsreceivable[i];
-                        _db.AccountsReceivables.Add(accountsReceivable);
+
+                        long customerFK = getCustomerId(accountsReceivable.customerId);
+
+                        if(customerFK > -1) 
+                        {
+                            accountsReceivable.customerFK = customerFK;
+                            _db.AccountsReceivables.Add(accountsReceivable);
+                        } else 
+                        {
+                            //TODO Logg feil
+                        }
+
                     }
 
                     //Adds TimeRegister to datawarehouse
@@ -138,7 +194,17 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         TimeRegister timeRegister = new TimeRegister();
                         timeRegister = contentsList.TimeRegister[i];
-                        _db.TimeRegisters.Add(timeRegister);
+
+                        long employeeFK = getEmployeeId(timeRegister.employeeId);
+
+                        if(employeeFK > -1) 
+                        {
+                            timeRegister.employeeFK = employeeFK;
+                            _db.TimeRegisters.Add(timeRegister);
+                        } else 
+                        {
+                            //TODO Logg feil
+                        }
                     }
 
                 }
@@ -156,6 +222,7 @@ namespace Datawarehouse_Backend.Controllers
                     Console.WriteLine("tennantid was -1");
                 }
 
+                Console.WriteLine("KOM JEGH MEG HITTT!!!!");
                 //Saves changes to DB if everything is OK
                 _db.SaveChanges();
 
@@ -320,7 +387,7 @@ namespace Datawarehouse_Backend.Controllers
         private long addCustomer(Customer customer, long tennantFK ) 
         {
             ErrorLog errorLog = new ErrorLog();
-            Customer databaseCustomer  = _db.Customers.Where(c => c.custommerId == customer.custommerId).FirstOrDefault<Customer>();
+            Customer databaseCustomer  = _db.Customers.Where(c => c.customerId == customer.customerId).FirstOrDefault<Customer>();
             if (databaseCustomer == null)
             {
                 Customer customer1 = new Customer();
@@ -329,6 +396,9 @@ namespace Datawarehouse_Backend.Controllers
                 _db.Customers.Add(customer1);
 
                 _db.SaveChanges();
+
+                Console.WriteLine(customer1.customerId);
+                Console.WriteLine(customer1.id);
 
                 return customer1.id;
             } 
@@ -351,6 +421,37 @@ namespace Datawarehouse_Backend.Controllers
                 return employee.id;
             } 
             return databaseEmployee.id;
+        }
+
+        private long getEmployeeId(long cordelId) {
+            Employee databaseEmployee  = _db.Employees.Where(c => c.employeeId == cordelId).FirstOrDefault<Employee>();
+
+            if(databaseEmployee != null) {
+                return databaseEmployee.id;
+            } 
+            return -1;
+        }
+
+        private long getOrderId(long cordelId) {
+            Order databaseOrder  = _db.Orders.Where(c => c.orderId == cordelId).FirstOrDefault<Order>();
+
+            if(databaseOrder != null) {
+                return databaseOrder.id;
+            } 
+            return -1;
+        }
+
+        private long getCustomerId(long cordelId) {
+            Customer databaseCustomer  = _db.Customers.Where(c => c.customerId == cordelId).FirstOrDefault<Customer>();
+            Console.WriteLine("");
+            Console.WriteLine("Inside getCustomerId()");
+            Console.WriteLine("CordelCustomerId: " + cordelId);
+            Console.WriteLine("CordelCustomerId: " + databaseCustomer.id);
+            Console.WriteLine("");
+            if(databaseCustomer != null) {
+                return databaseCustomer.id;
+            } 
+            return -1;
         }
     }
 

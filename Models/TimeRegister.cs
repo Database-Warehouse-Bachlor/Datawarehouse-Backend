@@ -32,6 +32,7 @@ namespace Datawarehouse_Backend.Models
         public string processingCode { get; set; }
         public string viaType { get; set; }
         public string summaryType { get; set; }
+        public long employeeId { get; set; }
 
         [ForeignKey("employee")]
         public long employeeFK { get; set; }

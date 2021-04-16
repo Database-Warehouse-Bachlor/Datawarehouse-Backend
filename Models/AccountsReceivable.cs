@@ -17,7 +17,7 @@ namespace Datawarehouse_Backend.Models
         public double amountDue { get; set; }
         public string overdueNotice { get; set; }
         public string note { get; set; }
-        public long oderId { get; set; }
+        public long customerId { get; set; }
         public long jobId { get; set; }
 
         [ForeignKey("customer")]
