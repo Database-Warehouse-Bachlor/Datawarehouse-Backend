@@ -1,5 +1,6 @@
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -17,10 +18,9 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
-/*
-* This controller handles the automated inputs sent from Cordel's systems every night.
-*/ 
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -43,9 +43,11 @@ namespace Datawarehouse_Backend.Controllers
 
         [HttpPost("add")]
         [Consumes("application/json")]
-        public IActionResult addData([FromBody] dynamic data) {
+        public IActionResult addData([FromQuery] string OrgNummer, [FromBody] dynamic data)
+        {
 
             string jsonDataAsString = data + "";
+            long tennantId = -1;
 
             try
             {
@@ -138,6 +140,7 @@ namespace Datawarehouse_Backend.Controllers
                         timeRegister = contentsList.TimeRegister[i];
                         _db.TimeRegisters.Add(timeRegister);
                     }
+
                 }
                 else
                 {
@@ -161,60 +164,99 @@ namespace Datawarehouse_Backend.Controllers
                 Fields that are null or not the expected datatype can cause this
                 */
             }
-            catch (Exception e) {
+            catch (JsonSerializationException e)
+            {
+
+                Console.WriteLine(e.GetType());
+
                 ErrorLog errorLog = new ErrorLog();
-                string errorMessage = e + " Exception caught.";
+                string errorType = e.GetType().ToString();
+                string errorMessage = e.Message.ToString() + " businessId: " + OrgNummer;
+                DateTime timeOfError = DateTime.Now;
+
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = DateTime.Now;
-                Console.WriteLine(errorLog.errorMessage + " " + errorLog.timeOfError);
+                errorLog.timeOfError = timeOfError;
+
                 _db.ErrorLogs.Add(errorLog);
                 _db.SaveChanges();
-                Console.WriteLine();
+
+
+                /*
+                This can be caused if some fields managed to stay null after JsonConvert.DeserializeObject
+                and the programm tries to create a new object with that information and add it to the database
+                where it is required to have a value. 
+                */
+            }
+            catch (NullReferenceException e)
+            {
+                ErrorLog errorLog = new ErrorLog();
+                
+                string errorType = e.GetType().ToString();
+                string errorMessage = e.ToString() + " Tennant ID: " + tennantId;
+                DateTime timeOfError = DateTime.Now;
+
+                errorLog.errorType = errorType;
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = timeOfError;
+
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+            }
+            catch (InvalidbusinessIdOrApiKeyException)
+            {
+                /*
+                This catch is only used for skipping the processing of incoming data.
+                There is only one place where it is thrown, and that is when the businessID
+                or apiKey is invalid. It gets logged in the database, and jumpes out of the Try.
+                */
             }
 
-            //-------------------------------------------------
-            //Er dette fin kode? Eller burde jeg endre på noe?
-            //-------------------------------------------------
+            /*
+            Systemet får en exception etter at et Required field er tom. Denne exception blir logga i terminal og i postman
+            Etter dette går den videre til catch, hvor alt funker som det skal helt til den SaveChanges hvor samme feilmelding
+            dukker opp selv om alle endringer i try egentlig skal bli kastet og ikke lagra. Aner ikke hvordan jeg skal løse dette 
+            eller hva det kommer av, så bare å rope ut hvis noen har peiling...
+            */
+            catch (DbUpdateException e)
+            {
+                ErrorLog errorLog = new ErrorLog();
 
-            //List<InvoiceInbound> invoices = [];
+                string errorType = e.GetType().ToString();
+                string errorMessage = 
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                tennantId;
+
+                DateTime timeOfError = DateTime.Now;
+
+                errorLog.errorType = errorType;
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = timeOfError;
+
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+
+            } 
             
-            //Adds Invoice inbound to datawarehouse
-            
-            // for(int i = 0; i < contentsList.InvoiceInbound.Count; i++) {
-            //     InvoiceInbound invoice = new InvoiceInbound();
-            //     invoice = contentsList.InvoiceInbound[i];
-            //     _db.InvoiceInbounds.Add(invoice);
-            //     _db.SaveChanges();
-            //     }
+            catch (Exception e) {
 
-            // //Adds Invoice outbound to datawarehouse
-            // for(int i = 0; i < contentsList.InvoiceOutbound.Count; i++) {
-            //     InvoiceOutbound outbound = new InvoiceOutbound();
-            //     outbound = contentsList.InvoiceOutbound[i];
-            //     _db.InvoiceOutbounds.Add(outbound);
-            //     _db.SaveChanges();
-            // }
-            
-            // //Adds custumer to datawarehouse
-            // for(int i = 0; i < contentsList.Customer.Count; i++) {
-            //     Customer customer = new Customer();
-            //     customer = contentsList.Customer[i];
-            //     _db.Customers.Add(customer);
-            //     _db.SaveChanges();
-            // }
+                ErrorLog errorLog = new ErrorLog();
 
+                string errorType = e.GetType().ToString();
+                string errorMessage = 
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                tennantId;
 
+                DateTime timeOfError = DateTime.Now;
+
+                errorLog.errorType = errorType;
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = timeOfError;
+
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
                 
-
-                //invoice.invoiceId       =   invoices.InvoiceInbound[i].invoiceId;
-                //invoice.tennantId       =   invoices.InvoiceInbound[i].tennantId;
-                //invoice.jobId           =   invoices.InvoiceInbound[i].jobId;
-                //invoice.supplierId      =   invoices.InvoiceInbound[i].supplierId;
-                //invoice.wholesalerId    =   invoices.InvoiceInbound[i].wholesalerId;
-                //invoice.invoiceDate     =   invoices.InvoiceInbound[i].invoiceDate;
-                //invoice.amountTotal     =   invoices.InvoiceInbound[i].amountTotal;
-                //invoice.specification   =   invoices.InvoiceInbound[i].specification;
-                //invoice.invoicePdf      =   invoices.InvoiceInbound[i].invoicePdf;
+            }
 
             return Ok();
         }
@@ -225,33 +267,55 @@ namespace Datawarehouse_Backend.Controllers
         If the incoming data doesn't have a tennant to connect the data to, it will create a tennant based on
         the incoming information (businessname, businessID and API-key).
          */
-        private void addTennant(string bId, string bName, string apiKey){
+        private long addTennant(string bId, string bName, string apiKey)
+        {
             ErrorLog errorLog = new ErrorLog();
             var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
-            if(business == null && bId != null && apiKey != null && bId != "" && apiKey != "") {  
+            if (business == null && bId != null && apiKey != null && bId != "" && apiKey != "")
+            {
                 Tennant tennant = new Tennant();
                 tennant.businessId = bId;
                 tennant.tennantName = bName;
                 tennant.apiKey = apiKey;
                 _db.Tennants.Add(tennant);
                 _db.SaveChanges();
-            } else if(bId == null || bId == "") {
-                string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId; 
+
+                return tennant.id;
+
+            }
+            else if (bId == null || bId == "")
+            {
+                string errorType = "BusinessId fail";
+                string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
+
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = businessIdError;
-                errorLog.timeOfError = DateTime.Now; 
-                Console.WriteLine("BusinessID is either empty or not presented properly");
+                errorLog.timeOfError = DateTime.Now;
+
                 _db.ErrorLogs.Add(errorLog);
                 _db.SaveChanges();
-            } else if(apiKey == null || apiKey == "") {
+                //Throws an Exception so it does not try to process incoming data that will lead to new Exception
+                throw new InvalidbusinessIdOrApiKeyException();
+            }
+            else if (apiKey == null || apiKey == "")
+            {
+                string errorType = "API-Key fail";
                 string apiKeyError = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
+
+                errorLog.errorType = errorType;
                 errorLog.errorMessage = apiKeyError;
                 errorLog.timeOfError = DateTime.Now;
+                
                 _db.ErrorLogs.Add(errorLog);
                 _db.SaveChanges();
-                Console.WriteLine("API-key er enten tom eller ikke presentert på riktig måte.");
-            } else if(business != null) {
+                //Throws an Exception so it does not try to process incoming data that will lead to new Exception
+                throw new InvalidbusinessIdOrApiKeyException();
+            }
+            else if (business != null)
+            {
                 Console.WriteLine("Tennant found, submitting data...");
             }
+            return business.id;
         }
         private long addCustomer(Customer customer, long tennantFK ) 
         {
@@ -282,11 +346,14 @@ namespace Datawarehouse_Backend.Controllers
                 employee1.tennantFK = tennantFK;
                 _db.Employees.Add(employee);
 
-               await _db.SaveChangesAsync();
+                _db.SaveChanges();
 
                 return employee.id;
             } 
             return databaseEmployee.id;
         }
     }
+
+    
+
 }

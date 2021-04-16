@@ -56,6 +56,13 @@ namespace Datawarehouse_Backend.Controllers
             .FirstOrDefault<Tennant>();
             return tennant;
         }
+         private long getTennantId()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            long tennantId = long.Parse(claim[0].Value);
+            return tennantId;
+        }
 
 
         [HttpPost("login")]
@@ -94,14 +101,14 @@ namespace Datawarehouse_Backend.Controllers
         * To use this function, the tennant need to allready have a user connected to the tennant.
         */
 
-        // TODO: [Authorize]
+        [Authorize(Roles = "User")]
         [HttpPost("register")]
-        public IActionResult register([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult register([FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
 
             User userCheck = findUserByMail(email);
-            Tennant tennant = findTennantById(tennantId);
+            Tennant tennant = findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
             {
@@ -112,6 +119,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.tennant = tennant;
                 newUser.Email = email;
                 newUser.password = hashedPassword;
+                newUser.role = Role.User;
 
                 // Adds and saves changes to the database
                 _db.Entry(newUser).State = EntityState.Added;
@@ -133,12 +141,12 @@ namespace Datawarehouse_Backend.Controllers
 
        // TODO: [Authorize(Roles = "Admin")]
         [HttpPost("initregister")]
-        public IActionResult initRegister([FromForm] long tennantId, [FromForm] string email, [FromForm] string pwd)
+        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd)
         {
             IActionResult response;
-            
+
             User userCheck = findUserByMail(email);
-            Tennant tennant = findTennantById(tennantId);
+            Tennant tennant = findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
             {
@@ -162,7 +170,7 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("users")]
         public List<User> getAllUsers()
         {
@@ -175,28 +183,14 @@ namespace Datawarehouse_Backend.Controllers
             //.ToList();
         }
 
-
-
-
-        [Authorize]
-        [HttpPost("Post")]
-        public string post()
+        [Authorize(Roles = "User")]
+        [HttpGet("tennantName")]
+        public string getTennantName()
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            var orgNum = claim[0].Value;
-            return "Welcome to: " + orgNum;
+            Tennant tennant = findTennantById(getTennantId());
+            return tennant.tennantName;
         }
-        [Authorize]
-        [HttpGet("getOrgNr")]
-        public string getOrgNr()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            var orgNum = claim[0].Value;
-            return orgNum;
-
-        }
+        
     }
 
 }

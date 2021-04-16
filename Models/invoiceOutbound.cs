@@ -2,25 +2,29 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Datawarehouse_Backend.Models {
+namespace Datawarehouse_Backend.Models
+{
 
-    public class InvoiceOutbound {
+    public class InvoiceOutbound
+    {
         [Key]
         public long id { get; set; }
+        public long invoiceOutboundId { get; set; }
         public DateTime invoiceDue { get; set; }
-       /*  public long jobId { get; set; }
+        public long jobId { get; set; }
         public DateTime invoiceDate { get; set; }
         public double invoiceExVat { get; set; }
         public double invoiceIncVat { get; set; }
         public double amountExVat { get; set; }
         public double amountIncVat { get; set; }
-        public double amountTotal { get; set; } */
+        public double amountTotal { get; set; }
 
         [ForeignKey("order")]
-        public long orderId { get; set; }
+        public long orderFK { get; set; }
         public virtual Order order { get; set; }
 
-        public long customerId { get; set; }
+        [ForeignKey("customer")]
+        public long customerFK { get; set; }
         public Customer customer { get; set; }
     }
 }
