@@ -65,6 +65,9 @@ namespace Datawarehouse_Backend.Controllers
                 case "thisWeek":
                     comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1);
                     break;
+                case "lastSevenDays":
+                    comparisonDate = dateTimeNow.Date.AddDays(-7);
+                    break;
                 default:
                     Console.WriteLine("No filter added, listing all..");
                     comparisonDate = dateTimeNow.Date.AddYears(-30);
@@ -132,7 +135,7 @@ namespace Datawarehouse_Backend.Controllers
             *  only tracks year, month and total absence for that month. 
             *  So instead of getting a list of all absences, it gives a list of total absences per month.
             */
-            if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays")
+            if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays" || filter == "lastSevenDays" )
             {
                 try
                 {
