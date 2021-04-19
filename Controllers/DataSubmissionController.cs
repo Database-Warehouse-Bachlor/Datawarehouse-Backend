@@ -21,9 +21,6 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
-/*
-* This controller handles the automated inputs sent from Cordel's systems every night.
-*/ 
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -66,14 +63,38 @@ namespace Datawarehouse_Backend.Controllers
                 //This happend once but never again, and we dont know why or what caused it
                 if (tennantId > 0)
                 {
+                    //Adds custumer to datawarehouse
+                    for (int i = 0; i < contentsList.Customer.Count; i++)
+                    {
+                        Customer customer = new Customer();
+                        customer = contentsList.Customer[i];
 
-                    Console.WriteLine("1111111111111111111111111111111111111111111111");
+                        addCustomer(customer, tennantId);
+                    }
+                    
+                    //Adds Employee to datawarehouse
+                    for (int i = 0; i < contentsList.Employee.Count; i++)
+                    {
+                        Employee employee = new Employee();
+                        employee = contentsList.Employee[i];
+
+                        addEmployee(employee, tennantId);
+                    }
+
+                    //Adds Order to datawarehouse
+                    for (int i = 0; i < contentsList.Order.Count; i++)
+                    {
+                        Order order = new Order();
+                        order = contentsList.Order[i];
+                        _db.Orders.Add(order);
+                    }
+
                     //Adds Invoice inbound to datawarehouse
                     for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
                     {
                         InvoiceInbound invoice = new InvoiceInbound();
                         invoice = contentsList.InvoiceInbound[i];
-                        invoice.tennantId = tennantId;
+                        invoice.tennantFK = tennantId;
                         _db.InvoiceInbounds.Add(invoice);
                     }
 
@@ -81,17 +102,12 @@ namespace Datawarehouse_Backend.Controllers
                     for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
                     {
                         InvoiceOutbound outbound = new InvoiceOutbound();
+
                         outbound = contentsList.InvoiceOutbound[i];
                         _db.InvoiceOutbounds.Add(outbound);
                     }
 
-                    //Adds custumer to datawarehouse
-                    for (int i = 0; i < contentsList.Customer.Count; i++)
-                    {
-                        Customer customer = new Customer();
-                        customer = contentsList.Customer[i];
-                        _db.Customers.Add(customer);
-                    }
+                    
 
                     //Adds Balance and Budget to datawarehouse
                     for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
@@ -112,25 +128,9 @@ namespace Datawarehouse_Backend.Controllers
                     //Adds Accountsreceivable to datawarehouse
                     for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
                     {
-                        Accountsreceivable accountsreceivable = new Accountsreceivable();
-                        accountsreceivable = contentsList.Accountsreceivable[i];
-                        _db.Accountsreceivables.Add(accountsreceivable);
-                    }
-
-                    //Adds Employee to datawarehouse
-                    for (int i = 0; i < contentsList.Employee.Count; i++)
-                    {
-                        Employee employee = new Employee();
-                        employee = contentsList.Employee[i];
-                        _db.Employees.Add(employee);
-                    }
-
-                    //Adds Order to datawarehouse
-                    for (int i = 0; i < contentsList.Order.Count; i++)
-                    {
-                        Order order = new Order();
-                        order = contentsList.Order[i];
-                        _db.Orders.Add(order);
+                        AccountsReceivable accountsReceivable = new AccountsReceivable();
+                        accountsReceivable = contentsList.Accountsreceivable[i];
+                        _db.AccountsReceivables.Add(accountsReceivable);
                     }
 
                     //Adds TimeRegister to datawarehouse
@@ -138,7 +138,7 @@ namespace Datawarehouse_Backend.Controllers
                     {
                         TimeRegister timeRegister = new TimeRegister();
                         timeRegister = contentsList.TimeRegister[i];
-                        _db.timeRegisters.Add(timeRegister);
+                        _db.TimeRegisters.Add(timeRegister);
                     }
 
                 }
@@ -317,5 +317,43 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
+        private long addCustomer(Customer customer, long tennantFK ) 
+        {
+            ErrorLog errorLog = new ErrorLog();
+            Customer databaseCustomer  = _db.Customers.Where(c => c.custommerId == customer.custommerId).FirstOrDefault<Customer>();
+            if (databaseCustomer == null)
+            {
+                Customer customer1 = new Customer();
+                customer1 = customer;
+                customer1.tennantFK = tennantFK;
+                _db.Customers.Add(customer1);
+
+                _db.SaveChanges();
+
+                return customer1.id;
+            } 
+            return databaseCustomer.id;
+        }
+
+        private long addEmployee(Employee employee, long tennantFK ) 
+        {
+            ErrorLog errorLog = new ErrorLog();
+            Employee databaseEmployee  = _db.Employees.Where(c => c.employeeId == employee.employeeId).FirstOrDefault<Employee>();
+            if (databaseEmployee == null)
+            {
+                Employee employee1 = new Employee();
+                employee1 = employee;
+                employee1.tennantFK = tennantFK;
+                _db.Employees.Add(employee);
+
+                _db.SaveChanges();
+
+                return employee.id;
+            } 
+            return databaseEmployee.id;
+        }
     }
+
+    
+
 }
