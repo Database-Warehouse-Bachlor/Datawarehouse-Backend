@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.LoginDatabase
+namespace Datawarehouse_Backend.Migrations
 {
     [DbContext(typeof(LoginDatabaseContext))]
-    partial class LoginDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210415084857_UserRoleField")]
+    partial class UserRoleField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,39 +28,21 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<long>("AbsenceRegisterId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("abcenseType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("abcenseTypeText")
-                        .HasColumnType("text");
-
-                    b.Property<string>("comment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("degreeDisability")
-                        .HasColumnType("text");
-
                     b.Property<double>("duration")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("employeeFK")
+                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("soleCaretaker")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("toDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
 
-                    b.HasIndex("employeeFK");
+                    b.HasIndex("employeeId");
 
                     b.ToTable("AbsenceRegister");
                 });
@@ -70,45 +54,12 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<long>("AccountsReceivableId")
+                    b.Property<long>("customerId")
                         .HasColumnType("bigint");
-
-                    b.Property<double>("amount")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("amountDue")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("customerFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("customerName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("dueDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("jobId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("note")
-                        .HasColumnType("text");
-
-                    b.Property<long>("oderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("overdueNotice")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("recordDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("recordType")
-                        .HasColumnType("text");
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerFK");
+                    b.HasIndex("customerId");
 
                     b.ToTable("AccountsReceivable");
                 });
@@ -120,36 +71,12 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<long>("BalanceAndBudgetId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("account")
-                        .HasColumnType("text");
-
-                    b.Property<string>("department")
-                        .HasColumnType("text");
-
-                    b.Property<double>("endBalance")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("name")
-                        .HasColumnType("text");
-
-                    b.Property<double>("periodBalance")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateTime>("periodDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<double>("startBalance")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("tennantFK")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("BalanceAndBudget");
                 });
@@ -161,30 +88,12 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("address")
-                        .HasColumnType("text");
-
-                    b.Property<string>("city")
-                        .HasColumnType("text");
-
-                    b.Property<string>("customerName")
-                        .HasColumnType("text");
-
-                    b.Property<long>("custommerId")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("isInactive")
-                        .HasColumnType("boolean");
-
-                    b.Property<long>("tennantFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("zipcode")
-                        .HasColumnType("integer");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Customer");
                 });
@@ -196,57 +105,15 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("birthdate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("employeeId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("employeeName")
                         .HasColumnType("text");
 
-                    b.Property<int>("employmentRate")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("employmentType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("gender")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("isCaseworker")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("leaveDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("posistionCategoryId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ssbPayType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ssbPositionCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ssbPositionText")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("startDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("status")
-                        .HasColumnType("text");
-
-                    b.Property<string>("statusText")
-                        .HasColumnType("text");
-
-                    b.Property<long>("tennantFK")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Employee");
                 });
@@ -258,36 +125,15 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<double>("amountTotal")
-                        .HasColumnType("double precision");
-
                     b.Property<DateTime>("invoiceDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<long>("invoiceInboundId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("invoicePdf")
-                        .HasColumnType("text");
-
-                    b.Property<long>("jobId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("specification")
-                        .HasColumnType("text");
-
-                    b.Property<long>("supplierId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("tennantFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("wholesalerId")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("InvoiceInbound");
                 });
@@ -299,44 +145,20 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<double>("amountExVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("amountIncVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("amountTotal")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("customerFK")
+                    b.Property<long>("customerId")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("invoiceDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("invoiceDue")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<double>("invoiceExVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("invoiceIncVat")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("invoiceOutboundId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("jobId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("orderFK")
+                    b.Property<long>("orderId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerFK");
+                    b.HasIndex("customerId");
 
-                    b.HasIndex("orderFK")
+                    b.HasIndex("orderId")
                         .IsUnique();
 
                     b.ToTable("InvoiceOutbound");
@@ -349,80 +171,20 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("caseHandler")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("confimedDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("customerFK")
+                    b.Property<long>("customerId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("customerName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("description")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("endDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<double>("fixedPriceAmount")
-                        .HasColumnType("double precision");
-
-                    b.Property<bool>("hasWarranty")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("hoursOfWork")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("invoiceOutboundFK")
+                    b.Property<long>("invoiceOutboundId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("isFixedPrice")
-                        .HasColumnType("boolean");
-
-                    b.Property<long>("jobId")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("jobName")
-                        .HasColumnType("text");
-
-                    b.Property<long>("jobSiteId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("lastChanged")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("materials")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("orderDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("orderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("orderType")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("plannedDelivery")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("startedDelivery")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<long>("tennantFK")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("warrantyDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("id");
 
-                    b.HasIndex("customerFK");
+                    b.HasIndex("customerId");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Order");
                 });
@@ -457,84 +219,15 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("account")
-                        .HasColumnType("text");
-
-                    b.Property<double>("amount")
-                        .HasColumnType("double precision");
-
-                    b.Property<long>("employeeFK")
+                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("invoiceRate")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("isCaseworker")
-                        .HasColumnType("boolean");
-
-                    b.Property<long>("orderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("payType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("payTypeName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("personDepartment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("personDepartmentName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("personName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("processingCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("qyt")
-                        .HasColumnType("text");
-
-                    b.Property<double>("rate")
-                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("recordDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("recordDepartment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("recordDepartmentName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("recordType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("recordTypeName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("summaryType")
-                        .HasColumnType("text");
-
-                    b.Property<long>("timeRegisterId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("viaType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("workComment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("workplace")
-                        .HasColumnType("text");
-
-                    b.Property<int>("year")
-                        .HasColumnType("integer");
-
                     b.HasKey("id");
 
-                    b.HasIndex("employeeFK");
+                    b.HasIndex("employeeId");
 
                     b.ToTable("TimeRegister");
                 });
@@ -559,12 +252,12 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     b.Property<string>("role")
                         .HasColumnType("text");
 
-                    b.Property<long>("tennantFK")
+                    b.Property<long>("tennantId")
                         .HasColumnType("bigint");
 
                     b.HasKey("id");
 
-                    b.HasIndex("tennantFK");
+                    b.HasIndex("tennantId");
 
                     b.ToTable("Users");
                 });
@@ -573,7 +266,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
                         .WithMany("absenceRegisters")
-                        .HasForeignKey("employeeFK")
+                        .HasForeignKey("employeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -584,7 +277,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("accountsreceivables")
-                        .HasForeignKey("customerFK")
+                        .HasForeignKey("customerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -595,7 +288,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("bnb")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -606,7 +299,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("customers")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -617,7 +310,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("employees")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -628,7 +321,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("invoicesInbound")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -639,13 +332,13 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("invoicesOutbound")
-                        .HasForeignKey("customerFK")
+                        .HasForeignKey("customerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Datawarehouse_Backend.Models.Order", "order")
                         .WithOne("invoiceOutbound")
-                        .HasForeignKey("Datawarehouse_Backend.Models.InvoiceOutbound", "orderFK")
+                        .HasForeignKey("Datawarehouse_Backend.Models.InvoiceOutbound", "orderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -658,13 +351,13 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Customer", "customer")
                         .WithMany("orders")
-                        .HasForeignKey("customerFK")
+                        .HasForeignKey("customerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("orders")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -677,7 +370,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Employee", "employee")
                         .WithMany("timeRegisters")
-                        .HasForeignKey("employeeFK")
+                        .HasForeignKey("employeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -688,7 +381,7 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 {
                     b.HasOne("Datawarehouse_Backend.Models.Tennant", "tennant")
                         .WithMany("users")
-                        .HasForeignKey("tennantFK")
+                        .HasForeignKey("tennantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
