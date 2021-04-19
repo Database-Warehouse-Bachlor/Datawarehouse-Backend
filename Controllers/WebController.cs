@@ -50,23 +50,23 @@ namespace Datawarehouse_Backend.Controllers
 
             switch (time)
             {
+                case "lastSevenDays":
+                    comparisonDate = dateTimeNow.Date.AddDays(-7);
+                    break;
                 case "lastThirtyDays":
                     comparisonDate = dateTimeNow.Date.AddDays(-30);
                     break;
                 case "lastTwelveMonths":
                     comparisonDate = dateTimeNow.Date.AddYears(-1);
                     break;
+                case "thisWeek":
+                    comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1);
+                    break;
                 case "thisMonth":
                     comparisonDate = dateTimeNow.Date.AddDays(-tempDay + 1);
                     break;
                 case "thisYear":
                     comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1);
-                    break;
-                case "thisWeek":
-                    comparisonDate = dateTimeNow.Date.AddDays(-tempWeek + 1);
-                    break;
-                case "lastSevenDays":
-                    comparisonDate = dateTimeNow.Date.AddDays(-7);
                     break;
                 default:
                     Console.WriteLine("No filter added, listing all..");
