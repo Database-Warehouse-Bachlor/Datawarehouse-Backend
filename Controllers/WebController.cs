@@ -200,7 +200,7 @@ namespace Datawarehouse_Backend.Controllers
                 }
                 return absenceViews;
             }
-            else
+            else  //Monthly-based filter is chosen, now we summarize for each month instead of day.
             {
                 try
                 {
@@ -307,6 +307,7 @@ namespace Datawarehouse_Backend.Controllers
             .OrderByDescending(o => o.endDate)
             .ToList();
             List<OrderView> orderList = new List<OrderView>();
+
             for (int i = 0; i < orders.Count; i++)
             {
                 OrderView order = new OrderView();
@@ -367,7 +368,7 @@ namespace Datawarehouse_Backend.Controllers
         *
         * 
         * Returns:
-        * A list of customer addresses, zipcode, city and total amount due
+        * A list of customer addresses, zipcodes, cities and total amount due
         */
 
         [Authorize]
@@ -381,7 +382,8 @@ namespace Datawarehouse_Backend.Controllers
             .OrderByDescending(d => d.periodDate).ToList();
             //Grab the important information and put it in a list of views so it's easier to handle @frontend
             List<BnbView> bnbList = new List<BnbView>();
-            for(int i = 0; i<balanceAndBudgets.Count; i++){
+            for (int i = 0; i < balanceAndBudgets.Count; i++)
+            {
                 BnbView bnb = new BnbView();
                 bnb.account = balanceAndBudgets[i].account;
                 bnb.startBalance = balanceAndBudgets[i].startBalance;
