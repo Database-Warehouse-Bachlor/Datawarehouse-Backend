@@ -12,9 +12,9 @@ namespace Datawarehouse_Backend.Models
         public string name { get; set; }
         public string account { get; set; }
         public DateTime periodDate { get; set; }
-        public double startBalance { get; set; }
-        public double periodBalance { get; set; }
-        public double endBalance { get; set; }
+        public decimal startBalance { get; set; }
+        public decimal periodBalance { get; set; }
+        public decimal endBalance { get; set; }
         public string department { get; set; }
 
         [ForeignKey("tennant")]

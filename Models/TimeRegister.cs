@@ -19,9 +19,9 @@ namespace Datawarehouse_Backend.Models
         public string recordDepartmentName { get; set; }
         public string payType { get; set; }
         public string payTypeName { get; set; }
-        public string qyt { get; set; }
+        public int qty { get; set; }
         public double rate { get; set; }
-        public double amount { get; set; }
+        public decimal amount { get; set; }
         public string invoiceRate { get; set; }
         public long orderId { get; set; }
         public string workplace { get; set; }

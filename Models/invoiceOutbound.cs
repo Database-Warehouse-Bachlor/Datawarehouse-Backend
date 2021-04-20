@@ -13,11 +13,11 @@ namespace Datawarehouse_Backend.Models
         public DateTime invoiceDue { get; set; }
         public long jobId { get; set; }
         public DateTime invoiceDate { get; set; }
-        public double invoiceExVat { get; set; }
-        public double invoiceIncVat { get; set; }
-        public double amountExVat { get; set; }
-        public double amountIncVat { get; set; }
-        public double amountTotal { get; set; }
+        public decimal invoiceExVat { get; set; }
+        public decimal invoiceIncVat { get; set; }
+        public decimal amountExVat { get; set; }
+        public decimal amountIncVat { get; set; }
+        public decimal amountTotal { get; set; }
 
         [ForeignKey("order")]
         public long orderFK { get; set; }
