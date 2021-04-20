@@ -72,7 +72,6 @@ namespace Datawarehouse_Backend.Controllers
                         customer = contentsList.Customer[i];
                         customer.tennantFK = tennantId;
                         addCustomer(customer, tennantId);
-                        _db.SaveChanges();
                     }
                     
                     //Adds Employee to datawarehouse
@@ -83,8 +82,6 @@ namespace Datawarehouse_Backend.Controllers
                         employee.tennantFK = tennantId;
 
                         addEmployee(employee, tennantId);
-                        _db.SaveChanges();
-
                     }
 
                     //Adds Order to datawarehouse
@@ -94,7 +91,7 @@ namespace Datawarehouse_Backend.Controllers
                         order = contentsList.Order[i];
                         order.tennantFK = tennantId;
                         Console.WriteLine("Cordel customerId: " + order.customerId);
-                        long customerFK = getCustomerId(order.customerId);
+                        long customerFK = getCustomerId(order.customerId, tennantId);
                         Console.WriteLine("CustomerFK: " + customerFK);
 
                         if(customerFK > -1) 
@@ -124,8 +121,8 @@ namespace Datawarehouse_Backend.Controllers
                         InvoiceOutbound outbound = new InvoiceOutbound();
                         outbound = contentsList.InvoiceOutbound[i];
 
-                        long orderFK = getOrderId(outbound.orderId);
-                        long customerFK = getCustomerId(outbound.customerId);
+                        long orderFK = getOrderId(outbound.orderId, tennantId);
+                        long customerFK = getCustomerId(outbound.customerId, tennantId);
 
                         if(orderFK > 0 || customerFK > 0) 
                         {
@@ -157,7 +154,7 @@ namespace Datawarehouse_Backend.Controllers
                         AbsenceRegister absenceRegister = new AbsenceRegister();
                         absenceRegister = contentsList.AbsenceRegister[i];
 
-                        long employeeFK = getEmployeeId(absenceRegister.employeeId);
+                        long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
 
                         if(employeeFK > -1) 
                         {
@@ -176,7 +173,7 @@ namespace Datawarehouse_Backend.Controllers
                         AccountsReceivable accountsReceivable = new AccountsReceivable();
                         accountsReceivable = contentsList.Accountsreceivable[i];
 
-                        long customerFK = getCustomerId(accountsReceivable.customerId);
+                        long customerFK = getCustomerId(accountsReceivable.customerId, tennantId);
 
                         if(customerFK > -1) 
                         {
@@ -195,7 +192,7 @@ namespace Datawarehouse_Backend.Controllers
                         TimeRegister timeRegister = new TimeRegister();
                         timeRegister = contentsList.TimeRegister[i];
 
-                        long employeeFK = getEmployeeId(timeRegister.employeeId);
+                        long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
 
                         if(employeeFK > -1) 
                         {
@@ -224,13 +221,38 @@ namespace Datawarehouse_Backend.Controllers
 
                 Console.WriteLine("KOM JEGH MEG HITTT!!!!");
                 //Saves changes to DB if everything is OK
-                _db.SaveChanges();
+                Console.WriteLine("333333333333333333333333333333");
 
+                
+                _db.SaveChanges();
+                
                 /*
                 The programm picks up this error if the JsonConvert.DeserializeObject fails.
                 Fields that are null or not the expected datatype can cause this
                 */
             }
+            catch (DbUpdateException e)
+            {
+
+                
+                Console.WriteLine("4444444444444444444444444444444444444444");
+                ErrorLog errorLog = new ErrorLog();
+
+                string errorType = e.GetType().ToString();
+                string errorMessage = 
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                tennantId;
+
+                DateTime timeOfError = DateTime.Now;
+
+                errorLog.errorType = errorType;
+                errorLog.errorMessage = errorMessage;
+                errorLog.timeOfError = timeOfError;
+
+                _db.ErrorLogs.Add(errorLog);
+                _db.SaveChanges();
+
+            } 
             catch (JsonSerializationException e)
             {
 
@@ -285,27 +307,10 @@ namespace Datawarehouse_Backend.Controllers
             dukker opp selv om alle endringer i try egentlig skal bli kastet og ikke lagra. Aner ikke hvordan jeg skal løse dette 
             eller hva det kommer av, så bare å rope ut hvis noen har peiling...
             */
-            catch (DbUpdateException e)
-            {
-                ErrorLog errorLog = new ErrorLog();
-
-                string errorType = e.GetType().ToString();
-                string errorMessage = 
-                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
-                tennantId;
-
-                DateTime timeOfError = DateTime.Now;
-
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = timeOfError;
-
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
-
-            } 
             
             catch (Exception e) {
+
+                Console.WriteLine("55555555555555555555555555555555555");
 
                 ErrorLog errorLog = new ErrorLog();
 
@@ -387,7 +392,9 @@ namespace Datawarehouse_Backend.Controllers
         private long addCustomer(Customer customer, long tennantFK ) 
         {
             ErrorLog errorLog = new ErrorLog();
-            Customer databaseCustomer  = _db.Customers.Where(c => c.customerId == customer.customerId).FirstOrDefault<Customer>();
+            Customer databaseCustomer  = _db.Customers
+            .Where(c => c.customerId == customer.customerId)
+            .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Customer>();
             if (databaseCustomer == null)
             {
                 Customer customer1 = new Customer();
@@ -397,9 +404,6 @@ namespace Datawarehouse_Backend.Controllers
 
                 _db.SaveChanges();
 
-                Console.WriteLine(customer1.customerId);
-                Console.WriteLine(customer1.id);
-
                 return customer1.id;
             } 
             return databaseCustomer.id;
@@ -408,7 +412,9 @@ namespace Datawarehouse_Backend.Controllers
         private long addEmployee(Employee employee, long tennantFK ) 
         {
             ErrorLog errorLog = new ErrorLog();
-            Employee databaseEmployee  = _db.Employees.Where(c => c.employeeId == employee.employeeId).FirstOrDefault<Employee>();
+            Employee databaseEmployee  = _db.Employees
+            .Where(c => c.employeeId == employee.employeeId)
+            .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Employee>();
             if (databaseEmployee == null)
             {
                 Employee employee1 = new Employee();
@@ -423,37 +429,51 @@ namespace Datawarehouse_Backend.Controllers
             return databaseEmployee.id;
         }
 
-        private long getEmployeeId(long cordelId) {
-            Employee databaseEmployee  = _db.Employees.Where(c => c.employeeId == cordelId).FirstOrDefault<Employee>();
+
+        private long getEmployeeId(long cordelId, long tennantId) {
+            Employee databaseEmployee  = _db.Employees
+            .Where(c => c.employeeId == cordelId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Employee>();
 
             if(databaseEmployee != null) {
                 return databaseEmployee.id;
             } 
+            Console.WriteLine("Employee er null");
             return -1;
         }
 
-        private long getOrderId(long cordelId) {
-            Order databaseOrder  = _db.Orders.Where(c => c.orderId == cordelId).FirstOrDefault<Order>();
+        private long getOrderId(long cordelId, long tennantId) {
+            Order databaseOrder  = _db.Orders
+            .Where(c => c.orderId == cordelId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Order>();
 
             if(databaseOrder != null) {
                 return databaseOrder.id;
             } 
+            Console.WriteLine("Order er null");
             return -1;
         }
 
-        private long getCustomerId(long cordelId) {
-            Customer databaseCustomer  = _db.Customers.Where(c => c.customerId == cordelId).FirstOrDefault<Customer>();
-            Console.WriteLine("");
-            Console.WriteLine("Inside getCustomerId()");
-            Console.WriteLine("CordelCustomerId: " + cordelId);
-            Console.WriteLine("CordelCustomerId: " + databaseCustomer.id);
-            Console.WriteLine("");
+        private long getCustomerId(long cordelId, long tennantId) 
+        {
+
+            Console.WriteLine(cordelId);
+
+            Console.WriteLine(tennantId);
+            Console.WriteLine("-------------------------");
+            Customer databaseCustomer  = _db.Customers
+            .Where(c => c.customerId == cordelId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Customer>();
+
+            Console.WriteLine(databaseCustomer);
+
             if(databaseCustomer != null) {
                 return databaseCustomer.id;
             } 
+            Console.WriteLine("Customer er null");
             return -1;
         }
-    }
+    }    
 
     
 
