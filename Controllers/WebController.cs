@@ -114,6 +114,14 @@ namespace Datawarehouse_Backend.Controllers
             return invoiceOutbounds;
         }
 
+
+        /*
+        *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
+        *  only tracks year, month and total absence for that month OR Date and total absence for that date.
+        *  If it's this week/month or last 30 / 7 days it will summarize for each date instead of month.
+        * So instead of getting a list of all absences, it gives a list of total absences per month/date.
+        */
+
         //[Authorize]
         [HttpGet("absence")]
         public IList<AbsenceView> getAbsenceRegister(string filter)
@@ -130,12 +138,6 @@ namespace Datawarehouse_Backend.Controllers
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;
 
-            /*
-            *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
-            *  only tracks year, month and total absence for that month OR Date and total absence for that date.
-            *  If it's this week/month or last 30 / 7 days it will summarize for each date instead of month.
-            * So instead of getting a list of all absences, it gives a list of total absences per month/date.
-            */
             if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays" || filter == "lastSevenDays")
             {
                 try
@@ -273,8 +275,12 @@ namespace Datawarehouse_Backend.Controllers
             .ToList();
             return timeRegisters;
         }
+
         /*
-        * A method to fetch all orders from a specific tennant.
+        * Returns a list of all tennants orders that have an end date 
+        * later than the date of the request.
+        * All orders are converted to orderView that only show customer name, 
+        * total amount from its invoice, jobname and end date.
         */
 
         [Authorize]
