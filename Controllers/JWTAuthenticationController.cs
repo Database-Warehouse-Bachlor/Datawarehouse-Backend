@@ -141,12 +141,12 @@ namespace Datawarehouse_Backend.Controllers
 
        // TODO: [Authorize(Roles = "Admin")]
         [HttpPost("initregister")]
-        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd)
+        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd,[FromForm] long tennantId )
         {
             IActionResult response;
 
             User userCheck = findUserByMail(email);
-            Tennant tennant = findTennantById(getTennantId());
+            Tennant tennant = findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
             {
@@ -157,6 +157,7 @@ namespace Datawarehouse_Backend.Controllers
                 initUser.tennant = tennant;
                 initUser.Email = email;
                 initUser.password = hashedPassword;
+                initUser.role = Role.User;
 
                 // Adds and saves changes to the database
                 _db.Users.Add(initUser);
