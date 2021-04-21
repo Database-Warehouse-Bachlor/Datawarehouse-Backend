@@ -107,7 +107,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email);
+            User userCheck = findUserByMail(email.Trim().ToLower());
             Tennant tennant = findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
@@ -117,7 +117,7 @@ namespace Datawarehouse_Backend.Controllers
 
                 User newUser = new User();
                 newUser.tennant = tennant;
-                newUser.Email = email;
+                newUser.Email = email.Trim().ToLower();
                 newUser.password = hashedPassword;
                 newUser.role = Role.User;
 
@@ -145,7 +145,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email);
+            User userCheck = findUserByMail(email.Trim().ToLower());
             Tennant tennant = findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
@@ -155,7 +155,7 @@ namespace Datawarehouse_Backend.Controllers
 
                 User initUser = new User();
                 initUser.tennant = tennant;
-                initUser.Email = email;
+                initUser.Email = email.Trim().ToLower();
                 initUser.password = hashedPassword;
                 initUser.role = Role.User;
 
