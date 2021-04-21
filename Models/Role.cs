@@ -1,8 +1,11 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 
-namespace MyMusic.Core.Models
+namespace Datawarehouse_Backend.Models
 {
-    public class Role : IdentityRole<Guid>
-    { }
+    public static class Role
+    {
+        public const string Admin = "Admin";
+        public const string User = "User";
+    }
 }

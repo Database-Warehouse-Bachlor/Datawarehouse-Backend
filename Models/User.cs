@@ -5,29 +5,28 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Datawarehouse_Backend.Models
 {
-    
-    public class User{
 
-        public User()
-        {
+    public class User
+    {
 
-        }
-
-        [Key]      
-        public int id {get; set;}
+        [Key]
+        public int id { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
         [MaxLength(50)]
-        public string Email {get; set;}
+        public string Email { get; set; }
 
-        [Required]        
+        [Required]
         [DataType(DataType.Password)]
         [MinLength(4)]
         [MaxLength(255)]
-        public string password {get; set;}
+        public string password { get; set; }
+
+        public string role { get; set; }
+
         [ForeignKey("tennant")]
-        public long tennantId { get; set; }
+        public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
     }
 }

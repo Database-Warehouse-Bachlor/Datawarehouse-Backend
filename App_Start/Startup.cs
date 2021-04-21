@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using MyMusic.Core.Models;
+
 
 namespace Datawarehouse_Backend.App_Start
 {
@@ -71,6 +71,7 @@ namespace Datawarehouse_Backend.App_Start
             services.AddDbContext<WarehouseContext>(opt =>
             opt.UseNpgsql(warehousedb));
 
+            
             //services.AddIdentity<User, Role>()
             //.AddUserStore<LoginDatabaseContext>()
             //.AddDefaultTokenProviders();
@@ -89,7 +90,7 @@ namespace Datawarehouse_Backend.App_Start
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 
