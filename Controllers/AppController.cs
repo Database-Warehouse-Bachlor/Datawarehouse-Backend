@@ -16,9 +16,9 @@ namespace Datawarehouse_Backend.Controllers
     public class AppController : ControllerBase
     {
 
-        public readonly WarehouseContext _warehouseDb;
+        public readonly IWarehouseContext _warehouseDb;
 
-        public AppController(WarehouseContext warehouseDb)
+        public AppController(IWarehouseContext warehouseDb)
         {
             _warehouseDb = warehouseDb;
         }
@@ -84,6 +84,7 @@ namespace Datawarehouse_Backend.Controllers
             .Count();
             return numberOfErrors;
         }
+
 
     }
 }
