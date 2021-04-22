@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,4 +24,4 @@ namespace Datawarehouse_Backend.Models
         public long customerFK { get; set; }
         public Customer customer { get; set; }
     }
-}
+} */

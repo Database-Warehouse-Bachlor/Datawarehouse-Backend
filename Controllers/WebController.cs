@@ -85,36 +85,19 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getAllInboundInvoice(string filter)
+        public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var inboundInvoices = _warehouseDb.InvoiceInbounds
-            .Where(i => i.tennantFK == tennantId)
+            var invoice = _warehouseDb.Invoices
+            .Where(i => i.client.tennantFK == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
-            return inboundInvoices;
+            return invoice;
         }
 
-        /*
-        * Getting invoice outbound based on it's duedate and filter given.
-        */
-        [Authorize]
-        [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds(string filter)
-        {
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customer.tennantFK == tennantId)
-            .Where(d => d.invoiceDue >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDue)
-            .ToList();
-            return invoiceOutbounds;
-        }
-
-
+    
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
         *  only tracks year, month and total absence for that month OR Date and total absence for that date.
@@ -295,8 +278,8 @@ namespace Datawarehouse_Backend.Controllers
             for (int i = 0; i < orders.Count; i++)
             {
                 OrderView order = new OrderView();
-                order.customerName = orders[i].customer.customerName;
-                order.invoiceTotal = orders[i].invoiceOutbound.amountTotal;
+                order.clientName = orders[i].client.clientName;
+                //order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);
@@ -304,6 +287,10 @@ namespace Datawarehouse_Backend.Controllers
             }
             return orderList;
         }
+
+        /*
+        * A method to fetch all orders
+        */
 
         [Authorize]
         [HttpGet("allOrders")]
@@ -317,8 +304,8 @@ namespace Datawarehouse_Backend.Controllers
             for (int i = 0; i < orders.Count; i++)
             {
                 OrderView order = new OrderView();
-                order.customerName = orders[i].customer.customerName;
-                order.invoiceTotal = orders[i].invoiceOutbound.amountTotal;
+                order.clientName = orders[i].client.clientName;
+                //order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);
@@ -334,36 +321,32 @@ namespace Datawarehouse_Backend.Controllers
         * it's list of accounts receivables.
         *
         * Returns:
-        * A list of customer addresses, zipcode, city and total amount due
+        * A list of customer addresses, zipcode, city and type
         *
-        * NOTE: Nested forloop. n^2 runtime.
-        * Possible fix: Make the amountDue total for a customer be stored in the model
-        * and updated whenever data is submitted in the dataSubmissionController.
         */
 
         [Authorize]
         [HttpGet("customers")]
-        public List<CustomerView> getCustomers()
+        public List<ClientView> getCustomers()
         {
-            var customers = getTennant().customers
-            .OrderByDescending(c => c.customerName)
+            var customers = getTennant().clients
+            .OrderByDescending(c => c.clientName)
             .ToList();
 
-            List<CustomerView> customerList = new List<CustomerView>();
+            List<ClientView> customerList = new List<ClientView>();
             for (int i = 0; i < customers.Count; i++)
             {
-                CustomerView cust = new CustomerView();
-                cust.customerName = customers[i].customerName;
+
+                ClientView cust = new ClientView();
+                cust.clientName = customers[i].clientName;
                 cust.address = customers[i].address;
                 cust.zipcode = customers[i].zipcode;
                 cust.city = customers[i].city;
-                decimal due = 0;
-                List<AccountsReceivable> accounts = customers[i].accountsreceivables.ToList();
-                for (int j = 0; j < accounts.Count; j++)
-                {
-                    due += accounts[j].amountDue;
+                if(customers[i].customer){
+                    cust.type = "Customer";
+                } else {
+                    cust.type = "Supplier";
                 }
-                cust.amountDue = due;
                 customerList.Add(cust);
             }
             return customerList;
@@ -404,7 +387,6 @@ namespace Datawarehouse_Backend.Controllers
         * Finds all the customers for the tennant then for each customer it iterates over
         * the customers accountreceivables and adds the information needed to AccountsView
         * and returns a list of AccountsView
-        */
         [Authorize]
         [HttpGet("accreceive")]
         public List<AccountsView> getAccountsReceivables(string filter)
@@ -426,6 +408,7 @@ namespace Datawarehouse_Backend.Controllers
             }
             return accountsReceivable;
         }
+        */
 
 
         /*

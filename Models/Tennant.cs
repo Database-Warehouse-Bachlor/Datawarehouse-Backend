@@ -17,10 +17,11 @@ namespace Datawarehouse_Backend.Models
 
         public ICollection<User> users { get; set; } = new List<User>();
         public ICollection<Employee> employees { get; set; } = new List<Employee>();
-        public ICollection<InvoiceInbound> invoicesInbound { get; set; } = new List<InvoiceInbound>();
+      //  public ICollection<Invoice> invoices { get; set; } = new List<Invoice>();
         public ICollection<BalanceAndBudget> bnb { get; set; } = new List<BalanceAndBudget>();
-        public ICollection<Customer> customers { get; set; } = new List<Customer>();
+        public ICollection<Client> clients { get; set; } = new List<Client>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
+        public ICollection<FinancialYear> financialYears { get; set; } = new List<FinancialYear>();
     }
 
 

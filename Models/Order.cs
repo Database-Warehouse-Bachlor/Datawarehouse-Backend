@@ -33,13 +33,13 @@ namespace Datawarehouse_Backend.Models
         public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
 
-        [ForeignKey("invoiceOutBound")]
-        public long invoiceOutboundFK { get; set; }
-        public virtual InvoiceOutbound invoiceOutbound { get; set; }
+       /*  [ForeignKey("invoice")]
+        public long invoiceFK { get; set; }
+        public virtual Invoice invoice{ get; set; } */
 
-        [ForeignKey("customer")]
-        public long customerFK { get; set; }
-        public Customer customer { get; set; }
+        [ForeignKey("client")]
+        public long clientFK { get; set; }
+        public Client client { get; set; }
 
     }
 }
