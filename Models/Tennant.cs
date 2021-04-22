@@ -21,6 +21,7 @@ namespace Datawarehouse_Backend.Models
         public ICollection<BalanceAndBudget> bnb { get; set; } = new List<BalanceAndBudget>();
         public ICollection<Customer> customers { get; set; } = new List<Customer>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
+        public ICollection<FinancialYear> financialYears { get; set; } = new List<FinancialYear>();
     }
 
 
