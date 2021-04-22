@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,8 +13,8 @@ namespace Datawarehouse_Backend.Models
         public DateTime dueDate { get; set; }
         public string recordType { get; set; }
         public string customerName { get; set; }
-        public double amount { get; set; }
-        public double amountDue { get; set; }
+        public decimal amount { get; set; }
+        public decimal amountDue { get; set; }
         public string overdueNotice { get; set; }
         public string note { get; set; }
         public long customerId { get; set; }
@@ -24,4 +24,4 @@ namespace Datawarehouse_Backend.Models
         public long customerFK { get; set; }
         public Customer customer { get; set; }
     }
-}
+} */

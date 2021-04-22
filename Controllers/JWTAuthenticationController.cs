@@ -69,7 +69,7 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            User loginUser = findUserByMail(email);
+            User loginUser = findUserByMail(email.Trim().ToLower());
 
             IActionResult response;
             try
@@ -107,7 +107,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email);
+            User userCheck = findUserByMail(email.Trim().ToLower());
             Tennant tennant = findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
@@ -117,7 +117,7 @@ namespace Datawarehouse_Backend.Controllers
 
                 User newUser = new User();
                 newUser.tennant = tennant;
-                newUser.Email = email;
+                newUser.Email = email.Trim().ToLower();
                 newUser.password = hashedPassword;
                 newUser.role = Role.User;
 
@@ -141,12 +141,12 @@ namespace Datawarehouse_Backend.Controllers
 
        // TODO: [Authorize(Roles = "Admin")]
         [HttpPost("initregister")]
-        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd)
+        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd,[FromForm] long tennantId )
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email);
-            Tennant tennant = findTennantById(getTennantId());
+            User userCheck = findUserByMail(email.Trim().ToLower());
+            Tennant tennant = findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
             {
@@ -155,8 +155,9 @@ namespace Datawarehouse_Backend.Controllers
 
                 User initUser = new User();
                 initUser.tennant = tennant;
-                initUser.Email = email;
+                initUser.Email = email.Trim().ToLower();
                 initUser.password = hashedPassword;
+                initUser.role = Role.User;
 
                 // Adds and saves changes to the database
                 _db.Users.Add(initUser);
