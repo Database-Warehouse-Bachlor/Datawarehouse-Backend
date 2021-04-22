@@ -16,10 +16,17 @@ namespace Datawarehouse_Backend.Models
         public decimal amountTotal { get; set; }
         public string specification { get; set; }
         public string invoicePdf { get; set; }
+        public long orderId { get; set; }
 
-        [ForeignKey("tennant")]
-        public long tennantFK { get; set; }
-        public Tennant tennant { get; set; }
+        [ForeignKey("client")]
+        public long clientFK { get; set; }
+        public Client client { get; set; }
+
+        [ForeignKey("Voucher")]
+        public long vouchertFK { get; set; }
+        public Voucher voucher { get; set; }
+
+        public ICollection<InvoiceLine> invoiceLines { get; set; } = new List<InvoiceLine>();
 
     }
 
