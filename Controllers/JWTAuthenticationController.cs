@@ -69,7 +69,7 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            User loginUser = findUserByMail(email);
+            User loginUser = findUserByMail(email.Trim().ToLower());
 
             IActionResult response;
             try
