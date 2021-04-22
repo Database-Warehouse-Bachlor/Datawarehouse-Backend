@@ -43,7 +43,7 @@ namespace Datawarehouse_Backend.Controllers
 
         [HttpPost("add")]
         [Consumes("application/json")]
-        public IActionResult addData([FromQuery] string OrgNummer, [FromBody] dynamic data)
+        public IActionResult addData([FromQuery] string apiKey, [FromBody] dynamic data)
         {
 
             string jsonDataAsString = data + "";
@@ -51,181 +51,183 @@ namespace Datawarehouse_Backend.Controllers
 
             try
             {
-
-                ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(
-                    jsonDataAsString);
-
-                Console.WriteLine(jsonDataAsString.ToString());
-
-
-                tennantId = addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
-
-
-                //Failsafe if addtennant dont update the tennantId
-                //This happend once but never again, and we dont know why or what caused it
-                if (tennantId > 0)
+                //Checks if the apiKey is valid in the datawarehouse
+                if (verifyApiKey(apiKey))
                 {
-                    //Adds custumer to datawarehouse
-                    for (int i = 0; i < contentsList.Customer.Count; i++)
-                    {
-                        Customer customer = new Customer();
-                        customer = contentsList.Customer[i];
-                        customer.tennantFK = tennantId;
-                        addCustomer(customer, tennantId);
-                    }
-                    
-                    //Adds Employee to datawarehouse
-                    for (int i = 0; i < contentsList.Employee.Count; i++)
-                    {
-                        Employee employee = new Employee();
-                        employee = contentsList.Employee[i];
-                        employee.tennantFK = tennantId;
 
-                        addEmployee(employee, tennantId);
-                    }
 
-                    //Adds Order to datawarehouse
-                    for (int i = 0; i < contentsList.Order.Count; i++)
+                    ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(
+                        jsonDataAsString);
+
+                    //Second verification where the apiKey in the URL gets compared with the apiKey
+                    //inside the body
+                    if (apiKey == contentsList.apiKey)
                     {
-                        Order order = new Order();
-                        order = contentsList.Order[i];
-                        order.tennantFK = tennantId;
-                        Console.WriteLine("Cordel customerId: " + order.customerId);
-                        long customerFK = getCustomerId(order.customerId, tennantId);
-                        Console.WriteLine("CustomerFK: " + customerFK);
 
-                        if(customerFK > -1) 
+                        tennantId = addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
+
+
+                        //Failsafe if addtennant dont update the tennantId
+                        //This happend once but never again, and we dont know why or what caused it
+                        if (tennantId > 0)
                         {
-                            order.customerFK = customerFK;
-                            _db.Orders.Add(order);
-                            _db.SaveChanges();
+                            //Adds custumer to datawarehouse
+                            for (int i = 0; i < contentsList.Customer.Count; i++)
+                            {
+                                Customer customer = new Customer();
+                                customer = contentsList.Customer[i];
+                                customer.tennantFK = tennantId;
 
-                        } else 
-                        {
-                            //TODO Logg feil
+                                addCustomer(customer, tennantId);
+                            }
+
+                            //Adds Employee to datawarehouse
+                            for (int i = 0; i < contentsList.Employee.Count; i++)
+                            {
+                                Employee employee = new Employee();
+                                employee = contentsList.Employee[i];
+                                employee.tennantFK = tennantId;
+
+                                addEmployee(employee, tennantId);
+                            }
+
+                            //Adds Order to datawarehouse
+                            for (int i = 0; i < contentsList.Order.Count; i++)
+                            {
+                                Order order = new Order();
+                                order = contentsList.Order[i];
+                                order.tennantFK = tennantId;
+                                long customerFK = getCustomerId(order.customerId, tennantId);
+
+                                if (customerFK > -1)
+                                {
+                                    order.customerFK = customerFK;
+                                    _db.Orders.Add(order);
+                                    _db.SaveChanges();
+
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
+                            //Adds Invoice inbound to datawarehouse
+                            for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
+                            {
+                                InvoiceInbound invoice = new InvoiceInbound();
+                                invoice = contentsList.InvoiceInbound[i];
+                                invoice.tennantFK = tennantId;
+                                _db.InvoiceInbounds.Add(invoice);
+                            }
+
+                            //Adds Invoice outbound to datawarehouse
+                            for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
+                            {
+                                InvoiceOutbound outbound = new InvoiceOutbound();
+                                outbound = contentsList.InvoiceOutbound[i];
+
+                                long orderFK = getOrderId(outbound.orderId, tennantId);
+                                long customerFK = getCustomerId(outbound.customerId, tennantId);
+
+                                if (orderFK > 0 || customerFK > 0)
+                                {
+                                    outbound.orderFK = orderFK;
+                                    outbound.customerFK = customerFK;
+                                    _db.InvoiceOutbounds.Add(outbound);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO LOGGE FEIL
+                                }
+                            }
+
+                            //Adds Balance and Budget to datawarehouse
+                            for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
+                            {
+                                BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
+                                balanceAndBudget = contentsList.BalanceAndBudget[i];
+                                balanceAndBudget.tennantFK = tennantId;
+                                _db.BalanceAndBudgets.Add(balanceAndBudget);
+                            }
+
+                            //Adds Absence Register to datawarehouse
+                            for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
+                            {
+                                AbsenceRegister absenceRegister = new AbsenceRegister();
+                                absenceRegister = contentsList.AbsenceRegister[i];
+
+                                long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
+
+                                if (employeeFK > -1)
+                                {
+                                    absenceRegister.employeeFK = employeeFK;
+                                    _db.AbsenceRegisters.Add(absenceRegister);
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+
+                            }
+
+                            //Adds Accountsreceivable to datawarehouse
+                            for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
+                            {
+                                AccountsReceivable accountsReceivable = new AccountsReceivable();
+                                accountsReceivable = contentsList.Accountsreceivable[i];
+
+                                long customerFK = getCustomerId(accountsReceivable.customerId, tennantId);
+
+                                if (customerFK > -1)
+                                {
+                                    accountsReceivable.customerFK = customerFK;
+                                    _db.AccountsReceivables.Add(accountsReceivable);
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+
+                            }
+
+                            //Adds TimeRegister to datawarehouse
+                            for (int i = 0; i < contentsList.TimeRegister.Count; i++)
+                            {
+                                TimeRegister timeRegister = new TimeRegister();
+                                timeRegister = contentsList.TimeRegister[i];
+
+                                long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
+
+                                if (employeeFK > -1)
+                                {
+                                    timeRegister.employeeFK = employeeFK;
+                                    _db.TimeRegisters.Add(timeRegister);
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
                         }
-                    }
-
-                    //Adds Invoice inbound to datawarehouse
-                    for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
-                    {
-                        InvoiceInbound invoice = new InvoiceInbound();
-                        invoice = contentsList.InvoiceInbound[i];
-                        invoice.tennantFK = tennantId;
-                        _db.InvoiceInbounds.Add(invoice);
-                    }
-
-                    //Adds Invoice outbound to datawarehouse
-                    for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
-                    {
-                        InvoiceOutbound outbound = new InvoiceOutbound();
-                        outbound = contentsList.InvoiceOutbound[i];
-
-                        long orderFK = getOrderId(outbound.orderId, tennantId);
-                        long customerFK = getCustomerId(outbound.customerId, tennantId);
-
-                        if(orderFK > 0 || customerFK > 0) 
+                        else
                         {
-                            outbound.orderFK = orderFK;
-                            outbound.customerFK = customerFK;
-                            Console.WriteLine("GAYYY");
-                            _db.InvoiceOutbounds.Add(outbound);
-                            _db.SaveChanges();
-                        } else 
-                        {
-                            //TODO LOGGE FEIL
-                        }
-                    }
+                            string errorType = "Tennant ID update fail";
+                            string errorMessage = "Tennant id ble ikke oppdatert i addData (DataSubmissionController.cs) før behandlingen av data skjedde";
 
-                    
+                            //Creates a new errorLog to the datawarehouse
+                            logError(errorMessage, errorType);
 
-                    //Adds Balance and Budget to datawarehouse
-                    for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
-                    {
-                        BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
-                        balanceAndBudget = contentsList.BalanceAndBudget[i];
-                        balanceAndBudget.tennantFK = tennantId;
-                        _db.BalanceAndBudgets.Add(balanceAndBudget);
-                    }
-
-                    //Adds Absence Register to datawarehouse
-                    for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
-                    {
-                        AbsenceRegister absenceRegister = new AbsenceRegister();
-                        absenceRegister = contentsList.AbsenceRegister[i];
-
-                        long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
-
-                        if(employeeFK > -1) 
-                        {
-                            absenceRegister.employeeFK = employeeFK;
-                            _db.AbsenceRegisters.Add(absenceRegister);
-                        } else 
-                        {
-                            //TODO Logg feil
                         }
 
                     }
 
-                    //Adds Accountsreceivable to datawarehouse
-                    for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
-                    {
-                        AccountsReceivable accountsReceivable = new AccountsReceivable();
-                        accountsReceivable = contentsList.Accountsreceivable[i];
-
-                        long customerFK = getCustomerId(accountsReceivable.customerId, tennantId);
-
-                        if(customerFK > -1) 
-                        {
-                            accountsReceivable.customerFK = customerFK;
-                            _db.AccountsReceivables.Add(accountsReceivable);
-                        } else 
-                        {
-                            //TODO Logg feil
-                        }
-
-                    }
-
-                    //Adds TimeRegister to datawarehouse
-                    for (int i = 0; i < contentsList.TimeRegister.Count; i++)
-                    {
-                        TimeRegister timeRegister = new TimeRegister();
-                        timeRegister = contentsList.TimeRegister[i];
-
-                        long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
-
-                        if(employeeFK > -1) 
-                        {
-                            timeRegister.employeeFK = employeeFK;
-                            _db.TimeRegisters.Add(timeRegister);
-                        } else 
-                        {
-                            //TODO Logg feil
-                        }
-                    }
+                    //Saves changes to DB if everything is OK
+                    _db.SaveChanges();
 
                 }
-                else
-                {
-                    ErrorLog errorLog = new ErrorLog();
-                    string errorType = "Tennant ID update fail";
-                    string errorMessage = "Tennant id ble ikke oppdatert i addData (DataSubmissionController.cs) før behandlingen av data skjedde";
-                    
-                    errorLog.errorType = errorType;
-                    errorLog.errorMessage = errorMessage;
-                    errorLog.timeOfError = DateTime.Now;
-                    _db.ErrorLogs.Add(errorLog);
-
-                    Console.WriteLine("tennantid was -1");
-                }
-
-                Console.WriteLine("KOM JEGH MEG HITTT!!!!");
-                //Saves changes to DB if everything is OK
-                Console.WriteLine("333333333333333333333333333333");
-
-                
-                _db.SaveChanges();
-                
                 /*
                 The programm picks up this error if the JsonConvert.DeserializeObject fails.
                 Fields that are null or not the expected datatype can cause this
@@ -233,42 +235,26 @@ namespace Datawarehouse_Backend.Controllers
             }
             catch (DbUpdateException e)
             {
-
-                
-                Console.WriteLine("4444444444444444444444444444444444444444");
                 ErrorLog errorLog = new ErrorLog();
 
                 string errorType = e.GetType().ToString();
-                string errorMessage = 
-                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                string errorMessage =
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " +
                 tennantId;
+                
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
 
-                DateTime timeOfError = DateTime.Now;
-
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = timeOfError;
-
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
-
-            } 
+            }
             catch (JsonSerializationException e)
             {
 
-                Console.WriteLine(e.GetType());
-
                 ErrorLog errorLog = new ErrorLog();
                 string errorType = e.GetType().ToString();
-                string errorMessage = e.Message.ToString() + " businessId: " + OrgNummer;
-                DateTime timeOfError = DateTime.Now;
-
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = timeOfError;
-
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
+                string errorMessage = e.Message.ToString() + " businessId: " + apiKey;
+            
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
 
 
                 /*
@@ -280,17 +266,12 @@ namespace Datawarehouse_Backend.Controllers
             catch (NullReferenceException e)
             {
                 ErrorLog errorLog = new ErrorLog();
-                
+
                 string errorType = e.GetType().ToString();
                 string errorMessage = e.ToString() + " Tennant ID: " + tennantId;
-                DateTime timeOfError = DateTime.Now;
-
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = timeOfError;
-
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
+                
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
             }
             catch (InvalidbusinessIdOrApiKeyException)
             {
@@ -307,28 +288,77 @@ namespace Datawarehouse_Backend.Controllers
             dukker opp selv om alle endringer i try egentlig skal bli kastet og ikke lagra. Aner ikke hvordan jeg skal løse dette 
             eller hva det kommer av, så bare å rope ut hvis noen har peiling...
             */
-            
-            catch (Exception e) {
 
-                Console.WriteLine("55555555555555555555555555555555555");
-
+            catch (Exception e)
+            {
                 ErrorLog errorLog = new ErrorLog();
 
                 string errorType = e.GetType().ToString();
-                string errorMessage = 
-                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " + 
+                string errorMessage =
+                "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " +
                 tennantId;
 
-                DateTime timeOfError = DateTime.Now;
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
 
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = errorMessage;
-                errorLog.timeOfError = timeOfError;
-
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
-                
             }
+
+            return Ok();
+        }
+
+        /*
+        This api is used when a tennant has bought the solution. This registers the tennant to the datawarehouse
+        and the system is after that ready to handle incoming data to the datawarehouse.
+        */
+        //[Authorize(Roles = "User")]
+        [HttpPost("registerTennant")]
+        [Consumes("application/x-www-form-urlencoded")]
+        public IActionResult registerTennant(
+            [FromForm] string tennantName,
+            [FromForm] string businessId,
+            [FromForm] string apiKey)
+        {
+            try
+            {
+
+                //If no apiKey is send with the request
+                if (apiKey == null)
+                {
+
+                    ErrorLog errorLog = new ErrorLog();
+
+                    string errorType = "API-Key empty when register tennant";
+                    string errorMessage = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: null";
+
+                    //Creates a new errorLog to the datawarehouse
+                    logError(errorMessage, errorType);
+
+                }
+                else
+                {
+                    //Creates a new tennant object with the information
+                    Tennant tennant = new Tennant();
+                    tennant.tennantName = tennantName;
+                    tennant.businessId = businessId;
+                    tennant.apiKey = apiKey;
+
+                    //Adds it to the database and saves the changes
+                    _db.Tennants.Add(tennant);
+                    _db.SaveChanges();
+                }
+               
+            } //If it catches an error, it will log it in the datawarehouse
+            catch (Exception e)
+            {
+                ErrorLog errorLog = new ErrorLog();
+
+                string errorType = e.GetType().ToString();
+                string errorMessage = e.ToString();
+
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
+            }
+
 
             return Ok();
         }
@@ -358,28 +388,22 @@ namespace Datawarehouse_Backend.Controllers
             else if (bId == null || bId == "")
             {
                 string errorType = "BusinessId fail";
-                string businessIdError = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
+                string errorMessage = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
 
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = businessIdError;
-                errorLog.timeOfError = DateTime.Now;
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
 
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
                 //Throws an Exception so it does not try to process incoming data that will lead to new Exception
                 throw new InvalidbusinessIdOrApiKeyException();
             }
             else if (apiKey == null || apiKey == "")
             {
                 string errorType = "API-Key fail";
-                string apiKeyError = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
+                string errorMessage = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
 
-                errorLog.errorType = errorType;
-                errorLog.errorMessage = apiKeyError;
-                errorLog.timeOfError = DateTime.Now;
-                
-                _db.ErrorLogs.Add(errorLog);
-                _db.SaveChanges();
+                //Creates a new errorLog to the datawarehouse
+                logError(errorMessage, errorType);
+
                 //Throws an Exception so it does not try to process incoming data that will lead to new Exception
                 throw new InvalidbusinessIdOrApiKeyException();
             }
@@ -389,10 +413,10 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
-        private long addCustomer(Customer customer, long tennantFK ) 
+        private long addCustomer(Customer customer, long tennantFK)
         {
             ErrorLog errorLog = new ErrorLog();
-            Customer databaseCustomer  = _db.Customers
+            Customer databaseCustomer = _db.Customers
             .Where(c => c.customerId == customer.customerId)
             .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Customer>();
             if (databaseCustomer == null)
@@ -405,14 +429,14 @@ namespace Datawarehouse_Backend.Controllers
                 _db.SaveChanges();
 
                 return customer1.id;
-            } 
+            }
             return databaseCustomer.id;
         }
 
-        private long addEmployee(Employee employee, long tennantFK ) 
+        private long addEmployee(Employee employee, long tennantFK)
         {
             ErrorLog errorLog = new ErrorLog();
-            Employee databaseEmployee  = _db.Employees
+            Employee databaseEmployee = _db.Employees
             .Where(c => c.employeeId == employee.employeeId)
             .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Employee>();
             if (databaseEmployee == null)
@@ -425,56 +449,89 @@ namespace Datawarehouse_Backend.Controllers
                 _db.SaveChanges();
 
                 return employee.id;
-            } 
+            }
             return databaseEmployee.id;
         }
 
 
-        private long getEmployeeId(long cordelId, long tennantId) {
-            Employee databaseEmployee  = _db.Employees
+        private long getEmployeeId(long cordelId, long tennantId)
+        {
+            Employee databaseEmployee = _db.Employees
             .Where(c => c.employeeId == cordelId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Employee>();
 
-            if(databaseEmployee != null) {
+            if (databaseEmployee != null)
+            {
                 return databaseEmployee.id;
-            } 
+            }
             Console.WriteLine("Employee er null");
             return -1;
         }
 
-        private long getOrderId(long cordelId, long tennantId) {
-            Order databaseOrder  = _db.Orders
+        private long getOrderId(long cordelId, long tennantId)
+        {
+            Order databaseOrder = _db.Orders
             .Where(c => c.orderId == cordelId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Order>();
 
-            if(databaseOrder != null) {
+            if (databaseOrder != null)
+            {
                 return databaseOrder.id;
-            } 
+            }
             Console.WriteLine("Order er null");
             return -1;
         }
 
-        private long getCustomerId(long cordelId, long tennantId) 
+        private long getCustomerId(long cordelId, long tennantId)
         {
-
-            Console.WriteLine(cordelId);
-
-            Console.WriteLine(tennantId);
-            Console.WriteLine("-------------------------");
-            Customer databaseCustomer  = _db.Customers
+            Customer databaseCustomer = _db.Customers
             .Where(c => c.customerId == cordelId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Customer>();
 
-            Console.WriteLine(databaseCustomer);
-
-            if(databaseCustomer != null) {
+            if (databaseCustomer != null)
+            {
                 return databaseCustomer.id;
-            } 
+            }
             Console.WriteLine("Customer er null");
             return -1;
         }
-    }    
 
-    
+
+        //This function checks if there is a tennant registert with the apiKey
+        //If there is, true will be returned and the handling of data will start
+        private bool verifyApiKey(string apiKey)
+        {
+            Tennant tennant = _db.Tennants
+            .Where(t => t.apiKey == apiKey).FirstOrDefault<Tennant>();
+
+            //Checks if there is a tennant with that api key
+            if (tennant != null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /*
+        This function creats a new errorLog, and uses the information in the 
+        parameters to create a new errorLog in the datawarehouse, and saves the changes
+        */
+        private void logError(string errorMessage, string errorType) 
+        {
+            ErrorLog errorLog = new ErrorLog();
+
+            DateTime timeOfError = DateTime.Now;
+
+            errorLog.errorType = errorType;
+            errorLog.errorMessage = errorMessage;
+            errorLog.timeOfError = timeOfError;
+
+            _db.ErrorLogs.Add(errorLog);
+            _db.SaveChanges();
+        }
+    }
+
+
 
 }
