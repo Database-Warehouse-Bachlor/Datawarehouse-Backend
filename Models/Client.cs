@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Datawarehouse_Backend.Models
 {
-    public class Customer
+    public class Client
     {
         [Key]
         public long id { get; set; }
@@ -20,10 +20,8 @@ namespace Datawarehouse_Backend.Models
         public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
 
-        public ICollection<Invoice> invoicesOutbound { get; set; } = new List<Invoice>();
-        public ICollection<AccountsReceivable> accountsreceivables { get; set; } = new List<AccountsReceivable>();
+        public ICollection<Invoice> invoices { get; set; } = new List<Invoice>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
-
 
     }
 }

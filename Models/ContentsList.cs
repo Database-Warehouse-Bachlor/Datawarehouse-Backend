@@ -11,14 +11,18 @@ namespace Datawarehouse_Backend.Models
         public string businessId { get; set; }
         public string apiKey { get; set; }
         public string tennantName { get; set; }
-        public List<Invoice> InvoiceInbound { get; set; }
-        public List<Invoice> InvoiceOutbound { get; set; }
-        public List<Customer> Customer { get; set; }
+        public List<Invoice> Invoices { get; set; }
+        public List<Client> Client { get; set; }
         public List<BalanceAndBudget> BalanceAndBudget { get; set; }
         public List<AbsenceRegister> AbsenceRegister { get; set; }
-        public List<AccountsReceivable> Accountsreceivable { get; set; }
         public List<Employee> Employee { get; set; }
         public List<Order> Order { get; set; }
         public List<TimeRegister> TimeRegister { get; set; }
+        public List<InvoiceLine> InvoiceLines {get; set;}       
+        public List<Voucher> Vouchers {get; set;}       
+        public List<Post> Posts {get; set;}       
+        public List<Account> Accounts {get; set;}       
+        public List<FinancialYear> FinancialYears {get; set;}   
+      //  public List<AccountsReceivable> Accountsreceivable { get; set; }
     }
 }

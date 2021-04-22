@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 //Bilag
@@ -13,5 +14,8 @@ namespace Datawarehouse_Backend.Models
         public string Type {get; set;} 
         public string description {get; set;}
         public DateTime date {get; set;}
+        public ICollection<Invoice> invoices { get; set; } = new List<Invoice>();
+        public ICollection<Post> posts { get; set; } = new List<Post>();
+
     }
 }
