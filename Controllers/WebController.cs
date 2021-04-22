@@ -85,34 +85,26 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getAllInboundInvoice( string filter)
+        public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            var invoice = _warehouseDb.Invoices
             .Where(i => i.tennantFK == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
-            return inboundInvoices;
+            return invoice;
         }
 
+    
+
         /*
-        * Getting invoice outbound based on it's duedate and filter given.
+        *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
+        *  only tracks year, month and total absence for that month OR Date and total absence for that date.
+        *  If it's this week/month or last 30 / 7 days it will summarize for each date instead of month.
+        * So instead of getting a list of all absences, it gives a list of total absences per month/date.
         */
-        [Authorize]
-        [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds(string filter)
-        {
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customer.tennantFK == tennantId)
-            .Where(d => d.invoiceDue >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDue)
-            .ToList();
-            return invoiceOutbounds;
-        }
 
         //[Authorize]
         [HttpGet("absence")]
@@ -130,12 +122,7 @@ namespace Datawarehouse_Backend.Controllers
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;
 
-            /*
-            *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
-            *  only tracks year, month and total absence for that month. 
-            *  So instead of getting a list of all absences, it gives a list of total absences per month.
-            */
-            if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays" || filter == "lastSevenDays" )
+            if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays" || filter == "lastSevenDays")
             {
                 try
                 {
@@ -199,7 +186,7 @@ namespace Datawarehouse_Backend.Controllers
                 }
                 return absenceViews;
             }
-            else
+            else  //Monthly-based filter is chosen, now we summarize for each month instead of day.
             {
                 try
                 {
@@ -272,63 +259,164 @@ namespace Datawarehouse_Backend.Controllers
             .ToList();
             return timeRegisters;
         }
+
         /*
-        * A method to fetch all orders from a specific tennant.
+        * Returns a list of all tennants orders that have an end date 
+        * later than the date of the request.
+        * All orders are converted to orderView that only show customer name, 
+        * total amount from its invoice, jobname and end date.
         */
 
         [Authorize]
-        [HttpGet("orders")]
-        public List<Order> getAllOrders(string filter)
+        [HttpGet("pendingOrders")]
+        public List<OrderView> getPendingOrders()
         {
-            DateTime comparisonDate = compareDates(filter);
-            var orders = getTennant().orders.ToList();
-            // .Where(d => d.invoiceDate >= comparisonDate)
-            //.OrderByDescending(d => d.invoiceDate)
-            return orders;
+            var orders = getTennant().orders
+            .Where(o => o.endDate >= DateTime.Now)
+            .OrderByDescending(o => o.endDate)
+            .ToList();
+            List<OrderView> orderList = new List<OrderView>();
+            for (int i = 0; i < orders.Count; i++)
+            {
+                OrderView order = new OrderView();
+                order.customerName = orders[i].customer.customerName;
+                order.invoiceTotal = orders[i].invoice.amountTotal;
+                order.jobname = orders[i].jobName;
+                order.endDate = orders[i].endDate;
+                orderList.Add(order);
+
+            }
+            return orderList;
         }
 
+        [Authorize]
+        [HttpGet("allOrders")]
+        public List<OrderView> getAllOrders()
+        {
+            var orders = getTennant().orders
+            .OrderByDescending(o => o.endDate)
+            .ToList();
+            List<OrderView> orderList = new List<OrderView>();
+
+            for (int i = 0; i < orders.Count; i++)
+            {
+                OrderView order = new OrderView();
+                order.customerName = orders[i].customer.customerName;
+                order.invoiceTotal = orders[i].invoice.amountTotal;
+                order.jobname = orders[i].jobName;
+                order.endDate = orders[i].endDate;
+                orderList.Add(order);
+            }
+            return orderList;
+        }
+
+
         /*
-        * A method to fetch all inbound invoices from a specific tennant.
+        * A method to find all customers for a specific tennant.
+        * Returns a list of customers ordered by their names.
+        * The customer information returned: Name, address, zipcode, city and total AmountDue from
+        * it's list of accounts receivables.
+        *
+        * Returns:
+        * A list of customer addresses, zipcode, city and total amount due
+        *
+        * NOTE: Nested forloop. n^2 runtime.
+        * Possible fix: Make the amountDue total for a customer be stored in the model
+        * and updated whenever data is submitted in the dataSubmissionController.
         */
 
         [Authorize]
         [HttpGet("customers")]
-        public List<Customer> getCustomers(string filter)
+        public List<CustomerView> getCustomers()
         {
-            DateTime comparisonDate = compareDates(filter);
-            var customers = getTennant().customers.ToList();
-            //.Where(d => d.invoiceDate >= comparisonDate)
-            // .OrderByDescending(d => d.invoiceDate)
-            return customers;
+            var customers = getTennant().customers
+            .OrderByDescending(c => c.customerName)
+            .ToList();
+
+            List<CustomerView> customerList = new List<CustomerView>();
+            for (int i = 0; i < customers.Count; i++)
+            {
+                CustomerView cust = new CustomerView();
+                cust.customerName = customers[i].customerName;
+                cust.address = customers[i].address;
+                cust.zipcode = customers[i].zipcode;
+                cust.city = customers[i].city;
+                decimal due = 0;
+                List<AccountsReceivable> accounts = customers[i].accountsreceivables.ToList();
+                for (int j = 0; j < accounts.Count; j++)
+                {
+                    due += accounts[j].amountDue;
+                }
+                cust.amountDue = due;
+                customerList.Add(cust);
+            }
+            return customerList;
         }
 
         /*
         * A method to fetch all inbound invoices from a specific tennant.
+        *
+        * 
+        * Returns:
+        * A list of customer addresses, zipcodes, cities and total amount due
         */
 
         [Authorize]
         [HttpGet("balance")]
-        public List<BalanceAndBudget> getBalanceAndBudget(string filter)
+        public List<BnbView> getBalanceAndBudget(string filter)
         {
+            //Gets all BnBs within the filter
             DateTime comparisonDate = compareDates(filter);
-            var balanceAndBudgets = getTennant().bnb.ToList();
-            //.Where(d => d.invoiceDate >= comparisonDate)
-            // .OrderByDescending(d => d.invoiceDate)
-            return balanceAndBudgets;
+            var balanceAndBudgets = getTennant().bnb
+            .Where(d => d.periodDate >= comparisonDate)
+            .OrderByDescending(d => d.periodDate).ToList();
+            //Grab the important information and put it in a list of views so it's easier to handle @frontend
+            List<BnbView> bnbList = new List<BnbView>();
+            for (int i = 0; i < balanceAndBudgets.Count; i++)
+            {
+                BnbView bnb = new BnbView();
+                bnb.account = balanceAndBudgets[i].account;
+                bnb.startBalance = balanceAndBudgets[i].startBalance;
+                bnb.periodBalance = balanceAndBudgets[i].periodBalance;
+                bnb.endBalance = balanceAndBudgets[i].endBalance;
+                bnbList.Add(bnb);
+            }
+            return bnbList;
         }
 
-
+        /*
+        * Finds all the customers for the tennant then for each customer it iterates over
+        * the customers accountreceivables and adds the information needed to AccountsView
+        * and returns a list of AccountsView
+        */
         [Authorize]
-        [HttpGet("accrecieve")]
-        public List<AccountsReceivable> getAccountsReceivables(string filter)
+        [HttpGet("accreceive")]
+        public List<AccountsView> getAccountsReceivables(string filter)
         {
-            long tennantId = getTennantId();
-            var accountsReceivable = _warehouseDb.Customers
-            .Where(c => c.tennantFK == tennantId).FirstOrDefault<Customer>()
-            .accountsreceivables
-            .ToList();
+            Tennant tennant = getTennant();
+            var customers = tennant.customers.ToList();
+            List<AccountsView> accountsReceivable = new List<AccountsView>();
+            for (int i = 0; i < customers.Count; i++)
+            {
+                List<AccountsReceivable> accounts = customers[i].accountsreceivables.ToList();
+                for (int j = 0; j < accounts.Count; j++)
+                {
+                    AccountsView acc = new AccountsView();
+                    acc.amount = accounts[j].amount;
+                    acc.amountDue = accounts[j].amountDue;
+                    acc.dueDate = accounts[j].dueDate;
+                    accountsReceivable.Add(acc);
+                }
+            }
             return accountsReceivable;
         }
+
+
+        /*
+        * Two functions that takes the first claim from the JWT Token to find which tennantId
+        * their accounts is bound to.  The first function returns the object tennant based on the ID
+        * The other function simply returns the tennantId that has been found.
+        */
 
         private Tennant getTennant()
         {

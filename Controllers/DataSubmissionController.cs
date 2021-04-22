@@ -320,7 +320,7 @@ namespace Datawarehouse_Backend.Controllers
         private long addCustomer(Customer customer, long tennantFK ) 
         {
             ErrorLog errorLog = new ErrorLog();
-            Customer databaseCustomer  = _db.Customers.Where(c => c.custommerId == customer.custommerId).FirstOrDefault<Customer>();
+            Customer databaseCustomer  = _db.Customers.Where(c => c.clientId == customer.clientId).FirstOrDefault<Customer>();
             if (databaseCustomer == null)
             {
                 Customer customer1 = new Customer();

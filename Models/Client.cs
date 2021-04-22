@@ -9,10 +9,10 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
-        public long custommerId { get; set; }
-        public String customerName { get; set; }
-        public String address { get; set; }
-        public int zipcode { get; set; }
+        public long clientId { get; set; }
+        public string customerName { get; set; }
+        public string address { get; set; }
+        public string zipcode { get; set; }
         public string city { get; set; }
         public Boolean isInactive { get; set; }
 
@@ -20,7 +20,7 @@ namespace Datawarehouse_Backend.Models
         public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
 
-        public ICollection<InvoiceOutbound> invoicesOutbound { get; set; } = new List<InvoiceOutbound>();
+        public ICollection<Invoice> invoicesOutbound { get; set; } = new List<Invoice>();
         public ICollection<AccountsReceivable> accountsreceivables { get; set; } = new List<AccountsReceivable>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
 

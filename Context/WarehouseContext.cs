@@ -13,8 +13,7 @@ namespace Datawarehouse_Backend.Context {
         public DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<InvoiceInbound> InvoiceInbounds { get; set; }
-        public DbSet<InvoiceOutbound> InvoiceOutbounds { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Tennant> Tennants { get; set; }
         public DbSet<TimeRegister> TimeRegisters { get; set; }
