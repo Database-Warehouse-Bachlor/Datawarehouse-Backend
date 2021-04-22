@@ -85,35 +85,19 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize]
         [HttpGet("inbound")]
-        public List<InvoiceInbound> getAllInboundInvoice(string filter)
+        public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var inboundInvoices = _warehouseDb.InvoiceInbounds
+            var invoice = _warehouseDb.Invoices
             .Where(i => i.tennantFK == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
-            return inboundInvoices;
+            return invoice;
         }
 
-        /*
-        * Getting invoice outbound based on it's duedate and filter given.
-        */
-        [Authorize]
-        [HttpGet("outbound")]
-        public List<InvoiceOutbound> getInvoiceOutbounds(string filter)
-        {
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var invoiceOutbounds = _warehouseDb.InvoiceOutbounds
-            .Where(a => a.customer.tennantFK == tennantId)
-            .Where(d => d.invoiceDue >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDue)
-            .ToList();
-            return invoiceOutbounds;
-        }
-
+    
 
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
@@ -296,7 +280,7 @@ namespace Datawarehouse_Backend.Controllers
             {
                 OrderView order = new OrderView();
                 order.customerName = orders[i].customer.customerName;
-                order.invoiceTotal = orders[i].invoiceOutbound.amountTotal;
+                order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);
@@ -318,7 +302,7 @@ namespace Datawarehouse_Backend.Controllers
             {
                 OrderView order = new OrderView();
                 order.customerName = orders[i].customer.customerName;
-                order.invoiceTotal = orders[i].invoiceOutbound.amountTotal;
+                order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);

@@ -11,8 +11,8 @@ namespace Datawarehouse_Backend.Models
         public string businessId { get; set; }
         public string apiKey { get; set; }
         public string tennantName { get; set; }
-        public List<InvoiceInbound> InvoiceInbound { get; set; }
-        public List<InvoiceOutbound> InvoiceOutbound { get; set; }
+        public List<Invoice> InvoiceInbound { get; set; }
+        public List<Invoice> InvoiceOutbound { get; set; }
         public List<Customer> Customer { get; set; }
         public List<BalanceAndBudget> BalanceAndBudget { get; set; }
         public List<AbsenceRegister> AbsenceRegister { get; set; }

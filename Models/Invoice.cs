@@ -6,16 +6,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Datawarehouse_Backend.Models
 {
 
-    public class InvoiceInbound
+    public class Invoice
     {
         [Key]
         public long id { get; set; }
-        public long invoiceInboundId { get; set; }
+        public long invoiceId { get; set; }
+        public string clientId { get; set; }
         public DateTime invoiceDate { get; set; }
-        public long jobId { get; set; }
-        public long supplierId { get; set; }
-        public long wholesalerId { get; set; }
-        public double amountTotal { get; set; }
+        public decimal amountTotal { get; set; }
         public string specification { get; set; }
         public string invoicePdf { get; set; }
 

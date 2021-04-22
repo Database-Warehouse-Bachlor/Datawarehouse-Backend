@@ -35,7 +35,7 @@ namespace Datawarehouse_Backend.Models
 
         [ForeignKey("invoiceOutBound")]
         public long invoiceOutboundFK { get; set; }
-        public virtual InvoiceOutbound invoiceOutbound { get; set; }
+        public virtual Invoice invoice{ get; set; }
 
         [ForeignKey("customer")]
         public long customerFK { get; set; }
