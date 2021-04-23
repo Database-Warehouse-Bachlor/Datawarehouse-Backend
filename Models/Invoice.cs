@@ -18,13 +18,9 @@ namespace Datawarehouse_Backend.Models
         public string invoicePdf { get; set; }
         public long orderId { get; set; }
 
-        [ForeignKey("client")]
-        public long clientFK { get; set; }
-        public Client client { get; set; }
-
-        [ForeignKey("Voucher")]
+        [ForeignKey("voucher")]
         public long vouchertFK { get; set; }
-        public Voucher voucher { get; set; }
+        public virtual Voucher voucher { get; set; }
 
         public ICollection<InvoiceLine> invoiceLines { get; set; } = new List<InvoiceLine>();
 
