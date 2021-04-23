@@ -5,7 +5,6 @@ using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -14,65 +13,73 @@ namespace Datawarehouse_Backend.Tests
     public class AppControllerTest
     {
 
-        // A test method to check if the getNumberOfTennants() method is doing what it is supposed to do.
         [Fact]
-        public void getTennantsTest()
+        public void getNumberOfTennants_ShouldReturnNumberOfTennants()
         {
+            //Given
+            var mockupDb = new Mock<IWarehouseContext>();
+            mockupDb.Setup(t => t.getNumberOfTennants()).Returns(TestDataForNumberOfTennants());
 
-            // Arrange
-            var mockData = new Mock<IWarehouseContext>();
-            int expected = 4;
-            mockData.Setup(mdata => mdata.Tennants.Count()).Returns(getTestData());
-            var controller = new AppController(mockData.Object);
-
-            // Act
+            var controller = new AppController(mockupDb.Object);
+            
+            //When
             var result = controller.getNumberOfTennants();
 
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<IEnumerable<Tennant>>(viewResult.ViewData.Model);
-            Assert.Equal(expected, model.Count());
+            //Then
+            var viewResult = Assert.IsType<int>(result);
+            Assert.Equal(2, viewResult);
+            Assert.NotEqual(1, viewResult);
         }
 
+         [Fact]
+          public void GetAllTennantsAsList()
+          {
+              var mockupDb = new Mock<IWarehouseContext>();
+              mockupDb.Setup(t => t.getAllTennants()).Returns(TestDataForAllTennants());
 
+              var controller = new AppController(mockupDb.Object);
 
+              var result = controller._warehouseDb.getAllTennants();
+              var viewResult = Assert.IsType<List<Tennant>>(result);
 
+              Assert.Equal(4, viewResult.Count);
+          }
 
-
-
-
-
-        // Creates dummydata used for testing purposes
-        public int getTestData()
+        private List<Tennant> TestDataForAllTennants()
         {
-            var tennants = new List<Tennant>() {
-            new Tennant {
-                id = 1,
-                tennantName = "Test One",
-                businessId = "123123123",
-                apiKey = "923hfna9fhawf"
-            },
-            new Tennant {
-                id = 2,
-                tennantName = "Test Two",
-                businessId = "345345345",
-                apiKey = "4oiugshbjg"
-            },
-            new Tennant {
-                id = 1,
-                tennantName = "Test Three",
-                businessId = "456456456",
-                apiKey = "aeo8hfuebf873"
-            },
-            new Tennant {
-                id = 1,
-                tennantName = "Test Four",
-                businessId = "567567567",
-                apiKey = "3q98fhqufiawhf"
-            },
+            var tennants = new List<Tennant> {
+                new Tennant {
+                    id = 1,
+                    tennantName = "someOne",
+                    businessId = "someId",
+                    apiKey = "someApiKey"
+                },
+                         new Tennant {
+                    id = 2,
+                    tennantName = "someTwo",
+                    businessId = "someIdTwo",
+                    apiKey = "someApiKeyTwo"
+                },
+                         new Tennant {
+                    id = 3,
+                    tennantName = "someThree",
+                    businessId = "someIdThree",
+                    apiKey = "someApiKeyThree"
+                },
+                new Tennant {
+                    id = 4,
+                    tennantName = "someFour",
+                    businessId = "someIdFour",
+                    apiKey = "someApiKeyFour"
+                },
             };
-            return tennants.Count();
+            return tennants;
+        }
 
+        private int TestDataForNumberOfTennants()
+        {
+            int someNumber = 2;
+            return someNumber;
         }
     }
 }

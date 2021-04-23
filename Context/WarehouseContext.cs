@@ -1,5 +1,8 @@
 
+using System.Collections.Generic;
+using System.Linq;
 using Datawarehouse_Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Datawarehouse_Backend.Context
@@ -10,7 +13,7 @@ namespace Datawarehouse_Backend.Context
         {
 
         }
-        // Define database tables
+        // Define database tables.
         public DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
         public DbSet<AccountsReceivable> AccountsReceivables { get; set; }
         public DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
@@ -22,5 +25,23 @@ namespace Datawarehouse_Backend.Context
         public DbSet<Tennant> Tennants { get; set; }
         public DbSet<TimeRegister> TimeRegisters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
+
+        public Tennant findTennantById(long tennantId)
+        {
+            var tennant = Tennants
+            .Where(o => o.id == tennantId)
+            .FirstOrDefault<Tennant>();
+            return tennant;
+        }
+
+        public List<Tennant> getAllTennants()
+        {
+            return Tennants.ToList();
+        }
+
+        public int getNumberOfTennants() {
+            return Tennants.Count();
+        }
+        
     }
 }

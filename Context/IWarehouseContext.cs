@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using Datawarehouse_Backend.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Datawarehouse_Backend.Context
 {
     public interface IWarehouseContext
     {
-
         DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
         DbSet<AccountsReceivable> AccountsReceivables { get; set; }
         DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
@@ -17,6 +18,10 @@ namespace Datawarehouse_Backend.Context
         DbSet<Tennant> Tennants { get; set; }
         DbSet<TimeRegister> TimeRegisters { get; set; }
         DbSet<ErrorLog> ErrorLogs { get; set; }
-        int SaveChanges();
+        
+        int getNumberOfTennants();
+        List<Tennant> getAllTennants();
+        Tennant findTennantById(long tennantId);
+
     }
 }

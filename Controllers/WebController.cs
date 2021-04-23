@@ -27,13 +27,10 @@ namespace Datawarehouse_Backend.Controllers
     {
         private readonly IConfiguration config;
         private readonly WarehouseContext _warehouseDb;
-        private readonly LoginDatabaseContext _db;
-
-        public WebController(IConfiguration config, WarehouseContext warehouseDb, LoginDatabaseContext logindb)
+        public WebController(IConfiguration config, WarehouseContext warehouseDb)
         {
             this.config = config;
             this._warehouseDb = warehouseDb;
-            this._db = logindb;
         }
         /*
         * Sets the filter to a pre-defined option based on what's requested, if no option is specified, all will be selected.

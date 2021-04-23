@@ -6,6 +6,7 @@ using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Datawarehouse_Backend.Controllers
@@ -41,13 +42,6 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
-        //[Authorize(Roles = "Admin")]
-        [HttpPost("tennants")]
-        public List<Tennant> getAllTennants() {
-            var tennants = _warehouseDb.Tennants
-            .ToList();
-            return tennants;
-        }
 
         //[Authorize(Roles = "Admin")]
         [HttpPost("errors")]
@@ -67,12 +61,16 @@ namespace Datawarehouse_Backend.Controllers
             return errors;
         }
 
-        // Returns a list of all tennants.
+        //[Authorize(Roles = "Admin")]
+        [HttpPost("tennants")]
+        public List<Tennant> getAllTennants() {
+            return _warehouseDb.getAllTennants();
+        }
+
+        // Returns number of elements of all tennants.
         public int getNumberOfTennants()
         {
-            var numberOfTennants = _warehouseDb.Tennants
-            .Count();
-            return numberOfTennants;
+            return _warehouseDb.getNumberOfTennants();
         }
 
         // Returns number of errors the last 24 hours
@@ -84,7 +82,5 @@ namespace Datawarehouse_Backend.Controllers
             .Count();
             return numberOfErrors;
         }
-
-
     }
 }
