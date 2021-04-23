@@ -84,20 +84,20 @@ namespace Datawarehouse_Backend.Controllers
         */
 
         // [Authorize]
-        [HttpGet("inbound")]
+        [HttpGet("invoices")]
         public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var invoice = _warehouseDb.Invoices
-            .Where(i => i.client.tennantFK == tennantId)
+            .Where(i => i.voucher.client.tennantFK == tennantId)
             .Where(d => d.invoiceDate >= comparisonDate)
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return invoice;
         }
 
-    
+
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
         *  only tracks year, month and total absence for that month OR Date and total absence for that date.
@@ -145,7 +145,7 @@ namespace Datawarehouse_Backend.Controllers
                                 view.day = absence[i].fromDate.Day;
                                 view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                                 view.totalDuration = totalAbsence;
-                                Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                                 absenceViews.Add(view);
                                 totalAbsence = 0;
                             }
@@ -159,7 +159,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -172,7 +172,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -207,7 +207,7 @@ namespace Datawarehouse_Backend.Controllers
                                 view.year = absence[i].fromDate.Year;
                                 view.month = absence[i].fromDate.Month;
                                 view.totalDuration = totalAbsence;
-                                Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                                 absenceViews.Add(view);
                                 totalAbsence = 0;
                             }
@@ -219,7 +219,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -230,7 +230,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -342,9 +342,12 @@ namespace Datawarehouse_Backend.Controllers
                 cust.address = customers[i].address;
                 cust.zipcode = customers[i].zipcode;
                 cust.city = customers[i].city;
-                if(customers[i].customer){
+                if (customers[i].customer)
+                {
                     cust.type = "Customer";
-                } else {
+                }
+                else
+                {
                     cust.type = "Supplier";
                 }
                 customerList.Add(cust);
