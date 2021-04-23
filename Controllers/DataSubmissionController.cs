@@ -72,13 +72,13 @@ namespace Datawarehouse_Backend.Controllers
                         if (tennantId > 0)
                         {
                             //Adds custumer to datawarehouse
-                            for (int i = 0; i < contentsList.Customer.Count; i++)
+                            for (int i = 0; i < contentsList.Client.Count; i++)
                             {
-                                Customer customer = new Customer();
-                                customer = contentsList.Customer[i];
-                                customer.tennantFK = tennantId;
+                                Client client = new Client();
+                                client = contentsList.Client[i];
+                                client.tennantFK = tennantId;
 
-                                addCustomer(customer, tennantId);
+                                addCustomer(client, tennantId);
                             }
 
                             //Adds Employee to datawarehouse
@@ -97,11 +97,11 @@ namespace Datawarehouse_Backend.Controllers
                                 Order order = new Order();
                                 order = contentsList.Order[i];
                                 order.tennantFK = tennantId;
-                                long customerFK = getCustomerId(order.customerId, tennantId);
+                                long customerFK = getCustomerId(order.clientFK, tennantId);
 
                                 if (customerFK > -1)
                                 {
-                                    order.customerFK = customerFK;
+                                    order.clientFK = customerFK;
                                     _db.Orders.Add(order);
                                     _db.SaveChanges();
 
@@ -109,37 +109,6 @@ namespace Datawarehouse_Backend.Controllers
                                 else
                                 {
                                     //TODO Logg feil
-                                }
-                            }
-
-                            //Adds Invoice inbound to datawarehouse
-                            for (int i = 0; i < contentsList.InvoiceInbound.Count; i++)
-                            {
-                                InvoiceInbound invoice = new InvoiceInbound();
-                                invoice = contentsList.InvoiceInbound[i];
-                                invoice.tennantFK = tennantId;
-                                _db.InvoiceInbounds.Add(invoice);
-                            }
-
-                            //Adds Invoice outbound to datawarehouse
-                            for (int i = 0; i < contentsList.InvoiceOutbound.Count; i++)
-                            {
-                                InvoiceOutbound outbound = new InvoiceOutbound();
-                                outbound = contentsList.InvoiceOutbound[i];
-
-                                long orderFK = getOrderId(outbound.orderId, tennantId);
-                                long customerFK = getCustomerId(outbound.customerId, tennantId);
-
-                                if (orderFK > 0 || customerFK > 0)
-                                {
-                                    outbound.orderFK = orderFK;
-                                    outbound.customerFK = customerFK;
-                                    _db.InvoiceOutbounds.Add(outbound);
-                                    _db.SaveChanges();
-                                }
-                                else
-                                {
-                                    //TODO LOGGE FEIL
                                 }
                             }
 
@@ -164,26 +133,6 @@ namespace Datawarehouse_Backend.Controllers
                                 {
                                     absenceRegister.employeeFK = employeeFK;
                                     _db.AbsenceRegisters.Add(absenceRegister);
-                                }
-                                else
-                                {
-                                    //TODO Logg feil
-                                }
-
-                            }
-
-                            //Adds Accountsreceivable to datawarehouse
-                            for (int i = 0; i < contentsList.Accountsreceivable.Count; i++)
-                            {
-                                AccountsReceivable accountsReceivable = new AccountsReceivable();
-                                accountsReceivable = contentsList.Accountsreceivable[i];
-
-                                long customerFK = getCustomerId(accountsReceivable.customerId, tennantId);
-
-                                if (customerFK > -1)
-                                {
-                                    accountsReceivable.customerFK = customerFK;
-                                    _db.AccountsReceivables.Add(accountsReceivable);
                                 }
                                 else
                                 {
@@ -413,18 +362,18 @@ namespace Datawarehouse_Backend.Controllers
             }
             return business.id;
         }
-        private long addCustomer(Customer customer, long tennantFK)
+        private long addCustomer(Client client, long tennantFK)
         {
             ErrorLog errorLog = new ErrorLog();
-            Customer databaseCustomer = _db.Customers
-            .Where(c => c.customerId == customer.customerId)
-            .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Customer>();
+            Client databaseCustomer = _db.Clients
+            .Where(c => c.clientId == client.clientId)
+            .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Client>();
             if (databaseCustomer == null)
             {
-                Customer customer1 = new Customer();
-                customer1 = customer;
+                Client customer1 = new Client();
+                customer1 = client;
                 customer1.tennantFK = tennantFK;
-                _db.Customers.Add(customer1);
+                _db.Clients.Add(customer1);
 
                 _db.SaveChanges();
 
@@ -484,9 +433,9 @@ namespace Datawarehouse_Backend.Controllers
 
         private long getCustomerId(long cordelId, long tennantId)
         {
-            Customer databaseCustomer = _db.Customers
-            .Where(c => c.customerId == cordelId)
-            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Customer>();
+            Client databaseCustomer = _db.Clients
+            .Where(c => c.clientId == cordelId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Client>();
 
             if (databaseCustomer != null)
             {
