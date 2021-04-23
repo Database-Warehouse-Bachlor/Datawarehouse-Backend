@@ -20,7 +20,7 @@ namespace Datawarehouse_Backend.Models
         public long tennantFK { get; set; }
         public Tennant tennant { get; set; }
 
-        public ICollection<Invoice> invoices { get; set; } = new List<Invoice>();
+        public ICollection<Voucher> vouchers { get; set; } = new List<Voucher>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
 
     }
