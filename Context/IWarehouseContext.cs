@@ -22,6 +22,9 @@ namespace Datawarehouse_Backend.Context
         int getNumberOfTennants();
         List<Tennant> getAllTennants();
         Tennant findTennantById(long tennantId);
+        int getNumberOfErrorsLastTwentyFour();
+        List<ErrorLog> getLatestErrors();
+        List<ErrorLog> getAllErrors();
 
     }
 }

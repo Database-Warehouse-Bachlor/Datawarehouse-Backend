@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datawarehouse_Backend.Models;
@@ -34,14 +35,43 @@ namespace Datawarehouse_Backend.Context
             return tennant;
         }
 
+        // Returns a list of all errors
+        public List<ErrorLog> getAllErrors()
+        {
+            var errors = ErrorLogs.ToList();
+            return errors;
+        }
+
+
+        // Returns a list of errors that arrived the last 24 hours
+        public List<ErrorLog> getLatestErrors()
+        {
+            DateTime currentTime = DateTime.Now;
+            var errors = ErrorLogs
+            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
+            .ToList();
+            return errors;
+        }
+
+        // Returns the number of errors the last 24 hours
+        public int getNumberOfErrorsLastTwentyFour()
+        {
+            DateTime currentTime = DateTime.Now;
+            var errors =  ErrorLogs.Where(d => d.timeOfError >= currentTime.AddHours(-24))
+            .Count();
+            return errors;
+        }
+
+        // Returns the number of tennants
+        public int getNumberOfTennants()
+        {
+            return Tennants.Count();
+        }
+
+        // Returns a list of all tennants
         public List<Tennant> getAllTennants()
         {
             return Tennants.ToList();
         }
-
-        public int getNumberOfTennants() {
-            return Tennants.Count();
-        }
-        
     }
 }

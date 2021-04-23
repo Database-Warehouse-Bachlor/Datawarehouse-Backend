@@ -46,21 +46,16 @@ namespace Datawarehouse_Backend.Controllers
         //[Authorize(Roles = "Admin")]
         [HttpPost("errors")]
         public List<ErrorLog> getAllErrors() {
-            var errors = _warehouseDb.ErrorLogs
-            .ToList();
-            return errors;
+           return _warehouseDb.getAllErrors();
         }
 
         //[Authorize(Roles = "Admin")]
         [HttpPost("lasterrors")]
         public List<ErrorLog> getLatestErrors() {
-            DateTime currentTime = DateTime.Now;
-            var errors = _warehouseDb.ErrorLogs
-            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
-            .ToList();
-            return errors;
+            return _warehouseDb.getLatestErrors();
         }
 
+        // Returns a list of all tennants registered in the database
         //[Authorize(Roles = "Admin")]
         [HttpPost("tennants")]
         public List<Tennant> getAllTennants() {
@@ -76,11 +71,7 @@ namespace Datawarehouse_Backend.Controllers
         // Returns number of errors the last 24 hours
         public int getNumberOfErrorsLastTwentyFour()
         {
-            DateTime currentTime = DateTime.Now;
-            var numberOfErrors = _warehouseDb.ErrorLogs
-            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
-            .Count();
-            return numberOfErrors;
+            return _warehouseDb.getNumberOfErrorsLastTwentyFour();
         }
     }
 }
