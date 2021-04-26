@@ -41,6 +41,7 @@ namespace Datawarehouse_Backend.App_Start
             });
             
             services.AddControllersWithViews();
+            services.AddScoped<IWarehouseContext, WarehouseContext>();
 
 
 

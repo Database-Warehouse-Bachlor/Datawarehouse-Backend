@@ -16,6 +16,7 @@ using Datawarehouse_Backend.Context;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
+
 /*
 *This controller is mainly for authenticating users and registering new users.
 */ 
@@ -50,12 +51,7 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * A function to find the correct Tennant based on it's ID.
         */
-        private Tennant findTennantById(long tennantId) {
-            var tennant = _warehousedb.Tennants
-            .Where(o => o.id == tennantId)
-            .FirstOrDefault<Tennant>();
-            return tennant;
-        }
+
          private long getTennantId()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -108,7 +104,7 @@ namespace Datawarehouse_Backend.Controllers
             IActionResult response;
 
             User userCheck = findUserByMail(email.Trim().ToLower());
-            Tennant tennant = findTennantById(getTennantId());
+            Tennant tennant = _warehousedb.findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
             {
@@ -146,7 +142,7 @@ namespace Datawarehouse_Backend.Controllers
             IActionResult response;
 
             User userCheck = findUserByMail(email.Trim().ToLower());
-            Tennant tennant = findTennantById(tennantId);
+            Tennant tennant = _warehousedb.findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
             {
@@ -188,7 +184,7 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("tennantName")]
         public string getTennantName()
         {
-            Tennant tennant = findTennantById(getTennantId());
+            Tennant tennant = _warehousedb.findTennantById(getTennantId());
             return tennant.tennantName;
         }
         
