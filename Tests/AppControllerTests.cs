@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
-using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 

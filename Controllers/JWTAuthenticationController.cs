@@ -29,23 +29,14 @@ namespace Datawarehouse_Backend.Controllers
     {
 
         private readonly IConfiguration _config;
-        private readonly LoginDatabaseContext _db;
-        private readonly WarehouseContext _warehousedb;
+        private readonly ILoginDatabaseContext _db;
+        private readonly IWarehouseContext _warehousedb;
 
-        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db, WarehouseContext warehousedb)
+        public JWTAuthenticationController(IConfiguration config, ILoginDatabaseContext db, IWarehouseContext warehousedb)
         {
             _config = config;
             _db = db;
             _warehousedb = warehousedb;
-        }
-        /*
-        * A function to find the correct User based on email.
-        */
-        private User findUserByMail(string email){
-            var user = _db.Users
-            .Where(e => e.Email == email)
-            .FirstOrDefault<User>();
-            return user;
         }
 
         /*
@@ -65,7 +56,7 @@ namespace Datawarehouse_Backend.Controllers
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            User loginUser = findUserByMail(email.Trim().ToLower());
+            User loginUser = _db.findUserByMail(email.Trim().ToLower());
 
             IActionResult response;
             try
@@ -103,7 +94,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email.Trim().ToLower());
+            User userCheck = _db.findUserByMail(email.Trim().ToLower());
             Tennant tennant = _warehousedb.findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
@@ -141,7 +132,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email.Trim().ToLower());
+            User userCheck = _db.findUserByMail(email.Trim().ToLower());
             Tennant tennant = _warehousedb.findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
