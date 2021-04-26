@@ -7,18 +7,21 @@ namespace Datawarehouse_Backend.Context
 {
     public interface IWarehouseContext
     {
-        DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
-        DbSet<AccountsReceivable> AccountsReceivables { get; set; }
-        DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
-        DbSet<Customer> Customers { get; set; }
-        DbSet<Employee> Employees { get; set; }
-        DbSet<InvoiceInbound> InvoiceInbounds { get; set; }
-        DbSet<InvoiceOutbound> InvoiceOutbounds { get; set; }
-        DbSet<Order> Orders { get; set; }
-        DbSet<Tennant> Tennants { get; set; }
-        DbSet<TimeRegister> TimeRegisters { get; set; }
-        DbSet<ErrorLog> ErrorLogs { get; set; }
-        
+        public DbSet<AbsenceRegister> AbsenceRegisters { get; set; }
+        public DbSet<BalanceAndBudget> BalanceAndBudgets { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Tennant> Tennants { get; set; }
+        public DbSet<TimeRegister> TimeRegisters { get; set; }
+        public DbSet<ErrorLog> ErrorLogs { get; set; }
+        public DbSet<InvoiceLine> InvoiceLines { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<FinancialYear> FinancialYears { get; set; }
+
         int getNumberOfTennants();
         List<Tennant> getAllTennants();
         Tennant findTennantById(long tennantId);
