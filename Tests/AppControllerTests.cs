@@ -4,8 +4,11 @@ using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
+using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 
@@ -21,6 +24,21 @@ namespace Datawarehouse_Backend.Tests
 {
     public class AppControllerTest
     {
+
+        [Fact]
+        public void getNumberOfTennantsAndErrorsAsJson()
+        {
+            var mockData = new Mock<IWarehouseContext>();
+            //mockData.Setup(json => json.getNumberOfTennantsAndErrorsAsJson()).Returns(TestDataWhenIntExpected());
+            //mockData.Setup(json => json.getNumberOfErrorsLastTwentyFour()).Returns(TestDataWhenIntExpected());
+
+            var controller = new AppController(mockData.Object);
+
+            var result = controller.getNumberOfTennantsAndErrorsAsJson();
+            
+            var viewResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, viewResult.StatusCode);
+        }
 
         [Fact]
         public void getNumberOfTennants_ShouldReturnNumberOfTennants()
@@ -106,7 +124,7 @@ namespace Datawarehouse_Backend.Tests
 
             var result = controller.getAllErrors();
             var viewResult = Assert.IsType<List<ErrorLog>>(result);
-        
+
             Assert.Equal(expected.ToString(), viewResult[0].ToString());
             Assert.Equal(2, viewResult.Count);
         }
@@ -183,20 +201,18 @@ namespace Datawarehouse_Backend.Tests
             return errorLog;
         }
 
-
-
-
         /*
          Creates a tennant object and returns it
         */
-        public Tennant tennant()
+        private Tennant tennant()
         {
-            Tennant tennant = new Tennant {
+            Tennant tennant = new Tennant
+            {
                 id = 1,
                 tennantName = "someOne",
                 businessId = "someId",
                 apiKey = "someApiKey"
-                };
+            };
             return tennant;
         }
 
