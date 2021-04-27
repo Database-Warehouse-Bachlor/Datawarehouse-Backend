@@ -1,9 +1,13 @@
 using System;
-using System.Text;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Principal;
 using Datawarehouse_Backend.Authentication;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -16,7 +20,11 @@ using Xunit;
     the Moq framework has been used. 
     
     Methods applied with [Fact] above is the actual tests, while the other methods are used to
-    Create testobjects and data to use in these tests. 
+    Create testobjects and data to use in these tests.
+
+    This class is adapted from  
+        - https://docs.microsoft.com/en-us/aspnet/web-api/overview/testing-and-debugging/unit-testing-controllers-in-web-api
+        - https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-5.0
 */
 namespace Datawarehouse_Backend.Tests
 {
@@ -25,20 +33,21 @@ namespace Datawarehouse_Backend.Tests
 
         /*
         * This is a test that checks that the response is the wanted response, when login is succsessful
+        * If the login is succsessful, 200 Ok is returned and the test will pass.
+        * If 401, 500 or any other errorcode is returned the test will fail
         */
         [Fact]
-        public void loginReturnsTheCorrectResponse()
+        public void loginReturnsSuccessfulResponse()
         {
             // Values needed for the class to be tested
             string email = "someemail@mail.no";
             string password = "somePassword";
-
             var token = Guid.NewGuid().ToString();
-            // Creates Mockdata for the specified class.
+
+            // Creates Mockdata used for testing.
             var mockConfig = new Mock<IConfiguration>();
             mockConfig.Setup(c => c["Jwt:Key"]).Returns(token);
 
-            // Creates Mockdata for the specified class.
             var mockLoginDb = new Mock<ILoginDatabaseContext>();
             mockLoginDb.Setup(l => l.findUserByMail(email)).Returns(TestUser());
 
@@ -53,6 +62,62 @@ namespace Datawarehouse_Backend.Tests
             // Verifies that two objects are equal. This checks if the responsecode is 200.
             Assert.Equal(200, viewResult.StatusCode);
         }
+
+        [Fact]
+        public void registerReturnsSuccessfulResponse() {
+            string email = "someNewEmail@mail.no";
+            string password = "somePassword";
+            long tennantFk = 1;
+
+            var mockConfig = new Mock<IConfiguration>();
+            
+            var mockLogin = new Mock<ILoginDatabaseContext>();
+            var mockWarehouse = new Mock<IWarehouseContext>();
+            mockWarehouse.Setup(w => w.findTennantById(tennantFk)).Returns(TestTennant());
+            
+            // Creates a controller-object to test, warehousedb set to null because it's not used in this method. 
+            var controller = new JWTAuthenticationController(mockConfig.Object, mockLogin.Object, mockWarehouse.Object);
+            // Sets result to the method that is being tested
+            var result = controller.register(email, password);
+            //Verifies that the object is of a given type
+            var viewResult = Assert.IsType<OkObjectResult>(result);
+            // Verifies that two objects are equal. This checks if the responsecode is 200.
+            Assert.Equal(200, viewResult.StatusCode);
+
+        }
+
+        /*
+        * This test checks that the response is the wanted response when a user is succsessfully created.
+        * If registration is succsessful, 200 Ok is returned and the test will pass.
+        * If 401, 500 or any other errorcode is returned the test will fail
+        */
+        [Fact]
+        public void initRegisterReturnsSuccessfulResponse() {
+
+            // Values needed for the class to be tested
+            string email = "someEmail@mail.no";
+            string password = "somePassword";
+            long tennantId = 1;
+
+            // Creates Mockdata used for testing.
+            var mockLogin = new Mock<ILoginDatabaseContext>();
+            mockLogin.Setup(l => l.Users.ToString()).Returns(TestUser().ToString());
+             
+            var mockWarehouse = new Mock<IWarehouseContext>();
+            mockWarehouse.Setup(w => w.findTennantById(tennantId)).Returns(TestTennant());
+            
+            var controller = new JWTAuthenticationController(null, mockLogin.Object, mockWarehouse.Object);
+            // Sets result to the method that is being tested
+            var result = controller.initRegister(email, password, tennantId);
+            //Verifies that the object is of a given type
+            var viewResult = Assert.IsType<OkObjectResult>(result);
+            // Verifies that two objects are equal. This checks if the responsecode is 200.
+            Assert.Equal(200, viewResult.StatusCode);
+        }
+
+
+
+
         /*
         * Returns a user as dummydata for testing
         */
@@ -67,6 +132,24 @@ namespace Datawarehouse_Backend.Tests
                 role = "User"
             };
             return user;
+        }
+
+        /*
+        * Returns a tennant as dummydata for testing
+        */
+        private Tennant TestTennant() {
+            var tennant = new Tennant {
+                id = 1,
+                tennantName = "someTennant",
+                businessId = "someId",
+                apiKey = "someApiKey"
+            };
+            return tennant;
+        }
+
+        private long TestTennantId() {
+            int number = 1;
+            return number;
         }
 
     }
