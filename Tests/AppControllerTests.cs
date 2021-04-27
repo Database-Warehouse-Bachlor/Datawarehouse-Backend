@@ -25,9 +25,7 @@ namespace Datawarehouse_Backend.Tests
         public void getNumberOfTennantsAndErrorsAsJson()
         {
             var mockData = new Mock<IWarehouseContext>();
-            //mockData.Setup(json => json.getNumberOfTennantsAndErrorsAsJson()).Returns(TestDataWhenIntExpected());
-            //mockData.Setup(json => json.getNumberOfErrorsLastTwentyFour()).Returns(TestDataWhenIntExpected());
-
+        
             var controller = new AppController(mockData.Object);
 
             var result = controller.getNumberOfTennantsAndErrorsAsJson();
