@@ -32,9 +32,7 @@ namespace Datawarehouse_Backend.Tests
     {
 
         /*
-        * This is a test that checks that the response is the wanted response, when login is succsessful
-        * If the login is succsessful, 200 Ok is returned and the test will pass.
-        * If 401, 500 or any other errorcode is returned the test will fail
+        * This is a test that checks that the response is the wanted response with the login method
         */
         [Fact]
         public void loginReturnsSuccessfulResponse()
@@ -54,27 +52,34 @@ namespace Datawarehouse_Backend.Tests
             // Creates a controller-object to test, warehousedb set to null because it's not used in this method. 
             var controller = new JWTAuthenticationController(mockConfig.Object, mockLoginDb.Object, null);
             // Sets result to the method that is being tested
-            var result = controller.login(email, password);
+            var resultOk = controller.login(email, password);
+
+            // changes tennantId to be able to retrieve unauthorized
+            password = "someNewPassword";
+            var resultUnAuth = controller.login(email, password); 
 
             //Verifies that the object is of a given type
-            var viewResult = Assert.IsType<OkObjectResult>(result);
-            
+            var viewResultOk = Assert.IsType<OkObjectResult>(resultOk);
+            var viewResultUnAuth = Assert.IsType<UnauthorizedResult>(resultUnAuth);
+
             // Verifies that two objects are equal. This checks if the responsecode is 200.
-            Assert.Equal(200, viewResult.StatusCode);
+            Assert.Equal(200, viewResultOk.StatusCode);
+            Assert.Equal(401, viewResultUnAuth.StatusCode);
         }
 
         [Fact]
-        public void registerReturnsSuccessfulResponse() {
+        public void registerReturnsSuccessfulResponse()
+        {
             string email = "someNewEmail@mail.no";
             string password = "somePassword";
             long tennantFk = 1;
 
             var mockConfig = new Mock<IConfiguration>();
-            
+
             var mockLogin = new Mock<ILoginDatabaseContext>();
             var mockWarehouse = new Mock<IWarehouseContext>();
             mockWarehouse.Setup(w => w.findTennantById(tennantFk)).Returns(TestTennant());
-            
+
             // Creates a controller-object to test, warehousedb set to null because it's not used in this method. 
             var controller = new JWTAuthenticationController(mockConfig.Object, mockLogin.Object, mockWarehouse.Object);
             // Sets result to the method that is being tested
@@ -87,12 +92,11 @@ namespace Datawarehouse_Backend.Tests
         }
 
         /*
-        * This test checks that the response is the wanted response when a user is succsessfully created.
-        * If registration is succsessful, 200 Ok is returned and the test will pass.
-        * If 401, 500 or any other errorcode is returned the test will fail
+        * This test checks that the response is the wanted response while creating a user
         */
         [Fact]
-        public void initRegisterReturnsSuccessfulResponse() {
+        public void initRegisterReturnsSuccessfulResponse()
+        {
 
             // Values needed for the class to be tested
             string email = "someEmail@mail.no";
@@ -102,17 +106,25 @@ namespace Datawarehouse_Backend.Tests
             // Creates Mockdata used for testing.
             var mockLogin = new Mock<ILoginDatabaseContext>();
             mockLogin.Setup(l => l.Users.ToString()).Returns(TestUser().ToString());
-             
+
             var mockWarehouse = new Mock<IWarehouseContext>();
             mockWarehouse.Setup(w => w.findTennantById(tennantId)).Returns(TestTennant());
-            
+
             var controller = new JWTAuthenticationController(null, mockLogin.Object, mockWarehouse.Object);
+
             // Sets result to the method that is being tested
-            var result = controller.initRegister(email, password, tennantId);
+            var resultOk = controller.initRegister(email, password, tennantId);
+            
+            // changes tennantId to be able to retrieve a bad request.
+            tennantId = 2;
+            var resultBadRequest = controller.initRegister(email, password, tennantId);
+            
             //Verifies that the object is of a given type
-            var viewResult = Assert.IsType<OkObjectResult>(result);
+            var viewResultOk = Assert.IsType<OkObjectResult>(resultOk);
+            var viewResultBadRequest = Assert.IsType<BadRequestObjectResult>(resultBadRequest);
             // Verifies that two objects are equal. This checks if the responsecode is 200.
-            Assert.Equal(200, viewResult.StatusCode);
+            Assert.Equal(200, viewResultOk.StatusCode);
+            Assert.Equal(400, viewResultBadRequest.StatusCode);
         }
 
 
@@ -137,8 +149,10 @@ namespace Datawarehouse_Backend.Tests
         /*
         * Returns a tennant as dummydata for testing
         */
-        private Tennant TestTennant() {
-            var tennant = new Tennant {
+        private Tennant TestTennant()
+        {
+            var tennant = new Tennant
+            {
                 id = 1,
                 tennantName = "someTennant",
                 businessId = "someId",
@@ -147,7 +161,8 @@ namespace Datawarehouse_Backend.Tests
             return tennant;
         }
 
-        private long TestTennantId() {
+        private long TestTennantId()
+        {
             int number = 1;
             return number;
         }
