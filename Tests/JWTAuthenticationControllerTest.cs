@@ -16,16 +16,16 @@ using Xunit;
 
 
 /*
-    This is a testclass for testing methods in the JWTAuthenticationController class.
-    It is unit tests written using Xunit. To be able to create mock-data
-    the Moq framework has been used. 
-    
-    Methods applied with [Fact] above is the actual tests, while the other methods are used to
-    Create testobjects and data to use in these tests.
-
-    This class is adapted from  
-        - https://docs.microsoft.com/en-us/aspnet/web-api/overview/testing-and-debugging/unit-testing-controllers-in-web-api
-        - https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-5.0
+*   This is a testclass for testing methods in the JWTAuthenticationController class.
+*   It is unit tests written using Xunit. To be able to create mock-data
+*   the Moq framework has been used. 
+*   
+*   Methods applied with [Fact] above is the actual tests, while the other methods are used to
+*   Create testobjects and data to use in these tests.
+*
+*   This class is adapted from  
+*        - https://docs.microsoft.com/en-us/aspnet/web-api/overview/testing-and-debugging/unit-testing-controllers-in-web-api
+*        - https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-5.0
 */
 namespace Datawarehouse_Backend.Tests
 {
@@ -33,7 +33,7 @@ namespace Datawarehouse_Backend.Tests
     {
 
         /*
-        * This is a test that checks that the response is the wanted response with the login method
+        *   This is a test that checks that the response is the wanted response with the login method
         */
         [Fact]
         public void loginReturnsExpectedResponse()
@@ -69,9 +69,9 @@ namespace Datawarehouse_Backend.Tests
         }
         
         /*
-        * This is a test that checks that the response is the wanted response with the register method
-        * Claims are adapted from:
-        *   - https://gunnarpeipman.com/aspnet-core-test-controller-fake-user/ is used for trhe claims
+        *   This is a test that checks that the response is the wanted response with the register method
+        *   Claims are adapted from and is used to claim an identity from a token:
+        *       - https://gunnarpeipman.com/aspnet-core-test-controller-fake-user/ 
         */
         [Fact]
         public void registerReturnsExpectedResponse()
@@ -106,7 +106,7 @@ namespace Datawarehouse_Backend.Tests
         }
 
         /*
-        * This is a test that checks that the response is the wanted response with the initregister method
+        *   This is a test that checks that the response is the wanted response with the initregister method
         */
         [Fact]
         public void initRegisterReturnsExpectedResponse()
@@ -145,7 +145,7 @@ namespace Datawarehouse_Backend.Tests
 
 
         /*
-        * Returns a user as dummydata for testing
+        *   Returns a user as dummydata for testing
         */
         private User TestUser()
         {
@@ -162,7 +162,7 @@ namespace Datawarehouse_Backend.Tests
         }
 
         /*
-        * Returns a tennant as dummydata for testing
+        *   Returns a tennant as dummydata for testing
         */
         private Tennant TestTennant()
         {
