@@ -9,7 +9,7 @@ namespace Datawarehouse_Backend.Context
     {
         public DbSet<User> Users { get; set; }
         User findUserByMail(string email);
-        EntityEntry Entry([NotNullAttribute] object entity);
+        void setAdded(object entity);
         int SaveChanges();
     }
 

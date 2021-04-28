@@ -26,5 +26,11 @@ namespace Datawarehouse_Backend.Context
             .FirstOrDefault<User>();
             return user;
         }
+
+        public void setAdded(object entity)
+        {
+            Entry(entity).State = EntityState.Added;
+        }
+
     }
 }

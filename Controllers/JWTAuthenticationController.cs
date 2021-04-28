@@ -109,7 +109,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.role = Role.User;
 
                 // Adds and saves changes to the database
-                _db.Entry(newUser).State = EntityState.Added;
+                _db.setAdded(newUser);
                 _db.SaveChanges();
                 response = Ok("User created");
             }

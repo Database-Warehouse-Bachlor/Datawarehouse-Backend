@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Threading;
 using Datawarehouse_Backend.Authentication;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
@@ -35,7 +36,7 @@ namespace Datawarehouse_Backend.Tests
         * This is a test that checks that the response is the wanted response with the login method
         */
         [Fact]
-        public void loginReturnsSuccessfulResponse()
+        public void loginReturnsExpectedResponse()
         {
             // Values needed for the class to be tested
             string email = "someemail@mail.no";
@@ -54,9 +55,9 @@ namespace Datawarehouse_Backend.Tests
             // Sets result to the method that is being tested
             var resultOk = controller.login(email, password);
 
-            // changes tennantId to be able to retrieve unauthorized
+            // changes tennantId to be able to retrieve unauthorized result
             password = "someNewPassword";
-            var resultUnAuth = controller.login(email, password); 
+            var resultUnAuth = controller.login(email, password);
 
             //Verifies that the object is of a given type
             var viewResultOk = Assert.IsType<OkObjectResult>(resultOk);
@@ -66,24 +67,37 @@ namespace Datawarehouse_Backend.Tests
             Assert.Equal(200, viewResultOk.StatusCode);
             Assert.Equal(401, viewResultUnAuth.StatusCode);
         }
-
+        
+        /*
+        * This is a test that checks that the response is the wanted response with the register method
+        * Claims are adapted from:
+        *   - https://gunnarpeipman.com/aspnet-core-test-controller-fake-user/ is used for trhe claims
+        */
         [Fact]
-        public void registerReturnsSuccessfulResponse()
+        public void registerReturnsExpectedResponse()
         {
-            string email = "someNewEmail@mail.no";
+            string email = "someEmail@mail.no";
             string password = "somePassword";
-            long tennantFk = 1;
+            long tennantFK = 1;
 
-            var mockConfig = new Mock<IConfiguration>();
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim [] {
+                new Claim(ClaimTypes.NameIdentifier, "1")
+            }));
 
             var mockLogin = new Mock<ILoginDatabaseContext>();
+            mockLogin.Setup(l => l.Users.ToString()).Returns(TestUser().ToString());
+                 
             var mockWarehouse = new Mock<IWarehouseContext>();
-            mockWarehouse.Setup(w => w.findTennantById(tennantFk)).Returns(TestTennant());
-
+            mockWarehouse.Setup(w => w.findTennantById(tennantFK)).Returns(TestTennant());
+            
             // Creates a controller-object to test, warehousedb set to null because it's not used in this method. 
-            var controller = new JWTAuthenticationController(mockConfig.Object, mockLogin.Object, mockWarehouse.Object);
+            var controller = new JWTAuthenticationController(null, mockLogin.Object, mockWarehouse.Object);
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext {User = user};
+            
             // Sets result to the method that is being tested
             var result = controller.register(email, password);
+           
             //Verifies that the object is of a given type
             var viewResult = Assert.IsType<OkObjectResult>(result);
             // Verifies that two objects are equal. This checks if the responsecode is 200.
@@ -92,10 +106,10 @@ namespace Datawarehouse_Backend.Tests
         }
 
         /*
-        * This test checks that the response is the wanted response while creating a user
+        * This is a test that checks that the response is the wanted response with the initregister method
         */
         [Fact]
-        public void initRegisterReturnsSuccessfulResponse()
+        public void initRegisterReturnsExpectedResponse()
         {
 
             // Values needed for the class to be tested
@@ -114,15 +128,15 @@ namespace Datawarehouse_Backend.Tests
 
             // Sets result to the method that is being tested
             var resultOk = controller.initRegister(email, password, tennantId);
-            
+
             // changes tennantId to be able to retrieve a bad request.
             tennantId = 2;
             var resultBadRequest = controller.initRegister(email, password, tennantId);
-            
+
             //Verifies that the object is of a given type
             var viewResultOk = Assert.IsType<OkObjectResult>(resultOk);
             var viewResultBadRequest = Assert.IsType<BadRequestObjectResult>(resultBadRequest);
-            // Verifies that two objects are equal. This checks if the responsecode is 200.
+            // Verifies that two objects are equal. This checks if the responsecode is 200 and 400.
             Assert.Equal(200, viewResultOk.StatusCode);
             Assert.Equal(400, viewResultBadRequest.StatusCode);
         }
@@ -140,6 +154,7 @@ namespace Datawarehouse_Backend.Tests
                 id = 1,
                 Email = "someemail@mail.com",
                 password = BCrypt.Net.BCrypt.HashPassword("somePassword"),
+                tennant = TestTennant(),
                 tennantFK = 1,
                 role = "User"
             };
