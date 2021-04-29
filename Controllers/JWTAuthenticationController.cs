@@ -18,8 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 
 /*
-*   This controller is for authenticating users and registering new users.
-*    
+*   This controller is for authenticating users and registering new users. 
 */ 
 namespace Datawarehouse_Backend.Controllers
 {
