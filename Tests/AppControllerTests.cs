@@ -1,55 +1,62 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
-using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 
 /*
-    This is a testclass for testing methods in the AppController class.
-    It is unit tests written using Xunit. To be able to create mock-data
-    the Moq framework has been used. 
-    
-    Methods applied with [Fact] above is the actual tests, while the other methods are used to
-    Create testobjects and data to use in these tests. 
+*   This is a testclass for testing methods in the AppController class.
+*   It is unit tests written using Xunit. To be able to create mock-data
+*   the Moq framework has been used. 
+*    
+*   Methods applied with [Fact] above is the actual tests, while the other methods are used to
+*   Create testobjects and data to use in these tests. 
+*   This class is adapted from  
+*       - https://docs.microsoft.com/en-us/aspnet/web-api/overview/testing-and-debugging/unit-testing-controllers-in-web-api
+*       - https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-5.0
 */
 namespace Datawarehouse_Backend.Tests
 {
     public class AppControllerTest
     {
-
+        /*
+        *   A test that checks that the response is correct
+        */
         [Fact]
         public void getNumberOfTennantsAndErrorsAsJson()
         {
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
-            //mockData.Setup(json => json.getNumberOfTennantsAndErrorsAsJson()).Returns(TestDataWhenIntExpected());
-            //mockData.Setup(json => json.getNumberOfErrorsLastTwentyFour()).Returns(TestDataWhenIntExpected());
-
+        
             var controller = new AppController(mockData.Object);
 
+            // Result is the method that is being tested
             var result = controller.getNumberOfTennantsAndErrorsAsJson();
             
             var viewResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(200, viewResult.StatusCode);
         }
 
+        /*
+        *   A test that checks that the correct number is returned
+        */
+
         [Fact]
         public void getNumberOfTennants_ShouldReturnNumberOfTennants()
         {
             //Given
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
             mockData.Setup(t => t.getNumberOfTennants()).Returns(TestDataWhenIntExpected());
 
             var controller = new AppController(mockData.Object);
 
             //When
+            // Result is the method that is being tested
             var result = controller.getNumberOfTennants();
 
             //Then
@@ -59,18 +66,20 @@ namespace Datawarehouse_Backend.Tests
         }
 
         /*
-            Test for getNumberOfErrorsLastTwentyFour();
+        *   A test that checks that the correct number is returned
         */
         [Fact]
         public void getNumberOfErrorsLastTwentyFour_ShouldReturnInt()
         {
             //Given
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
             mockData.Setup(e => e.getNumberOfErrorsLastTwentyFour()).Returns(TestDataWhenIntExpected());
 
             var controller = new AppController(mockData.Object);
 
             //When
+            // Result is the method that is being tested
             var result = controller.getNumberOfErrorsLastTwentyFour();
 
             //Then
@@ -78,16 +87,21 @@ namespace Datawarehouse_Backend.Tests
             Assert.Equal(2, viewResult);
         }
 
+        /*
+        *   A test that checks if the list is as long as it should and that it contains the correct information
+        */
         [Fact]
         public void GetAllTennantsAsList_ShouldCountListAndRetrieveCorrectListInfo()
         {
-
+            // Expected result    
             var expected = tennant();
+
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
             mockData.Setup(t => t.getAllTennants()).Returns(TestDataForAllTennants());
 
             var controller = new AppController(mockData.Object);
-
+            // Result is the method that is being tested
             var result = controller.getAllTennants();
             var viewResult = Assert.IsType<List<Tennant>>(result);
 
@@ -95,16 +109,21 @@ namespace Datawarehouse_Backend.Tests
             Assert.Equal(4, viewResult.Count);
         }
 
+        /*
+        *   A test that checks errors last 24 hours. Checkks that it contains the correct information
+        */
         [Fact]
         public void getLatestErrors_ShouldGetCorrectListTest()
         {
             //Given
             DateTime datetimeNow = DateTime.Now;
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
             mockData.Setup(e => e.getLatestErrors()).Returns(TestDataErrors());
 
             var controller = new AppController(mockData.Object);
             //When
+            // Result is the method that is being tested
             var result = controller.getLatestErrors();
 
             //Then
@@ -113,16 +132,24 @@ namespace Datawarehouse_Backend.Tests
             Assert.InRange(viewResult[1].timeOfError, DateTime.Now.AddHours(-24), DateTime.Now);
         }
 
+        /*
+        *   A test that checks if the list contains the correct information
+        */
         [Fact]
         public void getAllErrors_ShouldReturnList()
         {
+             // Expected result
             var expected = errorLog();
+
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockData = new Mock<IWarehouseContext>();
             mockData.Setup(t => t.getAllErrors()).Returns(TestDataErrors());
 
             var controller = new AppController(mockData.Object);
-
+            
+            // Result is the method that is being tested
             var result = controller.getAllErrors();
+
             var viewResult = Assert.IsType<List<ErrorLog>>(result);
 
             Assert.Equal(expected.ToString(), viewResult[0].ToString());

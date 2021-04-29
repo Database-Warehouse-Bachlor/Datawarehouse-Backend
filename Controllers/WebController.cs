@@ -81,18 +81,18 @@ namespace Datawarehouse_Backend.Controllers
         */
 
         // [Authorize]
-        [HttpGet("inbound")]
-        public List<Invoice> getAllInboundInvoice(string filter)
-        {
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var invoice = _warehouseDb.Invoices
-            .Where(i => i.client.tennantFK == tennantId)
-            .Where(d => d.invoiceDate >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDate)
-            .ToList();
-            return invoice;
-        }
+        // [HttpGet("inbound")]
+        // public List<Invoice> getAllInboundInvoice(string filter)
+        // {
+        //     long tennantId = getTennantId();
+        //     DateTime comparisonDate = compareDates(filter);
+        //     var invoice = _warehouseDb.Invoices
+        //     .Where(i => i.client.tennantFK == tennantId)
+        //     .Where(d => d.invoiceDate >= comparisonDate)
+        //     .OrderByDescending(d => d.invoiceDate)
+        //     .ToList();
+        //     return invoice;
+        // }
 
     
         /*

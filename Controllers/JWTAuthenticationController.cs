@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 
 /*
-*This controller is mainly for authenticating users and registering new users.
+*   This controller is for authenticating users and registering new users. 
 */ 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -29,43 +29,37 @@ namespace Datawarehouse_Backend.Controllers
     {
 
         private readonly IConfiguration _config;
-        private readonly LoginDatabaseContext _db;
-        private readonly WarehouseContext _warehousedb;
+        private readonly ILoginDatabaseContext _db;
+        private readonly IWarehouseContext _warehousedb;
 
-        public JWTAuthenticationController(IConfiguration config, LoginDatabaseContext db, WarehouseContext warehousedb)
+        public JWTAuthenticationController(IConfiguration config, ILoginDatabaseContext db, IWarehouseContext warehousedb)
         {
             _config = config;
             _db = db;
             _warehousedb = warehousedb;
         }
-        /*
-        * A function to find the correct User based on email.
-        */
-        private User findUserByMail(string email){
-            var user = _db.Users
-            .Where(e => e.Email == email)
-            .FirstOrDefault<User>();
-            return user;
-        }
 
         /*
         * A function to find the correct Tennant based on it's ID.
         */
-
          private long getTennantId()
         {
+            // HttpContext holds information about the current request. 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
             long tennantId = long.Parse(claim[0].Value);
             return tennantId;
         }
 
-
+        /*
+        *   This login-call is used when a user is logging in. A user must be registered in
+        *   our database in order to be able to login.
+        */
         [HttpPost("login")]
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
         {
-            User loginUser = findUserByMail(email.Trim().ToLower());
+            User loginUser = _db.findUserByMail(email.Trim().ToLower());
 
             IActionResult response;
             try
@@ -103,7 +97,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email.Trim().ToLower());
+            User userCheck = _db.findUserByMail(email.Trim().ToLower());
             Tennant tennant = _warehousedb.findTennantById(getTennantId());
 
             if (userCheck == null && tennant != null)
@@ -118,7 +112,7 @@ namespace Datawarehouse_Backend.Controllers
                 newUser.role = Role.User;
 
                 // Adds and saves changes to the database
-                _db.Entry(newUser).State = EntityState.Added;
+                _db.setAdded(newUser);
                 _db.SaveChanges();
                 response = Ok("User created");
             }
@@ -141,7 +135,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            User userCheck = findUserByMail(email.Trim().ToLower());
+            User userCheck = _db.findUserByMail(email.Trim().ToLower());
             Tennant tennant = _warehousedb.findTennantById(tennantId);
 
             if (userCheck == null && tennant != null)
