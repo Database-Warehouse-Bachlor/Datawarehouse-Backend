@@ -79,20 +79,13 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * A method to fetch all inbound invoices from a specific tennant.
         */
-
-
-
         // [Authorize]
         [HttpGet("invoices")]
         public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var invoice = _warehouseDb.Invoices
-            .Where(i => i.voucher.client.tennantFK == tennantId)
-            .Where(d => d.invoiceDate >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDate)
-            .ToList();
+            var invoice = _warehouseDb.getAllInboundInvoice(tennantId, comparisonDate);
             return invoice;
         }
 
@@ -101,11 +94,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId)
-            .Where(d => d.date >= comparisonDate)
-            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.date)
-            .ToList();
+            var vouchers = _warehouseDb.getVouchersInDescendingByPaymentThenByDate(tennantId, comparisonDate);
             //We now have a list of all vouchers that has date
             //after the filter given, ordered by paymentId, then by date
             // This enables us to compare voucher n to n+1
@@ -330,11 +319,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             long tennantId = getTennantId();
-            var timeRegisters = _warehouseDb.TimeRegisters
-            .Where(t => t.employee.tennantFK == tennantId)
-            .Where(d => d.recordDate >= comparisonDate)
-            .OrderByDescending(d => d.recordDate)
-            .ToList();
+            var timeRegisters = _warehouseDb.getAllTimeRegistersInDescendingOrder(tennantId, comparisonDate);
             return timeRegisters;
         }
 
@@ -498,14 +483,12 @@ namespace Datawarehouse_Backend.Controllers
         * their accounts is bound to.  The first function returns the object tennant based on the ID
         * The other function simply returns the tennantId that has been found.
         */
-
         private Tennant getTennant()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
             long tennantId = long.Parse(claim[0].Value);
-            Tennant tennant = _warehouseDb.Tennants
-            .Where(t => t.id == tennantId).FirstOrDefault<Tennant>();
+            Tennant tennant = _warehouseDb.findTennantById(tennantId);
             return tennant;
         }
         private long getTennantId()

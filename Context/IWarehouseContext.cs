@@ -29,8 +29,9 @@ namespace Datawarehouse_Backend.Context
         int getNumberOfErrorsLastTwentyFour();
         List<ErrorLog> getLatestErrors();
         List<ErrorLog> getAllErrors();
-
         List<AbsenceRegister> getAllAbsenceFromDate(long tennantId, DateTime comparisonDate);
-
+        List<Invoice> getAllInboundInvoice(long tennantId, DateTime comparisonDate);
+        List<TimeRegister> getAllTimeRegistersInDescendingOrder(long tennantId, DateTime comparisonDate);
+        List<Voucher> getVouchersInDescendingByPaymentThenByDate(long tennantId, DateTime comparisonDate);
     }
 }
