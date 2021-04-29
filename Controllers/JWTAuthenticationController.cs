@@ -18,7 +18,8 @@ using Microsoft.EntityFrameworkCore;
 
 
 /*
-*This controller is mainly for authenticating users and registering new users.
+*   This controller is for authenticating users and registering new users.
+*    
 */ 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -42,16 +43,19 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * A function to find the correct Tennant based on it's ID.
         */
-
          private long getTennantId()
         {
+            // HttpContext holds information about the current request. 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
             long tennantId = long.Parse(claim[0].Value);
             return tennantId;
         }
 
-
+        /*
+        *   This login-call is used when a user is logging in. A user must be registered in
+        *   our database in order to be able to login.
+        */
         [HttpPost("login")]
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult login([FromForm] string email, [FromForm] string pwd)
