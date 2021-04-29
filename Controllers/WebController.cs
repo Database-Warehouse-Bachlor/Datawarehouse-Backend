@@ -80,21 +80,108 @@ namespace Datawarehouse_Backend.Controllers
         * A method to fetch all inbound invoices from a specific tennant.
         */
 
-        // [Authorize]
-        // [HttpGet("inbound")]
-        // public List<Invoice> getAllInboundInvoice(string filter)
-        // {
-        //     long tennantId = getTennantId();
-        //     DateTime comparisonDate = compareDates(filter);
-        //     var invoice = _warehouseDb.Invoices
-        //     .Where(i => i.client.tennantFK == tennantId)
-        //     .Where(d => d.invoiceDate >= comparisonDate)
-        //     .OrderByDescending(d => d.invoiceDate)
-        //     .ToList();
-        //     return invoice;
-        // }
 
-    
+
+        // [Authorize]
+        [HttpGet("invoices")]
+        public List<Invoice> getAllInboundInvoice(string filter)
+        {
+            long tennantId = getTennantId();
+            DateTime comparisonDate = compareDates(filter);
+            var invoice = _warehouseDb.Invoices
+            .Where(i => i.voucher.client.tennantFK == tennantId)
+            .Where(d => d.invoiceDate >= comparisonDate)
+            .OrderByDescending(d => d.invoiceDate)
+            .ToList();
+            return invoice;
+        }
+
+        [HttpGet]
+        public List<DateStatusView> getAccountReceivables(string filter)
+        {
+            long tennantId = getTennantId();
+            DateTime comparisonDate = compareDates(filter);
+            var vouchers = _warehouseDb.Vouchers
+            .Where(v => v.client.tennantFK == tennantId)
+            .Where(d => d.date >= comparisonDate)
+            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.date)
+            .ToList();
+            //We now have a list of all vouchers that has date
+            //after the filter given, ordered by paymentId, then by date
+            // This enables us to compare voucher n to n+1
+            // if n has a voucher that is paid, it will be n+1
+            // and it makes sure that voucher n is the first voucher that is made on that id
+            // making n the outgoing voucher, and n+1 the payment voucher
+            // but only if n and n+1 has same paymentId
+
+            // Now we find all the vouchers that has been paid too late.
+            List<AccRecView> accList = new List<AccRecView>();
+            for (int i = 0; i < vouchers.Count - 1; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
+            {
+                Console.WriteLine("i value: " + i);
+                if (vouchers[i].paymentId == vouchers[i].paymentId && vouchers[i].invoice.invoiceDate < vouchers[i + 1].invoice.invoiceDate)
+                {
+                    AccRecView view = new AccRecView();
+                    view.startDate = vouchers[i].invoice.invoiceDate;
+                    view.endDate = vouchers[i + 1].invoice.invoiceDate;
+                    view.amount = vouchers[i].invoice.amountTotal;
+                    view.daysDue = view.endDate.DayOfYear - view.startDate.DayOfYear;
+                    accList.Add(view);
+                    i++; //Skip i+1, since we compiled i and i+1
+                } //Else do nothing and move to next.
+            }
+
+            accList.Sort((x, y) => x.startDate.CompareTo(y.startDate));
+            //We now have a sorted list of vouchers that was paid too late.
+
+            List<DateStatusView> graphList = new List<DateStatusView>();
+            DateTime tempDate = comparisonDate;  //Setting the temporary date to the first day of the filter requested.
+            DateTime dateTimeNow = DateTime.Now;
+            while (tempDate <= dateTimeNow)
+            {
+                DateStatusView aView = new DateStatusView();
+                aView.date = tempDate;
+                aView.thirtyAmount = 0;
+                aView.sixtyAmount = 0;
+                aView.ninetyAmount = 0;
+                aView.ninetyPlusAmount = 0;
+                for (int i = 0; i < accList.Count; i++)
+                {
+                    if (accList[i].startDate <= tempDate && tempDate <= accList[i].endDate)
+                    {
+                        if (accList[i].daysDue < 30)                                  //0-30
+                        {
+                            aView.thirtyAmount += accList[i].amount;
+                        }
+                        else if (30 <= accList[i].daysDue && accList[i].daysDue < 60) //30-60
+                        {
+                            aView.sixtyAmount += accList[i].amount;
+                        }
+                        else if (60 <= accList[i].daysDue && accList[i].daysDue < 90)//60-90
+                        {
+                            aView.ninetyAmount += accList[i].amount;
+                        }
+                        else                                                          //90+
+                        {                                                        
+                            aView.ninetyPlusAmount += accList[i].amount;
+                        }
+                    }
+                }
+                if (tempDate.AddDays(7) <= dateTimeNow) //If one week doesnt surpass today, add one week
+                {
+                    tempDate.AddDays(7);
+                }
+                else                                    // else set the date as todays date.
+                {
+                    tempDate = dateTimeNow;
+                }
+               graphList.Add(aView); 
+            }
+            return graphList;
+
+        }
+
+
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
         *  only tracks year, month and total absence for that month OR Date and total absence for that date.
@@ -142,7 +229,7 @@ namespace Datawarehouse_Backend.Controllers
                                 view.day = absence[i].fromDate.Day;
                                 view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                                 view.totalDuration = totalAbsence;
-                                Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                                 absenceViews.Add(view);
                                 totalAbsence = 0;
                             }
@@ -156,7 +243,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -169,7 +256,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("WIEW WeekDay: " + view.weekDay + "VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -204,7 +291,7 @@ namespace Datawarehouse_Backend.Controllers
                                 view.year = absence[i].fromDate.Year;
                                 view.month = absence[i].fromDate.Month;
                                 view.totalDuration = totalAbsence;
-                                Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                                Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                                 absenceViews.Add(view);
                                 totalAbsence = 0;
                             }
@@ -216,7 +303,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -227,7 +314,7 @@ namespace Datawarehouse_Backend.Controllers
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("VIEW Month: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
+                            Console.WriteLine("Adding new absence:\nMonth: " + view.month + "\nVIEW Year: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
@@ -339,9 +426,12 @@ namespace Datawarehouse_Backend.Controllers
                 cust.address = customers[i].address;
                 cust.zipcode = customers[i].zipcode;
                 cust.city = customers[i].city;
-                if(customers[i].customer){
+                if (customers[i].customer)
+                {
                     cust.type = "Customer";
-                } else {
+                }
+                else
+                {
                     cust.type = "Supplier";
                 }
                 customerList.Add(cust);
