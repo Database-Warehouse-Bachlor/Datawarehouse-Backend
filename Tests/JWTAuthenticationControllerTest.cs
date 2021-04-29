@@ -1,10 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading;
-using Datawarehouse_Backend.Authentication;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Controllers;
 using Datawarehouse_Backend.Models;
@@ -43,7 +38,7 @@ namespace Datawarehouse_Backend.Tests
             string password = "somePassword";
             var token = Guid.NewGuid().ToString();
 
-            // Creates Mockdata used for testing.
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockConfig = new Mock<IConfiguration>();
             mockConfig.Setup(c => c["Jwt:Key"]).Returns(token);
 
@@ -76,14 +71,17 @@ namespace Datawarehouse_Backend.Tests
         [Fact]
         public void registerReturnsExpectedResponse()
         {
+            // Values needed for the class to be tested
             string email = "someEmail@mail.no";
             string password = "somePassword";
             long tennantFK = 1;
 
+            // Defines a claim that is used when register is trying get a tennant
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim [] {
                 new Claim(ClaimTypes.NameIdentifier, "1")
             }));
 
+            // Creates Mockdata and sets it to return wanted outcome used for testing.            
             var mockLogin = new Mock<ILoginDatabaseContext>();
             mockLogin.Setup(l => l.Users.ToString()).Returns(TestUser().ToString());
                  
@@ -92,6 +90,8 @@ namespace Datawarehouse_Backend.Tests
             
             // Creates a controller-object to test, warehousedb set to null because it's not used in this method. 
             var controller = new JWTAuthenticationController(null, mockLogin.Object, mockWarehouse.Object);
+            
+            // A default context provider in unit testing
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext {User = user};
             
@@ -117,7 +117,7 @@ namespace Datawarehouse_Backend.Tests
             string password = "somePassword";
             long tennantId = 1;
 
-            // Creates Mockdata used for testing.
+            // Creates Mockdata and sets it to return wanted outcome used for testing.
             var mockLogin = new Mock<ILoginDatabaseContext>();
             mockLogin.Setup(l => l.Users.ToString()).Returns(TestUser().ToString());
 
