@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Datawarehouse_Backend.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,8 @@ namespace Datawarehouse_Backend.Context
         int getNumberOfErrorsLastTwentyFour();
         List<ErrorLog> getLatestErrors();
         List<ErrorLog> getAllErrors();
+
+        List<AbsenceRegister> getAllAbsenceFromDate(long tennantId, DateTime comparisonDate);
 
     }
 }

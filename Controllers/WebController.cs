@@ -26,8 +26,8 @@ namespace Datawarehouse_Backend.Controllers
     public class WebController : ControllerBase
     {
         private readonly IConfiguration config;
-        private readonly WarehouseContext _warehouseDb;
-        public WebController(IConfiguration config, WarehouseContext warehouseDb)
+        private readonly IWarehouseContext _warehouseDb;
+        public WebController(IConfiguration config, IWarehouseContext warehouseDb)
         {
             this.config = config;
             this._warehouseDb = warehouseDb;
@@ -195,12 +195,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennantFK == tennantId)
-            .Where(d => d.fromDate >= comparisonDate)
-            .OrderBy(d => d.fromDate)
-            .ToList();
-
+            var absence = _warehouseDb.getAllAbsenceFromDate(tennantId, comparisonDate);
             Console.WriteLine("Number of objects found: " + absence.Count);
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;

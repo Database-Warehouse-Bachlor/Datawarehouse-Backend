@@ -26,7 +26,6 @@ namespace Datawarehouse_Backend.Tests
 {
     public class JWTAuthenticationControllerTest
     {
-
         /*
         *   This is a test that checks that the response is the wanted response with the login method
         */
