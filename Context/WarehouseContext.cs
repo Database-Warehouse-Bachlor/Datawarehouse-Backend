@@ -109,13 +109,13 @@ namespace Datawarehouse_Backend.Context
             return timeRegisters;
         }
 
-        public List<Voucher> getVouchersInDescendingByPaymentThenByDate(long tennantId, DateTime comparisonDate)
+        public List<Voucher> getVouchersInDescendingByPaymentThenByType(long tennantId, DateTime comparisonDate)
         {
             var vouchers = Vouchers
-            .Where(v => v.client.tennantFK == tennantId)
-            .Where(d => d.date >= comparisonDate)
+            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
+            .Where(d => d.Type == "outbound" || d.Type == "payment")
             .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.Type)
             .ToList();
             return vouchers;
         }

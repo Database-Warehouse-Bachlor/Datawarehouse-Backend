@@ -92,12 +92,7 @@ namespace Datawarehouse_Backend.Controllers
             DateTime dateTimeNow = DateTime.Now;
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
-            .Where(d => d.Type == "outbound" || d.Type == "payment")
-            .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.Type)
-            .ToList();
+            var vouchers = _warehouseDb.getVouchersInDescendingByPaymentThenByType(tennantId, comparisonDate);
             //We now have a list of all vouchers that has date
             //after the filter given, ordered by paymentId, then by type
             // This enables us to compare voucher n to n+1
@@ -191,7 +186,6 @@ namespace Datawarehouse_Backend.Controllers
 
                 for (int i = 0; i < accList.Count; i++)
                 {
-                    Console.WriteLine("Adding data for date: " + tempDate);
                     if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
                     {
                         if (accList[i].daysDue < 30)
@@ -247,11 +241,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennantFK == tennantId)
-            .Where(d => d.fromDate >= comparisonDate)
-            .OrderBy(d => d.fromDate)
-            .ToList();
+            var absence = _warehouseDb.getAllAbsenceFromDate(tennantId, comparisonDate);
 
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;

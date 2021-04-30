@@ -32,6 +32,6 @@ namespace Datawarehouse_Backend.Context
         List<AbsenceRegister> getAllAbsenceFromDate(long tennantId, DateTime comparisonDate);
         List<Invoice> getAllInboundInvoice(long tennantId, DateTime comparisonDate);
         List<TimeRegister> getAllTimeRegistersInDescendingOrder(long tennantId, DateTime comparisonDate);
-        List<Voucher> getVouchersInDescendingByPaymentThenByDate(long tennantId, DateTime comparisonDate);
+        List<Voucher> getVouchersInDescendingByPaymentThenByType(long tennantId, DateTime comparisonDate);
     }
 }
