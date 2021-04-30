@@ -2,29 +2,44 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations.LoginDatabase
+namespace Datawarehouse_Backend.Migrations
 {
-    public partial class onetoone : Migration
+    public partial class ModelUpdate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Tennant",
+                name: "ErrorLogs",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    errorType = table.Column<string>(type: "text", nullable: false),
+                    errorMessage = table.Column<string>(type: "text", nullable: false),
+                    timeOfError = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ErrorLogs", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tennants",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     tennantName = table.Column<string>(type: "text", nullable: true),
-                    businessId = table.Column<string>(type: "text", nullable: false),
+                    businessId = table.Column<string>(type: "text", nullable: true),
                     apiKey = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tennant", x => x.id);
+                    table.PrimaryKey("PK_Tennants", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BalanceAndBudget",
+                name: "BalanceAndBudgets",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -41,17 +56,17 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BalanceAndBudget", x => x.id);
+                    table.PrimaryKey("PK_BalanceAndBudgets", x => x.id);
                     table.ForeignKey(
-                        name: "FK_BalanceAndBudget_Tennant_tennantFK",
+                        name: "FK_BalanceAndBudgets_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Client",
+                name: "Clients",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -67,17 +82,17 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Client", x => x.id);
+                    table.PrimaryKey("PK_Clients", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Client_Tennant_tennantFK",
+                        name: "FK_Clients_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employee",
+                name: "Employees",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -101,17 +116,17 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employee", x => x.id);
+                    table.PrimaryKey("PK_Employees", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Employee_Tennant_tennantFK",
+                        name: "FK_Employees_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FinancialYear",
+                name: "FinancialYears",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -124,17 +139,17 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FinancialYear", x => x.id);
+                    table.PrimaryKey("PK_FinancialYears", x => x.id);
                     table.ForeignKey(
-                        name: "FK_FinancialYear_Tennant_tennantFK",
+                        name: "FK_FinancialYears_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -146,17 +161,17 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.id);
+                    table.PrimaryKey("PK_User", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Users_Tennant_tennantFK",
+                        name: "FK_User_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Orders",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -181,28 +196,29 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     hoursOfWork = table.Column<double>(type: "double precision", nullable: false),
                     hasWarranty = table.Column<bool>(type: "boolean", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
+                    clientId = table.Column<long>(type: "bigint", nullable: false),
                     tennantFK = table.Column<long>(type: "bigint", nullable: false),
                     clientFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.id);
+                    table.PrimaryKey("PK_Orders", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Order_Client_clientFK",
+                        name: "FK_Orders_Clients_clientFK",
                         column: x => x.clientFK,
-                        principalTable: "Client",
+                        principalTable: "Clients",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_Tennant_tennantFK",
+                        name: "FK_Orders_Tennants_tennantFK",
                         column: x => x.tennantFK,
-                        principalTable: "Tennant",
+                        principalTable: "Tennants",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Voucher",
+                name: "Vouchers",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -213,26 +229,27 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     description = table.Column<string>(type: "text", nullable: true),
                     date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     paymentId = table.Column<int>(type: "integer", nullable: false),
+                    clientId = table.Column<long>(type: "bigint", nullable: false),
                     clientFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Voucher", x => x.id);
+                    table.PrimaryKey("PK_Vouchers", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Voucher_Client_clientFK",
+                        name: "FK_Vouchers_Clients_clientFK",
                         column: x => x.clientFK,
-                        principalTable: "Client",
+                        principalTable: "Clients",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "AbsenceRegister",
+                name: "AbsenceRegisters",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    AbsenceRegisterId = table.Column<long>(type: "bigint", nullable: false),
+                    absenceRegisterId = table.Column<long>(type: "bigint", nullable: false),
                     fromDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     toDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     duration = table.Column<double>(type: "double precision", nullable: false),
@@ -241,21 +258,22 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     abcenseTypeText = table.Column<string>(type: "text", nullable: true),
                     comment = table.Column<string>(type: "text", nullable: true),
                     degreeDisability = table.Column<string>(type: "text", nullable: true),
+                    employeeId = table.Column<long>(type: "bigint", nullable: false),
                     employeeFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AbsenceRegister", x => x.id);
+                    table.PrimaryKey("PK_AbsenceRegisters", x => x.id);
                     table.ForeignKey(
-                        name: "FK_AbsenceRegister_Employee_employeeFK",
+                        name: "FK_AbsenceRegisters_Employees_employeeFK",
                         column: x => x.employeeFK,
-                        principalTable: "Employee",
+                        principalTable: "Employees",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "TimeRegister",
+                name: "TimeRegisters",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -284,21 +302,22 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     processingCode = table.Column<string>(type: "text", nullable: true),
                     viaType = table.Column<string>(type: "text", nullable: true),
                     summaryType = table.Column<string>(type: "text", nullable: true),
+                    employeeId = table.Column<long>(type: "bigint", nullable: false),
                     employeeFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TimeRegister", x => x.id);
+                    table.PrimaryKey("PK_TimeRegisters", x => x.id);
                     table.ForeignKey(
-                        name: "FK_TimeRegister_Employee_employeeFK",
+                        name: "FK_TimeRegisters_Employees_employeeFK",
                         column: x => x.employeeFK,
-                        principalTable: "Employee",
+                        principalTable: "Employees",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Account",
+                name: "Accounts",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -309,45 +328,47 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     type = table.Column<string>(type: "text", nullable: true),
                     MVAcode = table.Column<long>(type: "bigint", nullable: false),
                     SAFTcode = table.Column<long>(type: "bigint", nullable: false),
-                    financialFK = table.Column<long>(type: "bigint", nullable: false)
+                    financialYearid = table.Column<long>(type: "bigint", nullable: false),
+                    financialYearFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Account", x => x.id);
+                    table.PrimaryKey("PK_Accounts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Account_FinancialYear_financialFK",
-                        column: x => x.financialFK,
-                        principalTable: "FinancialYear",
+                        name: "FK_Accounts_FinancialYears_financialYearFK",
+                        column: x => x.financialYearFK,
+                        principalTable: "FinancialYears",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Invoice",
+                name: "Invoices",
                 columns: table => new
                 {
                     voucherFK = table.Column<long>(type: "bigint", nullable: false),
                     invoiceId = table.Column<long>(type: "bigint", nullable: false),
-                    clientId = table.Column<string>(type: "text", nullable: true),
                     dueDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    clientId = table.Column<long>(type: "bigint", nullable: false),
                     amountTotal = table.Column<decimal>(type: "numeric", nullable: false),
                     specification = table.Column<string>(type: "text", nullable: true),
                     invoicePdf = table.Column<string>(type: "text", nullable: true),
-                    orderId = table.Column<long>(type: "bigint", nullable: false)
+                    orderId = table.Column<long>(type: "bigint", nullable: false),
+                    voucherId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Invoice", x => x.voucherFK);
+                    table.PrimaryKey("PK_Invoices", x => x.voucherFK);
                     table.ForeignKey(
-                        name: "FK_Invoice_Voucher_voucherFK",
+                        name: "FK_Invoices_Vouchers_voucherFK",
                         column: x => x.voucherFK,
-                        principalTable: "Voucher",
+                        principalTable: "Vouchers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Post",
+                name: "Posts",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -363,23 +384,23 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Post", x => x.id);
+                    table.PrimaryKey("PK_Posts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Post_Account_accountFK",
+                        name: "FK_Posts_Accounts_accountFK",
                         column: x => x.accountFK,
-                        principalTable: "Account",
+                        principalTable: "Accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Post_Voucher_voucherFK",
+                        name: "FK_Posts_Vouchers_voucherFK",
                         column: x => x.voucherFK,
-                        principalTable: "Voucher",
+                        principalTable: "Vouchers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "InvoiceLine",
+                name: "InvoiceLines",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
@@ -392,133 +413,137 @@ namespace Datawarehouse_Backend.Migrations.LoginDatabase
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     amountTotal = table.Column<decimal>(type: "numeric", nullable: false),
                     discount = table.Column<decimal>(type: "numeric", nullable: false),
+                    invoiceId = table.Column<long>(type: "bigint", nullable: false),
                     invoiceFK = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InvoiceLine", x => x.id);
+                    table.PrimaryKey("PK_InvoiceLines", x => x.id);
                     table.ForeignKey(
-                        name: "FK_InvoiceLine_Invoice_invoiceFK",
+                        name: "FK_InvoiceLines_Invoices_invoiceFK",
                         column: x => x.invoiceFK,
-                        principalTable: "Invoice",
+                        principalTable: "Invoices",
                         principalColumn: "voucherFK",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AbsenceRegister_employeeFK",
-                table: "AbsenceRegister",
+                name: "IX_AbsenceRegisters_employeeFK",
+                table: "AbsenceRegisters",
                 column: "employeeFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Account_financialFK",
-                table: "Account",
-                column: "financialFK");
+                name: "IX_Accounts_financialYearFK",
+                table: "Accounts",
+                column: "financialYearFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BalanceAndBudget_tennantFK",
-                table: "BalanceAndBudget",
+                name: "IX_BalanceAndBudgets_tennantFK",
+                table: "BalanceAndBudgets",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Client_tennantFK",
-                table: "Client",
+                name: "IX_Clients_tennantFK",
+                table: "Clients",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employee_tennantFK",
-                table: "Employee",
+                name: "IX_Employees_tennantFK",
+                table: "Employees",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinancialYear_tennantFK",
-                table: "FinancialYear",
+                name: "IX_FinancialYears_tennantFK",
+                table: "FinancialYears",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InvoiceLine_invoiceFK",
-                table: "InvoiceLine",
+                name: "IX_InvoiceLines_invoiceFK",
+                table: "InvoiceLines",
                 column: "invoiceFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_clientFK",
-                table: "Order",
+                name: "IX_Orders_clientFK",
+                table: "Orders",
                 column: "clientFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_tennantFK",
-                table: "Order",
+                name: "IX_Orders_tennantFK",
+                table: "Orders",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Post_accountFK",
-                table: "Post",
+                name: "IX_Posts_accountFK",
+                table: "Posts",
                 column: "accountFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Post_voucherFK",
-                table: "Post",
+                name: "IX_Posts_voucherFK",
+                table: "Posts",
                 column: "voucherFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeRegister_employeeFK",
-                table: "TimeRegister",
+                name: "IX_TimeRegisters_employeeFK",
+                table: "TimeRegisters",
                 column: "employeeFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_tennantFK",
-                table: "Users",
+                name: "IX_User_tennantFK",
+                table: "User",
                 column: "tennantFK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Voucher_clientFK",
-                table: "Voucher",
+                name: "IX_Vouchers_clientFK",
+                table: "Vouchers",
                 column: "clientFK");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AbsenceRegister");
+                name: "AbsenceRegisters");
 
             migrationBuilder.DropTable(
-                name: "BalanceAndBudget");
+                name: "BalanceAndBudgets");
 
             migrationBuilder.DropTable(
-                name: "InvoiceLine");
+                name: "ErrorLogs");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "InvoiceLines");
 
             migrationBuilder.DropTable(
-                name: "Post");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "TimeRegister");
+                name: "Posts");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "TimeRegisters");
 
             migrationBuilder.DropTable(
-                name: "Invoice");
+                name: "User");
 
             migrationBuilder.DropTable(
-                name: "Account");
+                name: "Invoices");
 
             migrationBuilder.DropTable(
-                name: "Employee");
+                name: "Accounts");
 
             migrationBuilder.DropTable(
-                name: "Voucher");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "FinancialYear");
+                name: "Vouchers");
 
             migrationBuilder.DropTable(
-                name: "Client");
+                name: "FinancialYears");
 
             migrationBuilder.DropTable(
-                name: "Tennant");
+                name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "Tennants");
         }
     }
 }

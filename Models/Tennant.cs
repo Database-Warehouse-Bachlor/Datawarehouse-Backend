@@ -8,7 +8,6 @@ namespace Datawarehouse_Backend.Models
     {
         [Key]
         public long id { get; set; }
-        [Required]
         public string tennantName { get; set; }
         public string businessId { get; set; }
         [Required]
@@ -21,21 +20,5 @@ namespace Datawarehouse_Backend.Models
         public ICollection<Client> clients { get; set; } = new List<Client>();
         public ICollection<Order> orders { get; set; } = new List<Order>();
         public ICollection<FinancialYear> financialYears { get; set; } = new List<FinancialYear>();
-    }
-
-
-    [Serializable]
-    class InvalidbusinessIdOrApiKeyException : Exception
-    {
-        public InvalidbusinessIdOrApiKeyException()
-        {
-
-        }
-
-        public InvalidbusinessIdOrApiKeyException(String name)
-            : base(String.Format("Invalid businessId or ApiKey", name))
-        {
-
-        }
     }
 }

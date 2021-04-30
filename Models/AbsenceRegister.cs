@@ -21,6 +21,7 @@ namespace Datawarehouse_Backend.Models
         public string abcenseTypeText { get; set; }
         public string comment { get; set; }
         public string degreeDisability { get; set; }
+        public long employeeId { get; set; }
 
         [ForeignKey("employee")]
         public long employeeFK { get; set; }

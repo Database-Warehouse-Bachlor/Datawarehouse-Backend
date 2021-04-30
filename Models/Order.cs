@@ -28,6 +28,7 @@ namespace Datawarehouse_Backend.Models
         public double hoursOfWork { get; set; }
         public Boolean hasWarranty { get; set; }
         public string description { get; set; }
+        public long clientId { get; set; }
 
         [ForeignKey("tennant")]
         public long tennantFK { get; set; }
