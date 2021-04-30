@@ -192,7 +192,7 @@ namespace Datawarehouse_Backend.Controllers
                 Console.WriteLine("i value: " + i);
                 if (i != vouchers.Count - 1)
                 {
-                    //        outbound                  inbound                    outbound duedate                   inbound paydate
+                    //if outbound and inbound has same paymentId and is paid too late:
                     if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
                     {
                         AccRecView view = new AccRecView();
@@ -202,7 +202,8 @@ namespace Datawarehouse_Backend.Controllers
                         view.daysDue = view.dueDate.DayOfYear - view.payDate.DayOfYear;
                         accList.Add(view);
                         i++; //Skip i+1, since we compiled i and i+1
-                    } //Else do nothing and move to next.
+                    } 
+                    //Else do nothing and move to next.
                 }
             }
 
@@ -212,6 +213,7 @@ namespace Datawarehouse_Backend.Controllers
             List<DateStatusView> graphList = new List<DateStatusView>();
             DateTime tempDate = comparisonDate;  //Setting the temporary date to the first day of the filter requested.
             DateTime dateTimeNow = DateTime.Now;
+            int timeIntervall = 7;
             while (tempDate < dateTimeNow)
             {
                 DateStatusView aView = new DateStatusView();
@@ -222,15 +224,6 @@ namespace Datawarehouse_Backend.Controllers
                 aView.ninetyPlusAmount = 0;
                 Console.WriteLine("im here");
                 Console.WriteLine("tempDate:" + tempDate);
-                
-                if (tempDate.AddDays(7) <= dateTimeNow) //If one week doesnt surpass today, add one week
-                {
-                    tempDate.AddDays(7);
-                }
-                else                                    // else set the date as todays date.
-                {
-                    tempDate = dateTimeNow;
-                }
                 
                 for (int i = 0; i < accList.Count; i++)
                 {
@@ -255,6 +248,15 @@ namespace Datawarehouse_Backend.Controllers
                             aView.ninetyPlusAmount += accList[i].amount;
                         }
                     }
+                }
+                 if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear) //If one week doesnt surpass today, add one week
+                {
+                    tempDate = tempDate.AddDays(timeIntervall);
+                }
+                else                                    // else set the date as todays date.
+                {
+                    tempDate = dateTimeNow;
+                    
                 }
                 graphList.Add(aView);
             }
