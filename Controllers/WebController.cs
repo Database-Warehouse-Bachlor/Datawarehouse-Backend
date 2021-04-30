@@ -515,7 +515,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        *
+        * A method to get statistics over number of employees and the male to female ratio
         * Returns:
         * Number of female / male Employees
         */
