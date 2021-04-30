@@ -103,27 +103,16 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("testing1")]
         public List<Voucher> getInvoiceTest(string filter)
         {
+            DateTime dateTimeNow = DateTime.Now;
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var invoices = _warehouseDb.Invoices
-            .Where(v => v.voucher.client.tennantFK == tennantId)
-            .Where(d => d.voucher.date >= comparisonDate)
-            .Include(c => c.voucher)
-            .OrderByDescending(p => p.voucher.paymentId).ThenByDescending(d => d.voucher.date)
+            var vouchers = _warehouseDb.Vouchers
+            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
+            .Where(d => d.Type == "outbound" || d.Type == "payment")
+            .Include(c => c.invoice)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
-            //return invoices;
-
-            List<Voucher> vouchers = new List<Voucher>();
-            for (int i = 0; i < invoices.Count - 1; i++)
-            {
-                if (invoices[i].voucher != null)
-                {
-                    Console.WriteLine("i value: " + i);
-                    Voucher voucher = new Voucher();
-                    voucher = invoices[i].voucher;
-                    vouchers.Add(voucher);
-                }
-            }
+            
             return vouchers;
         }
 
