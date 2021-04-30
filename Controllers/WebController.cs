@@ -10,6 +10,7 @@ using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -93,13 +94,79 @@ namespace Datawarehouse_Backend.Controllers
             DateTime comparisonDate = compareDates(filter);
             var invoice = _warehouseDb.Invoices
             .Where(i => i.voucher.client.tennantFK == tennantId)
-            .Where(d => d.invoiceDate >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDate)
+            .Where(d => d.dueDate >= comparisonDate)
+            .OrderByDescending(d => d.dueDate)
             .ToList();
             return invoice;
         }
 
-        [HttpGet]
+        [HttpGet("testing1")]
+        public List<Voucher> getInvoiceTest(string filter)
+        {
+            long tennantId = getTennantId();
+            DateTime comparisonDate = compareDates(filter);
+            var invoices = _warehouseDb.Invoices
+            .Where(v => v.voucher.client.tennantFK == tennantId)
+            .Where(d => d.voucher.date >= comparisonDate)
+            .Include(c => c.voucher)
+            .OrderByDescending(p => p.voucher.paymentId).ThenByDescending(d => d.voucher.date)
+            .ToList();
+            //return invoices;
+
+            List<Voucher> vouchers = new List<Voucher>();
+            for (int i = 0; i < invoices.Count - 1; i++)
+            {
+                if (invoices[i].voucher != null)
+                {
+                    Console.WriteLine("i value: " + i);
+                    Voucher voucher = new Voucher();
+                    voucher = invoices[i].voucher;
+                    vouchers.Add(voucher);
+                }
+            }
+            return vouchers;
+        }
+
+        [HttpGet("testing")]
+        public List<AccRecView> getVoucherTest(string filter)
+        {
+            long tennantId = getTennantId();
+            DateTime comparisonDate = compareDates(filter);
+            var vouchers = _warehouseDb.Vouchers
+            .Where(v => v.client.tennantFK == tennantId)
+            .Where(d => d.date >= comparisonDate)
+            .Include(c => c.invoice)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
+            .ToList();
+
+            Console.WriteLine("Voucher size: " + vouchers.Count);
+            // Now we find all the vouchers that has been paid too late.
+            List<AccRecView> accList = new List<AccRecView>();
+            for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
+            {
+                Console.WriteLine("i value: " + i);
+                if (i != vouchers.Count - 1)
+                {
+                Console.WriteLine("voucher PID: " + vouchers[i].paymentId +"\n Next pid:" + vouchers[i+1].paymentId);
+                    //        outbound                  inbound                    outbound duedate                   inbound paydate
+                    if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
+                    {
+                        AccRecView view = new AccRecView();
+                        Console.WriteLine("PID getting added: " + vouchers[i].paymentId);
+                        view.PID = vouchers[i].paymentId;
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = vouchers[i + 1].date;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                        accList.Add(view);
+                        i++; //Skip i+1, since we compiled i and i+1
+                    } //Else do nothing and move to next.
+                }
+            }
+            return accList;
+        }
+
+        [HttpGet("accrec")]
         public List<DateStatusView> getAccountReceivables(string filter)
         {
             long tennantId = getTennantId();
@@ -107,7 +174,8 @@ namespace Datawarehouse_Backend.Controllers
             var vouchers = _warehouseDb.Vouchers
             .Where(v => v.client.tennantFK == tennantId)
             .Where(d => d.date >= comparisonDate)
-            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.date)
+            .Include(c => c.invoice)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
             //We now have a list of all vouchers that has date
             //after the filter given, ordered by paymentId, then by date
@@ -116,31 +184,35 @@ namespace Datawarehouse_Backend.Controllers
             // and it makes sure that voucher n is the first voucher that is made on that id
             // making n the outgoing voucher, and n+1 the payment voucher
             // but only if n and n+1 has same paymentId
-
+            Console.WriteLine("Voucher size: " + vouchers.Count);
             // Now we find all the vouchers that has been paid too late.
             List<AccRecView> accList = new List<AccRecView>();
-            for (int i = 0; i < vouchers.Count - 1; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
+            for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
             {
                 Console.WriteLine("i value: " + i);
-                if (vouchers[i].paymentId == vouchers[i].paymentId && vouchers[i].invoice.invoiceDate < vouchers[i + 1].invoice.invoiceDate)
+                if (i != vouchers.Count - 1)
                 {
-                    AccRecView view = new AccRecView();
-                    view.startDate = vouchers[i].invoice.invoiceDate;
-                    view.endDate = vouchers[i + 1].invoice.invoiceDate;
-                    view.amount = vouchers[i].invoice.amountTotal;
-                    view.daysDue = view.endDate.DayOfYear - view.startDate.DayOfYear;
-                    accList.Add(view);
-                    i++; //Skip i+1, since we compiled i and i+1
-                } //Else do nothing and move to next.
+                    //        outbound                  inbound                    outbound duedate                   inbound paydate
+                    if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
+                    {
+                        AccRecView view = new AccRecView();
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = vouchers[i + 1].date;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.dueDate.DayOfYear - view.payDate.DayOfYear;
+                        accList.Add(view);
+                        i++; //Skip i+1, since we compiled i and i+1
+                    } //Else do nothing and move to next.
+                }
             }
 
-            accList.Sort((x, y) => x.startDate.CompareTo(y.startDate));
+            accList.Sort((x, y) => x.dueDate.CompareTo(y.dueDate));
             //We now have a sorted list of vouchers that was paid too late.
 
             List<DateStatusView> graphList = new List<DateStatusView>();
             DateTime tempDate = comparisonDate;  //Setting the temporary date to the first day of the filter requested.
             DateTime dateTimeNow = DateTime.Now;
-            while (tempDate <= dateTimeNow)
+            while (tempDate < dateTimeNow)
             {
                 DateStatusView aView = new DateStatusView();
                 aView.date = tempDate;
@@ -148,9 +220,23 @@ namespace Datawarehouse_Backend.Controllers
                 aView.sixtyAmount = 0;
                 aView.ninetyAmount = 0;
                 aView.ninetyPlusAmount = 0;
+                Console.WriteLine("im here");
+                Console.WriteLine("tempDate:" + tempDate);
+                
+                if (tempDate.AddDays(7) <= dateTimeNow) //If one week doesnt surpass today, add one week
+                {
+                    tempDate.AddDays(7);
+                }
+                else                                    // else set the date as todays date.
+                {
+                    tempDate = dateTimeNow;
+                }
+                
                 for (int i = 0; i < accList.Count; i++)
                 {
-                    if (accList[i].startDate <= tempDate && tempDate <= accList[i].endDate)
+                    Console.WriteLine("now im here");
+
+                    if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
                     {
                         if (accList[i].daysDue < 30)                                  //0-30
                         {
@@ -165,20 +251,12 @@ namespace Datawarehouse_Backend.Controllers
                             aView.ninetyAmount += accList[i].amount;
                         }
                         else                                                          //90+
-                        {                                                        
+                        {
                             aView.ninetyPlusAmount += accList[i].amount;
                         }
                     }
                 }
-                if (tempDate.AddDays(7) <= dateTimeNow) //If one week doesnt surpass today, add one week
-                {
-                    tempDate.AddDays(7);
-                }
-                else                                    // else set the date as todays date.
-                {
-                    tempDate = dateTimeNow;
-                }
-               graphList.Add(aView); 
+                graphList.Add(aView);
             }
             return graphList;
 

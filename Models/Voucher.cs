@@ -15,15 +15,14 @@ namespace Datawarehouse_Backend.Models
         public string Type { get; set; }
         public string description { get; set; }
         public DateTime date { get; set; }
-        public int paymentId {get; set;}
+        public int paymentId { get; set; }
+
+        public Invoice invoice { get; set; }
 
         [ForeignKey("client")]
         public long clientFK { get; set; }
         public Client client { get; set; }
 
-        [ForeignKey("invoiceFK")]
-        public long invoiceFK { get; set; }
-        public virtual Invoice invoice { get; set; }
         public ICollection<Post> posts { get; set; } = new List<Post>();
 
     }
