@@ -80,6 +80,13 @@ namespace Datawarehouse_Backend.Controllers
             return comparisonDate;
         }
 
+        /*
+        * A method to get all outbound vouchers that are paid too late or not paid.
+        * Returns:
+        * A custom(Weekly) update starting from the date of the filter til todays date, for all outbound vouchers that are
+        * paid too late or not paid at all.  The custom updates keeps track of the amount due at every given time, and in which
+        * category the amount due belongs(1-30/31-60/61-90/90+). 
+        */
 
         [Authorize(Roles = "User")]
         [HttpGet("accrec")]
@@ -232,7 +239,9 @@ namespace Datawarehouse_Backend.Controllers
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
         *  only tracks year, month and total absence for that month OR Date and total absence for that date.
         *  If it's this week/month or last 30 / 7 days it will summarize for each date instead of month.
-        * So instead of getting a list of all absences, it gives a list of total absences per month/date.
+        *  So instead of getting a list of all absences, it gives a list of total absences per month/date.
+        * Returns:
+        * A list of absences for each date an absence was recorded, or a summarized duration of absences for a given month.
         */
 
         [Authorize]
@@ -320,13 +329,13 @@ namespace Datawarehouse_Backend.Controllers
                         {
                             //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
                             if (absence[i].fromDate.Month == absence[i + 1].fromDate.Month)
-                            { 
+                            {
                                 totalAbsence += absence[i].duration;
                                 Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
                             }
                             // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
                             else
-                            { 
+                            {
                                 totalAbsence += absence[i].duration;
                                 AbsenceView view = new AbsenceView();
                                 view.year = absence[i].fromDate.Year;
@@ -339,7 +348,7 @@ namespace Datawarehouse_Backend.Controllers
                         }
                         //last absence has the same month as the one previously added absence
                         else if (absence[i].fromDate.Month == absence[i - 1].fromDate.Month)
-                        { 
+                        {
                             totalAbsence += absence[i].duration;
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
@@ -351,7 +360,7 @@ namespace Datawarehouse_Backend.Controllers
                         }
                         //last absence is in a new month
                         else
-                        { 
+                        {
                             totalAbsence += absence[i].duration;
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
@@ -371,6 +380,11 @@ namespace Datawarehouse_Backend.Controllers
             }
         }
 
+        /*
+        * A method to get all timeregisters in the given filter.
+        * Returns:
+        * A list of all time registers, the list is not adapted for frontend-view.
+        */
         [Authorize]
         [HttpGet("timeregister")]
         public List<TimeRegister> getTimeRegisters(string filter)
@@ -385,18 +399,19 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        * Returns a list of all tennants orders that have an end date 
-        * later than the date of the request.
-        * All orders are converted to orderView that only show customer name, 
-        * total amount from its invoice, jobname and end date.
+        * A method to fetch all pending orders
+        * Returns:
+        * A list of all tennants orders that have an end date later than the date of the request.
+        * All orders are converted to orderView that only show customer name, jobname and end date.
         */
 
         [Authorize]
         [HttpGet("pendingOrders")]
         public List<OrderView> getPendingOrders()
         {
-            var orders = getTennant().orders
-            .Where(o => o.endDate >= DateTime.Now)
+            long tennantId = getTennantId();
+            var orders = _warehouseDb.Orders
+            .Where(c => c.client.tennantFK == tennantId)
             .OrderByDescending(o => o.endDate)
             .ToList();
             List<OrderView> orderList = new List<OrderView>();
@@ -413,13 +428,18 @@ namespace Datawarehouse_Backend.Controllers
 
         /*
         * A method to fetch all orders
+        * Returns:
+        * A list of orders for given tennant, every order includes the clientname of the client it's bound to
+        * and the name of the job that the order was given and the date the order ended.
         */
 
         [Authorize]
         [HttpGet("allOrders")]
         public List<OrderView> getAllOrders()
         {
-            var orders = getTennant().orders
+            long tennantId = getTennantId();
+            var orders = _warehouseDb.Orders
+            .Where(c => c.client.tennantFK == tennantId)
             .OrderByDescending(o => o.endDate)
             .ToList();
             List<OrderView> orderList = new List<OrderView>();
@@ -435,21 +455,15 @@ namespace Datawarehouse_Backend.Controllers
             return orderList;
         }
 
-
         /*
         * A method to find all customers for a specific tennant.
-        * Returns a list of customers ordered by their names.
-        * The customer information returned: Name, address, zipcode, city and total AmountDue from
-        * it's list of accounts receivables.
-        *
         * Returns:
-        * A list of customer addresses, zipcode, city and type
-        *
+        * A list of client addresses, zipcode, city and type of client
         */
 
         [Authorize]
-        [HttpGet("customers")]
-        public List<ClientView> getCustomers()
+        [HttpGet("clients")]
+        public List<ClientView> getClients()
         {
             long tennantId = getTennantId();
             var customers = _warehouseDb.Clients
@@ -479,7 +493,9 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        * 
+        * A method to get the latest balance and budget.
+        * Returns:
+        * The statbalance, endbalance and periodBalance. 
         */
 
         [Authorize]
@@ -487,9 +503,11 @@ namespace Datawarehouse_Backend.Controllers
         public List<BnbView> getBalanceAndBudget(string filter)
         {
             DateTime comparisonDate = compareDates(filter);
-            var balanceAndBudgets = getTennant().bnb
-            .Where(d => d.periodDate >= comparisonDate)
-            .OrderByDescending(d => d.periodDate).ToList();
+            long tennantId = getTennantId();
+            var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
+            .Where(d => d.tennantFK == tennantId && d.periodDate >= comparisonDate)
+            .OrderByDescending(d => d.periodDate)
+            .ToList();
             List<BnbView> bnbList = new List<BnbView>();
             for (int i = 0; i < balanceAndBudgets.Count; i++)
             {

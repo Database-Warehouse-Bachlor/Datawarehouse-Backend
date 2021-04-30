@@ -9,6 +9,5 @@ namespace Datawarehouse_Backend.ViewModels
         public string zipcode { get; set; }
         public string city { get; set; }
         public string type {get; set;}
-        public decimal amountDue {get; set;}
     }
 }
