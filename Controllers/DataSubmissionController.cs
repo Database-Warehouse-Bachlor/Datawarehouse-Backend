@@ -203,6 +203,8 @@ namespace Datawarehouse_Backend.Controllers
                                 long voucherFK = getVoucherId(invoice.voucherId, tennantId);
                                 if (voucherFK != -1)
                                 {
+                                    Console.WriteLine("\\\\\\\\\\\\\\\\\\");
+                                    Console.WriteLine(voucherFK);
                                     invoice.voucherFK = voucherFK;
                                     _db.Invoices.Add(invoice);
                                     _db.SaveChanges();
@@ -586,7 +588,7 @@ namespace Datawarehouse_Backend.Controllers
 
             if (databaseInvoice != null)
             {
-                return databaseInvoice.id;
+                return databaseInvoice.voucherFK;
             }
             return -1;
         }
