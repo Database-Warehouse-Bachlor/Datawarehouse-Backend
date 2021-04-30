@@ -57,8 +57,8 @@ namespace Datawarehouse_Backend.Controllers
                     ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(
                         jsonDataAsString);
 
-
-                    tennantId = addTennant("", "", apiKey);
+                    //Gets the tennantId that is connected to the ApiKey
+                    tennantId = getTennantId(apiKey);
 
                     //Second verification where the apiKey in the URL gets compared with the apiKey
                     //inside the body
@@ -71,44 +71,69 @@ namespace Datawarehouse_Backend.Controllers
                             //Adds Client to datawarehouse
                             for (int i = 0; i < contentsList.Client.Count; i++)
                             {
+                                //Creates a new Client object
                                 Client client = new Client();
+                                //Connects the new Client object to the tennant in the contentList (Incoming data)
                                 client = contentsList.Client[i];
 
+                                //Checks if the Client exists in the datawarehouse
                                 findClient(client, tennantId);
 
+                                //Sets the client's tennant foreign key to tennantId
                                 client.tennantFK = tennantId;
-                                addClient(client, tennantId);
+                                //Adds the Client to the datawarehouse
+                                _db.Clients.Add(client);
+                                _db.SaveChanges();
                             }
 
                             //Adds order to the datawarehouse
                             for (int i = 0; i < contentsList.Order.Count; i++)
                             {
+                                //Creates a new Order object
                                 Order order = new Order();
+                                //Connects the new Order object to the tennant in the contentList (Incoming data)
                                 order = contentsList.Order[i];
+                                //Sets the orders's tennant foreign key to tennantId
                                 order.tennantFK = tennantId;
 
+                                //Checks if the Order exists in the datawarehouse
                                 findOrder(order, tennantId);
 
+                                //Gets the clientFk that it will be connected to
                                 long ClientFK = getClientId(order.clientId, tennantId);
 
+                                //If it finds a client to connect to, it will add it to the datawarehouse
                                 if (ClientFK > -1)
                                 {
+                                    //Sets the clientFK
                                     order.clientFK = ClientFK;
+                                    //Adds to the datawarehouse
                                     _db.Orders.Add(order);
                                     _db.SaveChanges();
                                 }
+                                //If it does not fins a client to connect to, it will logg an error
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "API-Key empty when register tennant";
+                                    string errorMessage = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: null";
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
                                 }
                             }
 
+                            //Adds Employee to the datawarehouse
                             for (int i = 0; i < contentsList.Employee.Count; i++)
-                            {                                
+                            {
+                                //Creates a new Employee object
                                 Employee employee = new Employee();
+                                //Connects the new Employee object to the tennant in the contentList (Incoming data)
                                 employee = contentsList.Employee[i];
+                                //Sets the employee's tennant foreign key to tennantId
                                 employee.tennantFK = tennantId;
-
+                                
+                                //Checks if the Employee exists in the datawarehouse
                                 findEmployee(employee, tennantId);
 
                                 addEmployee(employee, tennantId);
@@ -203,8 +228,6 @@ namespace Datawarehouse_Backend.Controllers
                                 long voucherFK = getVoucherId(invoice.voucherId, tennantId);
                                 if (voucherFK != -1)
                                 {
-                                    Console.WriteLine("\\\\\\\\\\\\\\\\\\");
-                                    Console.WriteLine(voucherFK);
                                     invoice.voucherFK = voucherFK;
                                     _db.Invoices.Add(invoice);
                                     _db.SaveChanges();
@@ -450,70 +473,22 @@ namespace Datawarehouse_Backend.Controllers
 
         /* 
         This function is called whenever the datawarehouse receives data.
-        If the incoming data doesn't have a tennant to connect the data to, it will create a tennant based on
-        the incoming information (businessname, businessID and API-key).
+        If the incoming data doesn't have a tennant to connect the data to, it will return -1.
+        If the incoming data does have a tennant to connect the data to, it will return the tennantId
          */
-        private long addTennant(string bId, string bName, string apiKey)
+        private long getTennantId(string apiKey)
         {
-            ErrorLog errorLog = new ErrorLog();
-            var business = _db.Tennants.Where(b => b.apiKey == apiKey).FirstOrDefault<Tennant>();
-            if (business == null && bId != null && apiKey != null && bId != "" && apiKey != "")
+            //Checks the datawarehouse for a tennant with the same apiKey
+            var tennant = _db.Tennants.Where(b => b.apiKey == apiKey).FirstOrDefault<Tennant>();
+
+            //If it does not find any tennant, it returns -1
+            if (tennant == null)
             {
-                Tennant tennant = new Tennant();
-                tennant.businessId = bId;
-                tennant.tennantName = bName;
-                tennant.apiKey = apiKey;
-                _db.Tennants.Add(tennant);
-                _db.SaveChanges();
-
-                return tennant.id;
-
+                return -1;
             }
-            /*else if (bId == null || bId == "")
-            {
-                string errorType = "BusinessId fail";
-                string errorMessage = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
 
-                //Creates a new errorLog to the datawarehouse
-                logError(errorMessage, errorType);
-
-                //Throws an Exception so it does not try to process incoming data that will lead to new Exception
-                throw new InvalidbusinessIdOrApiKeyException();
-            }
-            else if (apiKey == null || apiKey == "")
-            {
-                string errorType = "API-Key fail";
-                string errorMessage = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: " + apiKey;
-
-                //Creates a new errorLog to the datawarehouse
-                logError(errorMessage, errorType);
-
-                //Throws an Exception so it does not try to process incoming data that will lead to new Exception
-                throw new InvalidbusinessIdOrApiKeyException();
-            }
-            else if (business != null)
-            {
-                Console.WriteLine("Tennant found, submitting data...");
-            }*/
-            return business.id;
-        }
-        private long addClient(Client client, long tennantFK)
-        {
-            ErrorLog errorLog = new ErrorLog();
-            Client databaseClient = _db.Clients
-            .Where(c => c.clientId == client.clientId)
-            .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Client>();
-            if (databaseClient == null)
-            {
-                Client client1 = new Client();
-                client1 = client;
-                client1.tennantFK = tennantFK;
-                _db.Clients.Add(client1);
-                _db.SaveChanges();
-
-                return client1.id;
-            }
-            return databaseClient.id;
+            //If it finds the tennant, it returns the tennantId
+            return tennant.id;
         }
 
         private long addEmployee(Employee employee, long tennantFK)
@@ -619,17 +594,25 @@ namespace Datawarehouse_Backend.Controllers
             return -1;
         }
 
+        /*
+        The function checks if there is any clients in the datawarehouse that has the same clientId
+        and is connected to the same tennant. If there is, the Client will be removed so the 
+        updated data can be added later.
+        */
         private void findClient(Client client, long tennantId)
         {
+            //Checks the datawarehouse for a client with the same clientId and tennantId
             Client databaseClient = _db.Clients
             .Where(c => c.clientId == client.clientId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Client>();
 
-            if(databaseClient != null) 
+            //If it finds a Client, it will be deleted
+            if (databaseClient != null)
             {
+                //Deletes the Client
                 _db.Remove(databaseClient);
                 _db.SaveChanges();
-            }  
+            }
         }
 
         private void findVoucher(Voucher voucher, long tennantId)
@@ -638,7 +621,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.voucherId == voucher.voucherId)
             .Where(t => t.client.tennantFK == tennantId).FirstOrDefault<Voucher>();
 
-            if(databaseVoucher != null) 
+            if (databaseVoucher != null)
             {
                 _db.Remove(databaseVoucher);
                 _db.SaveChanges();
@@ -651,7 +634,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.invoiceId == invoice.invoiceId)
             .Where(t => t.voucher.client.tennantFK == tennantId).FirstOrDefault<Invoice>();
 
-            if(databaseInvoice != null) 
+            if (databaseInvoice != null)
             {
                 _db.Remove(databaseInvoice);
                 _db.SaveChanges();
@@ -665,10 +648,9 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.invoiceLineId == invoiceLine.invoiceLineId)
             .Where(t => t.invoice.voucher.client.tennantFK == tennantId).FirstOrDefault<InvoiceLine>();
 
-            
-            if(databaseInvoiceLine != null) 
+
+            if (databaseInvoiceLine != null)
             {
-                Console.WriteLine("Removed InvoiceLine: " + databaseInvoiceLine.invoiceLineId);
                 _db.Remove(databaseInvoiceLine);
                 _db.SaveChanges();
             }
@@ -680,7 +662,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.financialYearId == financialYear.financialYearId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<FinancialYear>();
 
-            if(databaseFinancialYear != null) 
+            if (databaseFinancialYear != null)
             {
                 _db.Remove(databaseFinancialYear);
                 _db.SaveChanges();
@@ -693,7 +675,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.accountId == account.accountId)
             .Where(t => t.financialYear.tennantFK == tennantId).FirstOrDefault<Account>();
 
-            if(databaseAccount != null) 
+            if (databaseAccount != null)
             {
                 _db.Remove(databaseAccount);
                 _db.SaveChanges();
@@ -706,7 +688,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.postId == post.postId)
             .Where(t => t.account.financialYear.tennantFK == tennantId).FirstOrDefault<Post>();
 
-            if(databasePost != null) 
+            if (databasePost != null)
             {
                 _db.Remove(databasePost);
                 _db.SaveChanges();
@@ -717,7 +699,7 @@ namespace Datawarehouse_Backend.Controllers
             BalanceAndBudget databaseBalanceAndBudget = _db.BalanceAndBudgets
             .Where(c => c.tennantFK == tennantId).FirstOrDefault<BalanceAndBudget>();
 
-            if(databaseBalanceAndBudget != null) 
+            if (databaseBalanceAndBudget != null)
             {
                 _db.Remove(databaseBalanceAndBudget);
                 _db.SaveChanges();
@@ -729,7 +711,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.orderId == order.orderId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Order>();
 
-            if(databaseOrder != null) 
+            if (databaseOrder != null)
             {
                 _db.Remove(databaseOrder);
                 _db.SaveChanges();
@@ -741,7 +723,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.employeeId == employee.employeeId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Employee>();
 
-            if(databaseEmployee != null) 
+            if (databaseEmployee != null)
             {
                 _db.Remove(databaseEmployee);
                 _db.SaveChanges();
@@ -753,7 +735,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.absenceRegisterId == absenceRegister.absenceRegisterId)
             .Where(t => t.employee.tennantFK == tennantId).FirstOrDefault<AbsenceRegister>();
 
-            if(databaseAbsenceRegister != null) 
+            if (databaseAbsenceRegister != null)
             {
                 _db.Remove(databaseAbsenceRegister);
                 _db.SaveChanges();
@@ -765,7 +747,7 @@ namespace Datawarehouse_Backend.Controllers
             .Where(c => c.timeRegisterId == timeRegister.timeRegisterId)
             .Where(t => t.employee.tennantFK == tennantId).FirstOrDefault<TimeRegister>();
 
-            if(databaseTimeRegister != null) 
+            if (databaseTimeRegister != null)
             {
                 _db.Remove(databaseTimeRegister);
                 _db.SaveChanges();
