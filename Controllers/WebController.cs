@@ -453,20 +453,20 @@ namespace Datawarehouse_Backend.Controllers
         public List<ClientView> getClients()
         {
             long tennantId = getTennantId();
-            var customers = _warehouseDb.Clients
+            var clients = _warehouseDb.Clients
             .Where(c => c.tennantFK == tennantId)
             .OrderBy(c => c.clientName)
             .ToList();
 
             List<ClientView> customerList = new List<ClientView>();
-            for (int i = 0; i < customers.Count; i++)
+            for (int i = 0; i < clients.Count; i++)
             {
                 ClientView cust = new ClientView();
-                cust.clientName = customers[i].clientName;
-                cust.address = customers[i].address;
-                cust.zipcode = customers[i].zipcode;
-                cust.city = customers[i].city;
-                if (customers[i].customer)
+                cust.clientName = clients[i].clientName;
+                cust.address = clients[i].address;
+                cust.zipcode = clients[i].zipcode;
+                cust.city = clients[i].city;
+                if (clients[i].customer)
                 {
                     cust.type = "Customer";
                 }
@@ -477,6 +477,78 @@ namespace Datawarehouse_Backend.Controllers
                 customerList.Add(cust);
             }
             return customerList;
+        }
+
+        /*
+        * A method to get all clients for a tennant and summarize them based on their type
+        * Returns:
+        * A statistic of how many customer and suppliers the tennant has
+        */
+        [Authorize]
+        [HttpGet("clientnumbers")]
+        public ClientStatisticsView getNumberOfClients()
+        {
+            long tennantId = getTennantId();
+            var clients = _warehouseDb.Clients
+            .Where(c => c.tennantFK == tennantId)
+            .OrderBy(c => c.clientName)
+            .ToList();
+
+            ClientStatisticsView statisticsView = new ClientStatisticsView();
+            statisticsView.numberOfCustomers = 0;
+            statisticsView.numberOfSuppliers = 0;
+            if (clients != null)
+            {
+                for (int i = 0; i < clients.Count; i++)
+                {
+                    if (clients[i].customer)
+                    {
+                        statisticsView.numberOfCustomers += 1;
+                    }
+                    else
+                    {
+                        statisticsView.numberOfSuppliers += 1;
+                    }
+                }
+            }
+            return statisticsView;
+        }
+
+        /*
+        *
+        * Returns:
+        * Number of female / male Employees
+        */
+        [Authorize]
+        [HttpGet("employeenumber")]
+        public EmployeeStatView getNumberOfEmployees()
+        {
+            long tennantId = getTennantId();
+            var employees = _warehouseDb.Employees
+            .Where(c => c.tennantFK == tennantId)
+            .OrderBy(c => c.gender)
+            .ToList();
+
+            EmployeeStatView statisticsView = new EmployeeStatView();
+            statisticsView.numberOfEmployees = employees.Count;
+            statisticsView.numberOfMales = 0;
+            statisticsView.numberOfFemales = 0;
+            if (employees != null)
+            {
+                for (int i = 0; i < employees.Count; i++)
+                {
+                    if (employees[i].gender == "male")
+                    {
+                        statisticsView.numberOfMales += 1;
+                    }
+                    else
+                    {
+                        statisticsView.numberOfFemales += 1;
+                    }
+                }
+            }
+            return statisticsView;
+
         }
 
         /*
