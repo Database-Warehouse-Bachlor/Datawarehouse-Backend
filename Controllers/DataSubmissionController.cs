@@ -73,7 +73,7 @@ namespace Datawarehouse_Backend.Controllers
                             {
                                 //Creates a new Client object
                                 Client client = new Client();
-                                //Connects the new Client object to the tennant in the contentList (Incoming data)
+                                //Connects the new Client object to data from the request(Incoming data)
                                 client = contentsList.Clients[i];
 
                                 //Checks if the Client exists in the datawarehouse
@@ -91,7 +91,7 @@ namespace Datawarehouse_Backend.Controllers
                             {
                                 //Creates a new Order object
                                 Order order = new Order();
-                                //Connects the new Order object to the tennant in the contentList (Incoming data)
+                                //Connects the new Order object to data from the request(Incoming data)
                                 order = contentsList.Orders[i];
 
                                 //Sets the orders's tennant foreign key to tennantId
@@ -136,7 +136,7 @@ namespace Datawarehouse_Backend.Controllers
                             {
                                 //Creates a new Employee object
                                 Employee employee = new Employee();
-                                //Connects the new Employee object to the tennant in the contentList (Incoming data)
+                                //Connects the new Employee object to data from the request(Incoming data)
                                 employee = contentsList.Employees[i];
 
                                 //Sets the employee's tennant foreign key to tennantId
@@ -144,9 +144,6 @@ namespace Datawarehouse_Backend.Controllers
 
                                 //Checks if the Employee exists in the datawarehouse
                                 findEmployee(employee, tennantId);
-
-                                //Sets the client's tennant foreign key to tennantId
-                                employee.tennantFK = tennantId;
 
                                 //Adds the Client to the datawarehouse
                                 _db.Employees.Add(employee);
@@ -156,16 +153,24 @@ namespace Datawarehouse_Backend.Controllers
                             //Adds Absence Register to datawarehouse
                             for (int i = 0; i < contentsList.AbsenceRegisters.Count; i++)
                             {
+                                //Creates a new AbsenceRegister object
                                 AbsenceRegister absenceRegister = new AbsenceRegister();
+                                //Connects the new AbsenceRegister object to data from the request(Incoming data)
                                 absenceRegister = contentsList.AbsenceRegisters[i];
 
+                                //Checks if the AbsenceRegister exists in the datawarehouse
                                 findAbsenceRegister(absenceRegister, tennantId);
 
+                                //Gets the employeeFK that it will be connected to
                                 long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
 
+                                //If it finds a employee to connect to, it will add it to the datawarehouse
                                 if (employeeFK > -1)
                                 {
+                                    //Sets the employeeFK
                                     absenceRegister.employeeFK = employeeFK;
+
+                                    //Adds the AbsenceRegister to the datawarehouse
                                     _db.AbsenceRegisters.Add(absenceRegister);
                                     _db.SaveChanges();
                                 }
@@ -190,16 +195,24 @@ namespace Datawarehouse_Backend.Controllers
                             //Adds TimeRegister to datawarehouse
                             for (int i = 0; i < contentsList.TimeRegisters.Count; i++)
                             {
+                                //Creates a new TimeRegister object
                                 TimeRegister timeRegister = new TimeRegister();
+                                //Connects the new TimeRegister object to data from the request(Incoming data)
                                 timeRegister = contentsList.TimeRegisters[i];
 
+                                //Checks if the TimeRegister exists in the datawarehouse
                                 findTimeregister(timeRegister, tennantId);
 
+                                //Gets the employeeFK that it will be connected to
                                 long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
 
+                                //If it finds a employee to connect to, it will add it to the datawarehouse
                                 if (employeeFK > -1)
                                 {
+                                    //Sets the employeeFK
                                     timeRegister.employeeFK = employeeFK;
+                                    
+                                    //Adds the TimeRegister to the datawarehouse
                                     _db.TimeRegisters.Add(timeRegister);
                                     _db.SaveChanges();
                                 }
@@ -224,27 +237,43 @@ namespace Datawarehouse_Backend.Controllers
                             //Adds Balance and Budget to datawarehouse
                             for (int i = 0; i < contentsList.BalanceAndBudgets.Count; i++)
                             {
+                                //Creates a new BalanceAndBudget object
                                 BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
-                                balanceAndBudget = contentsList.BalanceAndBudgets[i];
-                                balanceAndBudget.tennantFK = tennantId;
 
+                                //Connects the new BalanceAndBudget object to data from the request(Incoming data)
+                                balanceAndBudget = contentsList.BalanceAndBudgets[i];
+                                
+                                //Checks if the BalanceAndBudget exists in the datawarehouse
                                 findBalanceAndBudget(balanceAndBudget, tennantId);
 
+                                //Sets the tennantFK
+                                balanceAndBudget.tennantFK = tennantId;
+
+                                //Adds the BalanceAndBudget to the datawarehouse
                                 _db.BalanceAndBudgets.Add(balanceAndBudget);
                                 _db.SaveChanges();
                             }
 
+                            //Adds Voucher to datawarehouse
                             for (int i = 0; i < contentsList.Vouchers.Count; i++)
                             {
+                                //Creates a new Voucher object
                                 Voucher voucher = new Voucher();
+                                //Connects the new Voucher object to data from the request(Incoming data)
                                 voucher = contentsList.Vouchers[i];
 
+                                //Checks if the Voucher exists in the datawarehouse
                                 findVoucher(voucher, tennantId);
 
+                                //Gets the employeeFK that it will be connected to
                                 long clientFK = getClientId(voucher.clientId, tennantId);
+                                //If it finds a client to connect to, it will add it to the datawarehouse
                                 if (clientFK != -1)
                                 {
+                                    //Sets the clientFK
                                     voucher.clientFK = clientFK;
+
+                                    //Adds the Voucher to the datawarehouse
                                     _db.Vouchers.Add(voucher);
                                     _db.SaveChanges();
                                 }
@@ -266,19 +295,27 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                             }
 
-
+                            //Adds Voucher to datawarehouse
                             for (int i = 0; i < contentsList.Invoices.Count; i++)
                             {
+                                //Creates a new Invoice object
                                 Invoice invoice = new Invoice();
+                                //Connects the new Invoice object to data from the request(Incoming data)
                                 invoice = contentsList.Invoices[i];
 
-                                //If the invoice is not stored in the datawarehouse already
+                                //Checks if the Invoice exists in the datawarehouse
                                 findInvoice(invoice, tennantId);
 
+                                //Gets the voucherFK that it will be connected to
                                 long voucherFK = getVoucherId(invoice.voucherId, tennantId);
+                                
+                                //If it finds a voucher to connect to, it will add it to the datawarehouse
                                 if (voucherFK != -1)
                                 {
+                                    //Sets the voucherFK
                                     invoice.voucherFK = voucherFK;
+
+                                    //Adds the Voucher to the datawarehouse
                                     _db.Invoices.Add(invoice);
                                     _db.SaveChanges();
                                 }
@@ -303,15 +340,24 @@ namespace Datawarehouse_Backend.Controllers
 
                             for (int i = 0; i < contentsList.InvoiceLines.Count; i++)
                             {
+                                //Creates a new InvoiceLine object
                                 InvoiceLine invoiceLines = new InvoiceLine();
+                                //Connects the new InvoiceLine object to data from the request(Incoming data)
                                 invoiceLines = contentsList.InvoiceLines[i];
 
+                                //Checks if the InvoiceLine exists in the datawarehouse
                                 findInvoiceLine(invoiceLines, tennantId);
 
+                                //Gets the invoiceFK that it will be connected to
                                 long invoiceFK = getInvoiceId(invoiceLines.invoiceId, tennantId);
+
+                                //If it finds a Invoice to connect to, it will add it to the datawarehouse
                                 if (invoiceFK != -1)
                                 {
+                                    //Sets the invoiceFK
                                     invoiceLines.invoiceFK = invoiceFK;
+
+                                    //Adds the Invoice to the datawarehouse
                                     _db.InvoiceLines.Add(invoiceLines);
                                     _db.SaveChanges();
                                 }
@@ -333,31 +379,46 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                             }
 
-                            //Adds a financial year to the datawarehouse
+                            //Adds a FinancialYear to the datawarehouse
                             for (int i = 0; i < contentsList.FinancialYears.Count; i++)
                             {
+                                //Creates a new FinancialYear object
                                 FinancialYear financialYear = new FinancialYear();
+                                //Connects the new FinancialYear object to data from the request(Incoming data)
                                 financialYear = contentsList.FinancialYears[i];
 
+                                //Checks if the FinancialYear exists in the datawarehouse
                                 findFinancialYear(financialYear, tennantId);
 
+                                //Gets the tennantFK that it will be connected to
                                 financialYear.tennantFK = tennantId;
 
+                                //Adds the FinancialYear to the datawarehouse
                                 _db.FinancialYears.Add(financialYear);
                                 _db.SaveChanges();
                             }
 
+                            //Adds a Account year to the datawarehouse
                             for (int i = 0; i < contentsList.Accounts.Count; i++)
                             {
+                                //Creates a new Account object
                                 Account account = new Account();
+                                //Connects the new Account object to data from the request(Incoming data)
                                 account = contentsList.Accounts[i];
 
+                                //Checks if the Account exists in the datawarehouse
                                 findAccount(account, tennantId);
 
+                                //Gets the invoiceFK that it will be connected to
                                 long financialYearFK = getFinancialYearId(account.financialYearid, tennantId);
+
+                                //If it finds a FinancialYear to connect to, it will add it to the datawarehouse
                                 if (financialYearFK != -1)
                                 {
+                                    //Gets the financialYearFK that it will be connected to
                                     account.financialYearFK = financialYearFK;
+
+                                    //Adds the Account to the datawarehouse
                                     _db.Accounts.Add(account);
                                     _db.SaveChanges();
                                 }
@@ -379,21 +440,34 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                             }
 
+                            //Adds a Post year to the datawarehouse
                             for (int i = 0; i < contentsList.Posts.Count; i++)
                             {
+                                //Creates a new Post object
                                 Post post = new Post();
+                                //Connects the new Account object to data from the request(Incoming data)
                                 post = contentsList.Posts[i];
 
+                                //Checks if the Post exists in the datawarehouse
                                 findPost(post, tennantId);
 
+                                //Gets the voucherFK that it will be connected to
                                 long voucherFK = getVoucherId(post.voucherId, tennantId);
+                                //Gets the accountFK that it will be connected to
                                 long accountFK = getAccountId(post.accountId, tennantId);
+
+                                //If it finds a Voucher to connect to, it will add it to the datawarehouse
                                 if (voucherFK != -1)
                                 {
+                                    //If it finds an Account to connect to, it will add it to the datawarehouse
                                     if (accountFK != -1)
                                     {
+                                        //Gets the voucherFK that it will be connected to
                                         post.voucherFK = voucherFK;
+                                        //Gets the accountFK that it will be connected to
                                         post.accountFK = accountFK;
+
+                                        //Adds the Post to the datawarehouse
                                         _db.Posts.Add(post);
                                         _db.SaveChanges();
                                     }
@@ -759,7 +833,6 @@ namespace Datawarehouse_Backend.Controllers
 
         private void findInvoiceLine(InvoiceLine invoiceLine, long tennantId)
         {
-            Console.WriteLine(invoiceLine.invoiceLineId);
             InvoiceLine databaseInvoiceLine = _db.InvoiceLines
             .Where(c => c.invoiceLineId == invoiceLine.invoiceLineId)
             .Where(t => t.invoice.voucher.client.tennantFK == tennantId).FirstOrDefault<InvoiceLine>();
