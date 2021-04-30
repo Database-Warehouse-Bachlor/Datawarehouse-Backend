@@ -69,12 +69,12 @@ namespace Datawarehouse_Backend.Controllers
                         if (tennantId > 0)
                         {
                             //Adds Client to datawarehouse
-                            for (int i = 0; i < contentsList.Client.Count; i++)
+                            for (int i = 0; i < contentsList.Clients.Count; i++)
                             {
                                 //Creates a new Client object
                                 Client client = new Client();
                                 //Connects the new Client object to the tennant in the contentList (Incoming data)
-                                client = contentsList.Client[i];
+                                client = contentsList.Clients[i];
 
                                 //Checks if the Client exists in the datawarehouse
                                 findClient(client, tennantId);
@@ -87,12 +87,13 @@ namespace Datawarehouse_Backend.Controllers
                             }
 
                             //Adds order to the datawarehouse
-                            for (int i = 0; i < contentsList.Order.Count; i++)
+                            for (int i = 0; i < contentsList.Orders.Count; i++)
                             {
                                 //Creates a new Order object
                                 Order order = new Order();
                                 //Connects the new Order object to the tennant in the contentList (Incoming data)
-                                order = contentsList.Order[i];
+                                order = contentsList.Orders[i];
+
                                 //Sets the orders's tennant foreign key to tennantId
                                 order.tennantFK = tennantId;
 
@@ -111,39 +112,52 @@ namespace Datawarehouse_Backend.Controllers
                                     _db.Orders.Add(order);
                                     _db.SaveChanges();
                                 }
-                                //If it does not fins a client to connect to, it will logg an error
+                                //If it does not find a client to connect to, it will logg an error
                                 else
                                 {
                                     //Sets the errorType and ErrorMessage
-                                    string errorType = "API-Key empty when register tennant";
-                                    string errorMessage = "API-nøkkelen er enten tom eller ikke presentert på riktig måte.\nAPI-key: null";
+                                    string errorType = "Order - Client Connection";
+                                    string errorMessage = "There is no Client with Id: "
+                                        + order.clientId
+                                        + " that orderId: "
+                                        + order.orderId +
+                                        " can be connected to. TennantId: " + tennantId;
 
                                     //Creates a new errorLog to the datawarehouse
                                     logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
                             //Adds Employee to the datawarehouse
-                            for (int i = 0; i < contentsList.Employee.Count; i++)
+                            for (int i = 0; i < contentsList.Employees.Count; i++)
                             {
                                 //Creates a new Employee object
                                 Employee employee = new Employee();
                                 //Connects the new Employee object to the tennant in the contentList (Incoming data)
-                                employee = contentsList.Employee[i];
+                                employee = contentsList.Employees[i];
+
                                 //Sets the employee's tennant foreign key to tennantId
                                 employee.tennantFK = tennantId;
-                                
+
                                 //Checks if the Employee exists in the datawarehouse
                                 findEmployee(employee, tennantId);
 
-                                addEmployee(employee, tennantId);
+                                //Sets the client's tennant foreign key to tennantId
+                                employee.tennantFK = tennantId;
+
+                                //Adds the Client to the datawarehouse
+                                _db.Employees.Add(employee);
+                                _db.SaveChanges();
                             }
 
                             //Adds Absence Register to datawarehouse
-                            for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
+                            for (int i = 0; i < contentsList.AbsenceRegisters.Count; i++)
                             {
                                 AbsenceRegister absenceRegister = new AbsenceRegister();
-                                absenceRegister = contentsList.AbsenceRegister[i];
+                                absenceRegister = contentsList.AbsenceRegisters[i];
 
                                 findAbsenceRegister(absenceRegister, tennantId);
 
@@ -157,15 +171,27 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "AbsenceRegister - Employee Connection";
+                                    string errorMessage = "There is no Employee with Id: "
+                                        + absenceRegister.employeeId
+                                        + " that absenceRegisterId: "
+                                        + absenceRegister.absenceRegisterId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
                             //Adds TimeRegister to datawarehouse
-                            for (int i = 0; i < contentsList.TimeRegister.Count; i++)
+                            for (int i = 0; i < contentsList.TimeRegisters.Count; i++)
                             {
                                 TimeRegister timeRegister = new TimeRegister();
-                                timeRegister = contentsList.TimeRegister[i];
+                                timeRegister = contentsList.TimeRegisters[i];
 
                                 findTimeregister(timeRegister, tennantId);
 
@@ -179,15 +205,27 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "TimeRegister - Employee Connection";
+                                    string errorMessage = "There is no Employee with Id: "
+                                        + timeRegister.employeeId
+                                        + " that timeRegisterId: "
+                                        + timeRegister.timeRegisterId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
                             //Adds Balance and Budget to datawarehouse
-                            for (int i = 0; i < contentsList.BalanceAndBudget.Count; i++)
+                            for (int i = 0; i < contentsList.BalanceAndBudgets.Count; i++)
                             {
                                 BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
-                                balanceAndBudget = contentsList.BalanceAndBudget[i];
+                                balanceAndBudget = contentsList.BalanceAndBudgets[i];
                                 balanceAndBudget.tennantFK = tennantId;
 
                                 findBalanceAndBudget(balanceAndBudget, tennantId);
@@ -196,10 +234,10 @@ namespace Datawarehouse_Backend.Controllers
                                 _db.SaveChanges();
                             }
 
-                            for (int i = 0; i < contentsList.Voucher.Count; i++)
+                            for (int i = 0; i < contentsList.Vouchers.Count; i++)
                             {
                                 Voucher voucher = new Voucher();
-                                voucher = contentsList.Voucher[i];
+                                voucher = contentsList.Vouchers[i];
 
                                 findVoucher(voucher, tennantId);
 
@@ -212,15 +250,27 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "Voucher - Client Connection";
+                                    string errorMessage = "There is no Client with Id: "
+                                        + voucher.clientId
+                                        + " that voucherId: "
+                                        + voucher.voucherId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
 
-                            for (int i = 0; i < contentsList.Invoice.Count; i++)
+                            for (int i = 0; i < contentsList.Invoices.Count; i++)
                             {
                                 Invoice invoice = new Invoice();
-                                invoice = contentsList.Invoice[i];
+                                invoice = contentsList.Invoices[i];
 
                                 //If the invoice is not stored in the datawarehouse already
                                 findInvoice(invoice, tennantId);
@@ -234,21 +284,31 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "Invoice - Voucher Connection";
+                                    string errorMessage = "There is no Voucher with Id: "
+                                        + invoice.voucherId
+                                        + " that invoiceId: "
+                                        + invoice.invoiceId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
 
                             }
 
-                            for (int i = 0; i < contentsList.InvoiceLine.Count; i++)
+                            for (int i = 0; i < contentsList.InvoiceLines.Count; i++)
                             {
                                 InvoiceLine invoiceLines = new InvoiceLine();
-                                invoiceLines = contentsList.InvoiceLine[i];
+                                invoiceLines = contentsList.InvoiceLines[i];
 
                                 findInvoiceLine(invoiceLines, tennantId);
-                                Console.WriteLine("---------------" + invoiceLines.invoiceLineId);
 
                                 long invoiceFK = getInvoiceId(invoiceLines.invoiceId, tennantId);
-                                Console.WriteLine("++++++++++ " + invoiceFK);
                                 if (invoiceFK != -1)
                                 {
                                     invoiceLines.invoiceFK = invoiceFK;
@@ -257,15 +317,27 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "InvoiceLine - Invoice Connection";
+                                    string errorMessage = "There is no Invoice with Id: "
+                                        + invoiceLines.invoiceId
+                                        + " that invoiceLineId: "
+                                        + invoiceLines.invoiceLineId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
                             //Adds a financial year to the datawarehouse
-                            for (int i = 0; i < contentsList.FinancialYear.Count; i++)
+                            for (int i = 0; i < contentsList.FinancialYears.Count; i++)
                             {
                                 FinancialYear financialYear = new FinancialYear();
-                                financialYear = contentsList.FinancialYear[i];
+                                financialYear = contentsList.FinancialYears[i];
 
                                 findFinancialYear(financialYear, tennantId);
 
@@ -275,10 +347,10 @@ namespace Datawarehouse_Backend.Controllers
                                 _db.SaveChanges();
                             }
 
-                            for (int i = 0; i < contentsList.Account.Count; i++)
+                            for (int i = 0; i < contentsList.Accounts.Count; i++)
                             {
                                 Account account = new Account();
-                                account = contentsList.Account[i];
+                                account = contentsList.Accounts[i];
 
                                 findAccount(account, tennantId);
 
@@ -291,14 +363,26 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "Account - FinancialYear Connection";
+                                    string errorMessage = "There is no FinancialYear with Id: "
+                                        + account.financialYearid
+                                        + " that accountId: "
+                                        + account.accountId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
-                            for (int i = 0; i < contentsList.Post.Count; i++)
+                            for (int i = 0; i < contentsList.Posts.Count; i++)
                             {
                                 Post post = new Post();
-                                post = contentsList.Post[i];
+                                post = contentsList.Posts[i];
 
                                 findPost(post, tennantId);
 
@@ -306,14 +390,46 @@ namespace Datawarehouse_Backend.Controllers
                                 long accountFK = getAccountId(post.accountId, tennantId);
                                 if (voucherFK != -1)
                                 {
-                                    post.voucherFK = voucherFK;
-                                    post.accountFK = accountFK;
-                                    _db.Posts.Add(post);
-                                    _db.SaveChanges();
+                                    if (accountFK != -1)
+                                    {
+                                        post.voucherFK = voucherFK;
+                                        post.accountFK = accountFK;
+                                        _db.Posts.Add(post);
+                                        _db.SaveChanges();
+                                    }
+                                    else
+                                    {
+                                        //Sets the errorType and ErrorMessage
+                                        string errorType = "Post - Account Connection";
+                                        string errorMessage = "There is no Account with Id: "
+                                            + post.accountId
+                                            + " that postId: "
+                                            + post.postId +
+                                            " can be connected to. TennantId: " + tennantId;
+
+                                        //Creates a new errorLog to the datawarehouse
+                                        logError(errorMessage, errorType);
+
+                                        //Throws a new exception so the program dont handle more data
+                                        throw new InvalidModelFK();
+                                    }
+
                                 }
                                 else
                                 {
-                                    //TODO Logg feil
+                                    //Sets the errorType and ErrorMessage
+                                    string errorType = "Post - Voucher Connection";
+                                    string errorMessage = "There is no Voucher with Id: "
+                                        + post.voucherId
+                                        + " that postId: "
+                                        + post.postId +
+                                        " can be connected to. TennantId: " + tennantId;
+
+                                    //Creates a new errorLog to the datawarehouse
+                                    logError(errorMessage, errorType);
+
+                                    //Throws a new exception so the program dont handle more data
+                                    throw new InvalidModelFK();
                                 }
                             }
 
@@ -380,12 +496,12 @@ namespace Datawarehouse_Backend.Controllers
                 //Creates a new errorLog to the datawarehouse
                 logError(errorMessage, errorType);
             }
-            catch (InvalidbusinessIdOrApiKeyException)
+            catch (InvalidModelFK)
             {
                 /*
-                This catch is only used for skipping the processing of incoming data.
-                There is only one place where it is thrown, and that is when the businessID
-                or apiKey is invalid. It gets logged in the database, and jumpes out of the Try.
+                This catch is only used for skipping rest of the processing of incoming data.
+                This exception is only thrown when the program cannot connect one object to another in the database
+                because the Id and FK dont connect.
                 */
             }
 

@@ -22,20 +22,4 @@ namespace Datawarehouse_Backend.Models
         public ICollection<Order> orders { get; set; } = new List<Order>();
         public ICollection<FinancialYear> financialYears { get; set; } = new List<FinancialYear>();
     }
-
-
-    [Serializable]
-    class InvalidbusinessIdOrApiKeyException : Exception
-    {
-        public InvalidbusinessIdOrApiKeyException()
-        {
-
-        }
-
-        public InvalidbusinessIdOrApiKeyException(String name)
-            : base(String.Format("Invalid businessId or ApiKey", name))
-        {
-
-        }
-    }
 }
