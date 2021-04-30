@@ -18,6 +18,7 @@ namespace Datawarehouse_Backend.Models
         public decimal price { get; set; }
         public decimal amountTotal { get; set; }
         public decimal discount { get; set; }
+        public long invoiceId { get; set; }
         
         [ForeignKey("invoice")]
         public long invoiceFK { get; set; }

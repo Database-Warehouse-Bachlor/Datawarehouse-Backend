@@ -54,57 +54,103 @@ namespace Datawarehouse_Backend.Controllers
                 //Checks if the apiKey is valid in the datawarehouse
                 if (verifyApiKey(apiKey))
                 {
-
-
                     ContentsList contentsList = JsonConvert.DeserializeObject<ContentsList>(
                         jsonDataAsString);
+
+
+                    tennantId = addTennant("", "", apiKey);
 
                     //Second verification where the apiKey in the URL gets compared with the apiKey
                     //inside the body
                     if (apiKey == contentsList.apiKey)
                     {
-
-                        tennantId = addTennant(contentsList.businessId, contentsList.tennantName, contentsList.apiKey);
-
-
                         //Failsafe if addtennant dont update the tennantId
                         //This happend once but never again, and we dont know why or what caused it
                         if (tennantId > 0)
                         {
-                            //Adds custumer to datawarehouse
+                            //Adds Client to datawarehouse
                             for (int i = 0; i < contentsList.Client.Count; i++)
                             {
                                 Client client = new Client();
                                 client = contentsList.Client[i];
+
+                                findClient(client, tennantId);
+
                                 client.tennantFK = tennantId;
-
-                                addCustomer(client, tennantId);
+                                addClient(client, tennantId);
                             }
 
-                            //Adds Employee to datawarehouse
-                            for (int i = 0; i < contentsList.Employee.Count; i++)
-                            {
-                                Employee employee = new Employee();
-                                employee = contentsList.Employee[i];
-                                employee.tennantFK = tennantId;
-
-                                addEmployee(employee, tennantId);
-                            }
-
-                            //Adds Order to datawarehouse
+                            //Adds order to the datawarehouse
                             for (int i = 0; i < contentsList.Order.Count; i++)
                             {
                                 Order order = new Order();
                                 order = contentsList.Order[i];
                                 order.tennantFK = tennantId;
-                                long customerFK = getCustomerId(order.clientFK, tennantId);
 
-                                if (customerFK > -1)
+                                findOrder(order, tennantId);
+
+                                long ClientFK = getClientId(order.clientId, tennantId);
+
+                                if (ClientFK > -1)
                                 {
-                                    order.clientFK = customerFK;
+                                    order.clientFK = ClientFK;
                                     _db.Orders.Add(order);
                                     _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
 
+                            for (int i = 0; i < contentsList.Employee.Count; i++)
+                            {                                
+                                Employee employee = new Employee();
+                                employee = contentsList.Employee[i];
+                                employee.tennantFK = tennantId;
+
+                                findEmployee(employee, tennantId);
+
+                                addEmployee(employee, tennantId);
+                            }
+
+                            //Adds Absence Register to datawarehouse
+                            for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
+                            {
+                                AbsenceRegister absenceRegister = new AbsenceRegister();
+                                absenceRegister = contentsList.AbsenceRegister[i];
+
+                                findAbsenceRegister(absenceRegister, tennantId);
+
+                                long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
+
+                                if (employeeFK > -1)
+                                {
+                                    absenceRegister.employeeFK = employeeFK;
+                                    _db.AbsenceRegisters.Add(absenceRegister);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
+                            //Adds TimeRegister to datawarehouse
+                            for (int i = 0; i < contentsList.TimeRegister.Count; i++)
+                            {
+                                TimeRegister timeRegister = new TimeRegister();
+                                timeRegister = contentsList.TimeRegister[i];
+
+                                findTimeregister(timeRegister, tennantId);
+
+                                long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
+
+                                if (employeeFK > -1)
+                                {
+                                    timeRegister.employeeFK = employeeFK;
+                                    _db.TimeRegisters.Add(timeRegister);
+                                    _db.SaveChanges();
                                 }
                                 else
                                 {
@@ -118,21 +164,48 @@ namespace Datawarehouse_Backend.Controllers
                                 BalanceAndBudget balanceAndBudget = new BalanceAndBudget();
                                 balanceAndBudget = contentsList.BalanceAndBudget[i];
                                 balanceAndBudget.tennantFK = tennantId;
+
+                                findBalanceAndBudget(balanceAndBudget, tennantId);
+
                                 _db.BalanceAndBudgets.Add(balanceAndBudget);
+                                _db.SaveChanges();
                             }
 
-                            //Adds Absence Register to datawarehouse
-                            for (int i = 0; i < contentsList.AbsenceRegister.Count; i++)
+                            for (int i = 0; i < contentsList.Voucher.Count; i++)
                             {
-                                AbsenceRegister absenceRegister = new AbsenceRegister();
-                                absenceRegister = contentsList.AbsenceRegister[i];
+                                Voucher voucher = new Voucher();
+                                voucher = contentsList.Voucher[i];
 
-                                long employeeFK = getEmployeeId(absenceRegister.employeeId, tennantId);
+                                findVoucher(voucher, tennantId);
 
-                                if (employeeFK > -1)
+                                long clientFK = getClientId(voucher.clientId, tennantId);
+                                if (clientFK != -1)
                                 {
-                                    absenceRegister.employeeFK = employeeFK;
-                                    _db.AbsenceRegisters.Add(absenceRegister);
+                                    voucher.clientFK = clientFK;
+                                    _db.Vouchers.Add(voucher);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
+
+                            for (int i = 0; i < contentsList.Invoice.Count; i++)
+                            {
+                                Invoice invoice = new Invoice();
+                                invoice = contentsList.Invoice[i];
+
+                                //If the invoice is not stored in the datawarehouse already
+                                findInvoice(invoice, tennantId);
+
+                                long voucherFK = getVoucherId(invoice.voucherId, tennantId);
+                                if (voucherFK != -1)
+                                {
+                                    invoice.voucherFK = voucherFK;
+                                    _db.Invoices.Add(invoice);
+                                    _db.SaveChanges();
                                 }
                                 else
                                 {
@@ -141,24 +214,84 @@ namespace Datawarehouse_Backend.Controllers
 
                             }
 
-                            //Adds TimeRegister to datawarehouse
-                            for (int i = 0; i < contentsList.TimeRegister.Count; i++)
+                            for (int i = 0; i < contentsList.InvoiceLine.Count; i++)
                             {
-                                TimeRegister timeRegister = new TimeRegister();
-                                timeRegister = contentsList.TimeRegister[i];
+                                InvoiceLine invoiceLines = new InvoiceLine();
+                                invoiceLines = contentsList.InvoiceLine[i];
 
-                                long employeeFK = getEmployeeId(timeRegister.employeeId, tennantId);
+                                findInvoiceLine(invoiceLines, tennantId);
+                                Console.WriteLine("---------------" + invoiceLines.invoiceLineId);
 
-                                if (employeeFK > -1)
+                                long invoiceFK = getInvoiceId(invoiceLines.invoiceId, tennantId);
+                                Console.WriteLine("++++++++++ " + invoiceFK);
+                                if (invoiceFK != -1)
                                 {
-                                    timeRegister.employeeFK = employeeFK;
-                                    _db.TimeRegisters.Add(timeRegister);
+                                    invoiceLines.invoiceFK = invoiceFK;
+                                    _db.InvoiceLines.Add(invoiceLines);
+                                    _db.SaveChanges();
                                 }
                                 else
                                 {
                                     //TODO Logg feil
                                 }
                             }
+
+                            //Adds a financial year to the datawarehouse
+                            for (int i = 0; i < contentsList.FinancialYear.Count; i++)
+                            {
+                                FinancialYear financialYear = new FinancialYear();
+                                financialYear = contentsList.FinancialYear[i];
+
+                                findFinancialYear(financialYear, tennantId);
+
+                                financialYear.tennantFK = tennantId;
+
+                                _db.FinancialYears.Add(financialYear);
+                                _db.SaveChanges();
+                            }
+
+                            for (int i = 0; i < contentsList.Account.Count; i++)
+                            {
+                                Account account = new Account();
+                                account = contentsList.Account[i];
+
+                                findAccount(account, tennantId);
+
+                                long financialYearFK = getFinancialYearId(account.financialYearid, tennantId);
+                                if (financialYearFK != -1)
+                                {
+                                    account.financialYearFK = financialYearFK;
+                                    _db.Accounts.Add(account);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
+                            for (int i = 0; i < contentsList.Post.Count; i++)
+                            {
+                                Post post = new Post();
+                                post = contentsList.Post[i];
+
+                                findPost(post, tennantId);
+
+                                long voucherFK = getVoucherId(post.voucherId, tennantId);
+                                long accountFK = getAccountId(post.accountId, tennantId);
+                                if (voucherFK != -1)
+                                {
+                                    post.voucherFK = voucherFK;
+                                    post.accountFK = accountFK;
+                                    _db.Posts.Add(post);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    //TODO Logg feil
+                                }
+                            }
+
 
                         }
                         else
@@ -190,7 +323,7 @@ namespace Datawarehouse_Backend.Controllers
                 string errorMessage =
                 "Failed when trying to save changes to the database. This might be an result of required fields being null. TennantId: " +
                 tennantId;
-                
+
                 //Creates a new errorLog to the datawarehouse
                 logError(errorMessage, errorType);
 
@@ -201,7 +334,7 @@ namespace Datawarehouse_Backend.Controllers
                 ErrorLog errorLog = new ErrorLog();
                 string errorType = e.GetType().ToString();
                 string errorMessage = e.Message.ToString() + " businessId: " + apiKey;
-            
+
                 //Creates a new errorLog to the datawarehouse
                 logError(errorMessage, errorType);
 
@@ -218,7 +351,7 @@ namespace Datawarehouse_Backend.Controllers
 
                 string errorType = e.GetType().ToString();
                 string errorMessage = e.ToString() + " Tennant ID: " + tennantId;
-                
+
                 //Creates a new errorLog to the datawarehouse
                 logError(errorMessage, errorType);
             }
@@ -233,7 +366,7 @@ namespace Datawarehouse_Backend.Controllers
 
             /*
             Systemet får en exception etter at et Required field er tom. Denne exception blir logga i terminal og i postman
-            Etter dette går den videre til catch, hvor alt funker som det skal helt til den SaveChanges hvor samme feilmelding
+            Etter dette går den videre til catch, hvor alt funker som det skal helt til den prøver SaveChanges hvor samme feilmelding
             dukker opp selv om alle endringer i try egentlig skal bli kastet og ikke lagra. Aner ikke hvordan jeg skal løse dette 
             eller hva det kommer av, så bare å rope ut hvis noen har peiling...
             */
@@ -295,7 +428,7 @@ namespace Datawarehouse_Backend.Controllers
                     _db.Tennants.Add(tennant);
                     _db.SaveChanges();
                 }
-               
+
             } //If it catches an error, it will log it in the datawarehouse
             catch (Exception e)
             {
@@ -321,7 +454,7 @@ namespace Datawarehouse_Backend.Controllers
         private long addTennant(string bId, string bName, string apiKey)
         {
             ErrorLog errorLog = new ErrorLog();
-            var business = _db.Tennants.Where(b => b.businessId == bId).FirstOrDefault<Tennant>();
+            var business = _db.Tennants.Where(b => b.apiKey == apiKey).FirstOrDefault<Tennant>();
             if (business == null && bId != null && apiKey != null && bId != "" && apiKey != "")
             {
                 Tennant tennant = new Tennant();
@@ -334,7 +467,7 @@ namespace Datawarehouse_Backend.Controllers
                 return tennant.id;
 
             }
-            else if (bId == null || bId == "")
+            /*else if (bId == null || bId == "")
             {
                 string errorType = "BusinessId fail";
                 string errorMessage = "BusinessId er enten tom eller ikke presentert på riktig måte.\nBID: " + bId;
@@ -359,27 +492,26 @@ namespace Datawarehouse_Backend.Controllers
             else if (business != null)
             {
                 Console.WriteLine("Tennant found, submitting data...");
-            }
+            }*/
             return business.id;
         }
-        private long addCustomer(Client client, long tennantFK)
+        private long addClient(Client client, long tennantFK)
         {
             ErrorLog errorLog = new ErrorLog();
-            Client databaseCustomer = _db.Clients
+            Client databaseClient = _db.Clients
             .Where(c => c.clientId == client.clientId)
             .Where(t => t.tennantFK == tennantFK).FirstOrDefault<Client>();
-            if (databaseCustomer == null)
+            if (databaseClient == null)
             {
-                Client customer1 = new Client();
-                customer1 = client;
-                customer1.tennantFK = tennantFK;
-                _db.Clients.Add(customer1);
-
+                Client client1 = new Client();
+                client1 = client;
+                client1.tennantFK = tennantFK;
+                _db.Clients.Add(client1);
                 _db.SaveChanges();
 
-                return customer1.id;
+                return client1.id;
             }
-            return databaseCustomer.id;
+            return databaseClient.id;
         }
 
         private long addEmployee(Employee employee, long tennantFK)
@@ -413,36 +545,229 @@ namespace Datawarehouse_Backend.Controllers
             {
                 return databaseEmployee.id;
             }
-            Console.WriteLine("Employee er null");
             return -1;
         }
 
-        private long getOrderId(long cordelId, long tennantId)
+        /*
+        The function getClientId checks for an existing client in the datawarehouse,
+        and then return the unique back if it exists, or return -1 if it does not exist
+        */
+        private long getClientId(long cordelId, long tennantId)
         {
-            Order databaseOrder = _db.Orders
-            .Where(c => c.orderId == cordelId)
-            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Order>();
-
-            if (databaseOrder != null)
-            {
-                return databaseOrder.id;
-            }
-            Console.WriteLine("Order er null");
-            return -1;
-        }
-
-        private long getCustomerId(long cordelId, long tennantId)
-        {
-            Client databaseCustomer = _db.Clients
+            Client databaseClient = _db.Clients
             .Where(c => c.clientId == cordelId)
             .Where(t => t.tennantFK == tennantId).FirstOrDefault<Client>();
 
-            if (databaseCustomer != null)
+            if (databaseClient != null)
             {
-                return databaseCustomer.id;
+                return databaseClient.id;
             }
-            Console.WriteLine("Customer er null");
             return -1;
+        }
+
+        private long getVoucherId(long cordelId, long tennantId)
+        {
+            Voucher databaseVoucher = _db.Vouchers
+            .Where(v => v.voucherId == cordelId)
+            .Where(t => t.client.tennantFK == tennantId).FirstOrDefault<Voucher>();
+
+            if (databaseVoucher != null)
+            {
+                return databaseVoucher.id;
+            }
+            return -1;
+        }
+
+        private long getInvoiceId(long cordelId, long tennantId)
+        {
+            Invoice databaseInvoice = _db.Invoices
+            .Where(c => c.invoiceId == cordelId)
+            .Where(t => t.voucher.client.tennantFK == tennantId).FirstOrDefault<Invoice>();
+
+            if (databaseInvoice != null)
+            {
+                return databaseInvoice.id;
+            }
+            return -1;
+        }
+
+        private long getFinancialYearId(long cordelId, long tennantId)
+        {
+            FinancialYear databaseFinancialYear = _db.FinancialYears
+            .Where(c => c.financialYearId == cordelId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<FinancialYear>();
+
+            if (databaseFinancialYear != null)
+            {
+                return databaseFinancialYear.id;
+            }
+            return -1;
+        }
+
+        private long getAccountId(long cordelId, long tennantId)
+        {
+            Account databaseAccount = _db.Accounts
+            .Where(c => c.accountId == cordelId)
+            .Where(t => t.financialYear.tennantFK == tennantId).FirstOrDefault<Account>();
+
+            if (databaseAccount != null)
+            {
+                return databaseAccount.id;
+            }
+            return -1;
+        }
+
+        private void findClient(Client client, long tennantId)
+        {
+            Client databaseClient = _db.Clients
+            .Where(c => c.clientId == client.clientId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Client>();
+
+            if(databaseClient != null) 
+            {
+                _db.Remove(databaseClient);
+                _db.SaveChanges();
+            }  
+        }
+
+        private void findVoucher(Voucher voucher, long tennantId)
+        {
+            Voucher databaseVoucher = _db.Vouchers
+            .Where(c => c.voucherId == voucher.voucherId)
+            .Where(t => t.client.tennantFK == tennantId).FirstOrDefault<Voucher>();
+
+            if(databaseVoucher != null) 
+            {
+                _db.Remove(databaseVoucher);
+                _db.SaveChanges();
+            }
+        }
+
+        private void findInvoice(Invoice invoice, long tennantId)
+        {
+            Invoice databaseInvoice = _db.Invoices
+            .Where(c => c.invoiceId == invoice.invoiceId)
+            .Where(t => t.voucher.client.tennantFK == tennantId).FirstOrDefault<Invoice>();
+
+            if(databaseInvoice != null) 
+            {
+                _db.Remove(databaseInvoice);
+                _db.SaveChanges();
+            }
+        }
+
+        private void findInvoiceLine(InvoiceLine invoiceLine, long tennantId)
+        {
+            Console.WriteLine(invoiceLine.invoiceLineId);
+            InvoiceLine databaseInvoiceLine = _db.InvoiceLines
+            .Where(c => c.invoiceLineId == invoiceLine.invoiceLineId)
+            .Where(t => t.invoice.voucher.client.tennantFK == tennantId).FirstOrDefault<InvoiceLine>();
+
+            
+            if(databaseInvoiceLine != null) 
+            {
+                Console.WriteLine("Removed InvoiceLine: " + databaseInvoiceLine.invoiceLineId);
+                _db.Remove(databaseInvoiceLine);
+                _db.SaveChanges();
+            }
+        }
+
+        private void findFinancialYear(FinancialYear financialYear, long tennantId)
+        {
+            FinancialYear databaseFinancialYear = _db.FinancialYears
+            .Where(c => c.financialYearId == financialYear.financialYearId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<FinancialYear>();
+
+            if(databaseFinancialYear != null) 
+            {
+                _db.Remove(databaseFinancialYear);
+                _db.SaveChanges();
+            }
+        }
+
+        private void findAccount(Account account, long tennantId)
+        {
+            Account databaseAccount = _db.Accounts
+            .Where(c => c.accountId == account.accountId)
+            .Where(t => t.financialYear.tennantFK == tennantId).FirstOrDefault<Account>();
+
+            if(databaseAccount != null) 
+            {
+                _db.Remove(databaseAccount);
+                _db.SaveChanges();
+            }
+        }
+
+        private void findPost(Post post, long tennantId)
+        {
+            Post databasePost = _db.Posts
+            .Where(c => c.postId == post.postId)
+            .Where(t => t.account.financialYear.tennantFK == tennantId).FirstOrDefault<Post>();
+
+            if(databasePost != null) 
+            {
+                _db.Remove(databasePost);
+                _db.SaveChanges();
+            }
+        }
+        private void findBalanceAndBudget(BalanceAndBudget balanceAndBudget, long tennantId)
+        {
+            BalanceAndBudget databaseBalanceAndBudget = _db.BalanceAndBudgets
+            .Where(c => c.tennantFK == tennantId).FirstOrDefault<BalanceAndBudget>();
+
+            if(databaseBalanceAndBudget != null) 
+            {
+                _db.Remove(databaseBalanceAndBudget);
+                _db.SaveChanges();
+            }
+        }
+        private void findOrder(Order order, long tennantId)
+        {
+            Order databaseOrder = _db.Orders
+            .Where(c => c.orderId == order.orderId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Order>();
+
+            if(databaseOrder != null) 
+            {
+                _db.Remove(databaseOrder);
+                _db.SaveChanges();
+            }
+        }
+        private void findEmployee(Employee employee, long tennantId)
+        {
+            Employee databaseEmployee = _db.Employees
+            .Where(c => c.employeeId == employee.employeeId)
+            .Where(t => t.tennantFK == tennantId).FirstOrDefault<Employee>();
+
+            if(databaseEmployee != null) 
+            {
+                _db.Remove(databaseEmployee);
+                _db.SaveChanges();
+            }
+        }
+        private void findAbsenceRegister(AbsenceRegister absenceRegister, long tennantId)
+        {
+            AbsenceRegister databaseAbsenceRegister = _db.AbsenceRegisters
+            .Where(c => c.absenceRegisterId == absenceRegister.absenceRegisterId)
+            .Where(t => t.employee.tennantFK == tennantId).FirstOrDefault<AbsenceRegister>();
+
+            if(databaseAbsenceRegister != null) 
+            {
+                _db.Remove(databaseAbsenceRegister);
+                _db.SaveChanges();
+            }
+        }
+        private void findTimeregister(TimeRegister timeRegister, long tennantId)
+        {
+            TimeRegister databaseTimeRegister = _db.TimeRegisters
+            .Where(c => c.timeRegisterId == timeRegister.timeRegisterId)
+            .Where(t => t.employee.tennantFK == tennantId).FirstOrDefault<TimeRegister>();
+
+            if(databaseTimeRegister != null) 
+            {
+                _db.Remove(databaseTimeRegister);
+                _db.SaveChanges();
+            }
         }
 
 
@@ -466,7 +791,7 @@ namespace Datawarehouse_Backend.Controllers
         This function creats a new errorLog, and uses the information in the 
         parameters to create a new errorLog in the datawarehouse, and saves the changes
         */
-        private void logError(string errorMessage, string errorType) 
+        private void logError(string errorMessage, string errorType)
         {
             ErrorLog errorLog = new ErrorLog();
 
@@ -480,7 +805,4 @@ namespace Datawarehouse_Backend.Controllers
             _db.SaveChanges();
         }
     }
-
-
-
 }

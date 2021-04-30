@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 //Bilag
 namespace Datawarehouse_Backend.Models
 {
@@ -14,7 +14,13 @@ namespace Datawarehouse_Backend.Models
         public string Type {get; set;} 
         public string description {get; set;}
         public DateTime date {get; set;}
-        public ICollection<Invoice> invoices { get; set; } = new List<Invoice>();
+        public long clientId { get; set; }
+
+        [ForeignKey("client")]
+        public long clientFK { get; set; }
+        public Client client { get; set; }
+        public virtual Invoice invoice { get; set; }        
+        
         public ICollection<Post> posts { get; set; } = new List<Post>();
 
     }

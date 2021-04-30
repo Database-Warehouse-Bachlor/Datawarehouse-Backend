@@ -85,7 +85,7 @@ namespace Datawarehouse_Backend.Controllers
 
         // [Authorize]
         [HttpGet("inbound")]
-        public List<Invoice> getAllInboundInvoice(string filter)
+        /*public List<Invoice> getAllInboundInvoice(string filter)
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
@@ -95,8 +95,8 @@ namespace Datawarehouse_Backend.Controllers
             .OrderByDescending(d => d.invoiceDate)
             .ToList();
             return invoice;
-        }
-
+        }*/
+        
     
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which

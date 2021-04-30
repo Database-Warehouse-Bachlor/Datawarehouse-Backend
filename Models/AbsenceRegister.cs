@@ -9,7 +9,7 @@ namespace Datawarehouse_Backend.Models
         [Key]
         public long id { get; set; }
 
-        public long AbsenceRegisterId { get; set; }
+        public long absenceRegisterId { get; set; }
         [Required]
         public DateTime fromDate { get; set; }
         [Required]

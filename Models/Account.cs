@@ -16,10 +16,11 @@ namespace Datawarehouse_Backend.Models
         public string type { get; set; } //Gjeld / Egenkapital / Resultat...
         public long MVAcode { get; set; }
         public long SAFTcode { get; set; }
+        public long financialYearid { get; set; }
 
-        [ForeignKey("FinancialYear")]
-        public long financialFK {get; set;}
-        public FinancialYear FinancialYear {get; set;}
+        [ForeignKey("financialYear")]
+        public long financialYearFK {get; set;}
+        public FinancialYear financialYear {get; set;}
 
         public ICollection<Post> posts { get; set; } = new List<Post>();
     }
