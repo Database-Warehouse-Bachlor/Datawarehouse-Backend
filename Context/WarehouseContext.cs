@@ -93,8 +93,8 @@ namespace Datawarehouse_Backend.Context
         {
             var inboundInvoice = Invoices
             .Where(i => i.voucher.client.tennantFK == tennantId)
-            .Where(d => d.invoiceDate >= comparisonDate)
-            .OrderByDescending(d => d.invoiceDate)
+            .Where(d => d.dueDate >= comparisonDate)
+            .OrderByDescending(d => d.dueDate)
             .ToList();
             return inboundInvoice;
         }
