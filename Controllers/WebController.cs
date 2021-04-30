@@ -27,14 +27,11 @@ namespace Datawarehouse_Backend.Controllers
     public class WebController : ControllerBase
     {
         private readonly IConfiguration config;
-        private readonly WarehouseContext _warehouseDb;
-        private readonly LoginDatabaseContext _db;
-
-        public WebController(IConfiguration config, WarehouseContext warehouseDb, LoginDatabaseContext logindb)
+        private readonly IWarehouseContext _warehouseDb;
+        public WebController(IConfiguration config, IWarehouseContext warehouseDb)
         {
             this.config = config;
             this._warehouseDb = warehouseDb;
-            this._db = logindb;
         }
         /*
         * Sets the filter to a pre-defined option based on what's requested, if no option is specified, all will be selected.
@@ -95,12 +92,7 @@ namespace Datawarehouse_Backend.Controllers
             DateTime dateTimeNow = DateTime.Now;
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
-            .Where(d => d.Type == "outbound" || d.Type == "payment")
-            .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.Type)
-            .ToList();
+            var vouchers = _warehouseDb.getVouchersInDescendingByPaymentThenByType(tennantId, comparisonDate);
             //We now have a list of all vouchers that has date
             //after the filter given, ordered by paymentId, then by type
             // This enables us to compare voucher n to n+1
@@ -194,7 +186,6 @@ namespace Datawarehouse_Backend.Controllers
 
                 for (int i = 0; i < accList.Count; i++)
                 {
-                    Console.WriteLine("Adding data for date: " + tempDate);
                     if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
                     {
                         if (accList[i].daysDue < 30)
@@ -250,11 +241,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
-            var absence = _warehouseDb.AbsenceRegisters
-            .Where(i => i.employee.tennantFK == tennantId)
-            .Where(d => d.fromDate >= comparisonDate)
-            .OrderBy(d => d.fromDate)
-            .ToList();
+            var absence = _warehouseDb.getAllAbsenceFromDate(tennantId, comparisonDate);
 
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;
@@ -526,14 +513,12 @@ namespace Datawarehouse_Backend.Controllers
         * their accounts is bound to.  The first function returns the object tennant based on the ID
         * The other function simply returns the tennantId that has been found.
         */
-
         private Tennant getTennant()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
             long tennantId = long.Parse(claim[0].Value);
-            Tennant tennant = _warehouseDb.Tennants
-            .Where(t => t.id == tennantId).FirstOrDefault<Tennant>();
+            Tennant tennant = _warehouseDb.findTennantById(tennantId);
             return tennant;
         }
         private long getTennantId()

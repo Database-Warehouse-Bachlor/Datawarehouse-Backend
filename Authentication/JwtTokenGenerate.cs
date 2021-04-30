@@ -2,18 +2,20 @@
 using System.IdentityModel.Tokens.Jwt;
 using Datawarehouse_Backend.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
+
+/*
+*   Generates a JWT token with different claims. Claims gives information about the current user.
+*   TODO: This is currently adapted from, but we're not sure about the real origin of this.
+*       - https://stackoverflow.com/questions/61296262/c-sharp-jwt-token-persist-claims-after-update
+*/
 namespace Datawarehouse_Backend.Authentication
 {
-     public class JwtTokenGenerate
+    public class JwtTokenGenerate
  {
 
      public JwtTokenGenerate()

@@ -1,13 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
+
+
+/*
+*   This controller is for the app to give information to users. 
+*/
 namespace Datawarehouse_Backend.Controllers
 {
 
@@ -16,13 +18,16 @@ namespace Datawarehouse_Backend.Controllers
     public class AppController : ControllerBase
     {
 
-        public readonly WarehouseContext _warehouseDb;
+        public readonly IWarehouseContext _warehouseDb;
 
-        public AppController(WarehouseContext warehouseDb)
+        public AppController(IWarehouseContext warehouseDb)
         {
             _warehouseDb = warehouseDb;
         }
 
+        /*
+        *   Returns number of tennants and errors last 24 hours as json.
+        */
         // [Authorize(Roles = "Admin")]
         [HttpPost("homeinfo")]
         public IActionResult getNumberOfTennantsAndErrorsAsJson()
@@ -41,49 +46,48 @@ namespace Datawarehouse_Backend.Controllers
             return response;
         }
 
-        //[Authorize(Roles = "Admin")]
-        [HttpPost("tennants")]
-        public List<Tennant> getAllTennants() {
-            var tennants = _warehouseDb.Tennants
-            .ToList();
-            return tennants;
-        }
-
+        /*
+        *   Returns a list of all errors
+        */
         //[Authorize(Roles = "Admin")]
         [HttpPost("errors")]
         public List<ErrorLog> getAllErrors() {
-            var errors = _warehouseDb.ErrorLogs
-            .ToList();
-            return errors;
+           return _warehouseDb.getAllErrors();
         }
 
+        /*
+        *   Returns a list of all errors in the last 24 hours
+        */
         //[Authorize(Roles = "Admin")]
         [HttpPost("lasterrors")]
         public List<ErrorLog> getLatestErrors() {
-            DateTime currentTime = DateTime.Now;
-            var errors = _warehouseDb.ErrorLogs
-            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
-            .ToList();
-            return errors;
+            return _warehouseDb.getLatestErrors();
         }
 
-        // Returns a list of all tennants.
+        /*
+        *   Returns a list of all tennants registered in the database
+        */
+        //[Authorize(Roles = "Admin")]
+        [HttpPost("tennants")]
+        public List<Tennant> getAllTennants() {
+            return _warehouseDb.getAllTennants();
+        }
+
+
+        /*
+        *   Returns number of all tennants
+        */
         public int getNumberOfTennants()
         {
-            var numberOfTennants = _warehouseDb.Tennants
-            .Count();
-            return numberOfTennants;
+            return _warehouseDb.getNumberOfTennants();
         }
 
-        // Returns number of errors the last 24 hours
+        /*
+        *   Returns number of errors the last 24 hours
+        */
         public int getNumberOfErrorsLastTwentyFour()
         {
-            DateTime currentTime = DateTime.Now;
-            var numberOfErrors = _warehouseDb.ErrorLogs
-            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
-            .Count();
-            return numberOfErrors;
+            return _warehouseDb.getNumberOfErrorsLastTwentyFour();
         }
-
     }
 }

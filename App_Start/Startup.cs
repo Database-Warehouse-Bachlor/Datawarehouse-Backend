@@ -44,6 +44,8 @@ namespace Datawarehouse_Backend.App_Start
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+            services.AddScoped<IWarehouseContext, WarehouseContext>();
+            services.AddScoped<ILoginDatabaseContext, LoginDatabaseContext>();
 
 
 
