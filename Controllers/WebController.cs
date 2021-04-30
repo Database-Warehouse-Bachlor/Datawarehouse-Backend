@@ -130,11 +130,12 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("testing")]
         public List<AccRecView> getVoucherTest(string filter)
         {
+            DateTime dateTimeNow = DateTime.Now;
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId)
-            .Where(d => d.date >= comparisonDate)
+            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
+            .Where(d => d.Type == "outbound" || d.Type == "payment")
             .Include(c => c.invoice)
             .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
@@ -147,8 +148,8 @@ namespace Datawarehouse_Backend.Controllers
                 Console.WriteLine("i value: " + i);
                 if (i != vouchers.Count - 1)
                 {
-                Console.WriteLine("voucher PID: " + vouchers[i].paymentId +"\n Next pid:" + vouchers[i+1].paymentId);
-                    //        outbound                  inbound                    outbound duedate                   inbound paydate
+                    Console.WriteLine("voucher PID: " + vouchers[i].paymentId + "\n Next pid:" + vouchers[i + 1].paymentId);
+                    //        outbound                  Payment                    outbound duedate                   payment paydate
                     if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
                     {
                         AccRecView view = new AccRecView();
@@ -160,20 +161,50 @@ namespace Datawarehouse_Backend.Controllers
                         view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
                         accList.Add(view);
                         i++; //Skip i+1, since we compiled i and i+1
-                    } //Else do nothing and move to next.
+                    }
+                    //If an outbound voucher has not been paid. 
+                    //Setting payDate to the date of request so that I can categorize how long overdue the payment is. 
+                    else if (vouchers[i].paymentId != vouchers[i + 1].paymentId)
+                    {
+                        Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                        AccRecView view = new AccRecView();
+                        view.PID = vouchers[i].paymentId;
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = dateTimeNow;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                        accList.Add(view);
+                    }
+                    //Else do nothing and move to next.
                 }
-            }
+                //Last payment n was not connected to n-1, therefore it's an unpaid outbound invoice.
+                else if (i == vouchers.Count - 1)
+                {
+                    Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                    AccRecView view = new AccRecView();
+                    view.PID = vouchers[i].paymentId;
+                    view.dueDate = vouchers[i].invoice.dueDate;
+                    view.payDate = dateTimeNow;
+                    view.amount = vouchers[i].invoice.amountTotal;
+                    view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                    accList.Add(view);
+                }
+                //If it's not one of the 4 conditions above, the outbound invoice was paid in time.
+                    //Else do nothing and move to next.
+                }
             return accList;
-        }
+            }
+        
 
         [HttpGet("accrec")]
         public List<DateStatusView> getAccountReceivables(string filter)
         {
+            DateTime dateTimeNow = DateTime.Now;
             long tennantId = getTennantId();
             DateTime comparisonDate = compareDates(filter);
             var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId)
-            .Where(d => d.date >= comparisonDate)
+            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
+            .Where(d => d.Type == "outbound" || d.Type == "payment")
             .Include(c => c.invoice)
             .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
@@ -190,9 +221,9 @@ namespace Datawarehouse_Backend.Controllers
             for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
             {
                 Console.WriteLine("i value: " + i);
-                if (i != vouchers.Count - 1)
+                if (i < vouchers.Count - 1)
                 {
-                    //if outbound and inbound has same paymentId and is paid too late:
+                    //if outbound and payment has same paymentId and is paid too late:
                     if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
                     {
                         AccRecView view = new AccRecView();
@@ -202,9 +233,33 @@ namespace Datawarehouse_Backend.Controllers
                         view.daysDue = view.dueDate.DayOfYear - view.payDate.DayOfYear;
                         accList.Add(view);
                         i++; //Skip i+1, since we compiled i and i+1
-                    } 
+                    }
+                    //If an outbound voucher has not been paid. 
+                    //Setting payDate to the date of request so that I can categorize how long overdue the payment is. 
+                    else if (vouchers[i].paymentId != vouchers[i + 1].paymentId)
+                    {
+                        Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                        AccRecView view = new AccRecView();
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = dateTimeNow;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.dueDate.DayOfYear - view.payDate.DayOfYear;
+                        accList.Add(view);
+                    }
                     //Else do nothing and move to next.
                 }
+                //Last payment n was not connected to n-1, therefore it's an unpaid outbound invoice.
+                else if (i == vouchers.Count - 1)
+                {
+                    Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                    AccRecView view = new AccRecView();
+                    view.dueDate = vouchers[i].invoice.dueDate;
+                    view.payDate = dateTimeNow;
+                    view.amount = vouchers[i].invoice.amountTotal;
+                    view.daysDue = view.dueDate.DayOfYear - view.payDate.DayOfYear;
+                    accList.Add(view);
+                }
+                //If it's not one of the 4 conditions above, the outbound invoice was paid in time.
             }
 
             accList.Sort((x, y) => x.dueDate.CompareTo(y.dueDate));
@@ -212,7 +267,6 @@ namespace Datawarehouse_Backend.Controllers
 
             List<DateStatusView> graphList = new List<DateStatusView>();
             DateTime tempDate = comparisonDate;  //Setting the temporary date to the first day of the filter requested.
-            DateTime dateTimeNow = DateTime.Now;
             int timeIntervall = 7;
             while (tempDate < dateTimeNow)
             {
@@ -224,32 +278,32 @@ namespace Datawarehouse_Backend.Controllers
                 aView.ninetyPlusAmount = 0;
                 Console.WriteLine("im here");
                 Console.WriteLine("tempDate:" + tempDate);
-                
+
                 for (int i = 0; i < accList.Count; i++)
                 {
                     Console.WriteLine("now im here");
 
                     if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
                     {
-                        if (accList[i].daysDue < 30)                                  //0-30
+                        if (accList[i].daysDue < 30)
                         {
                             aView.thirtyAmount += accList[i].amount;
                         }
-                        else if (30 <= accList[i].daysDue && accList[i].daysDue < 60) //30-60
+                        else if (30 <= accList[i].daysDue && accList[i].daysDue < 60) 
                         {
                             aView.sixtyAmount += accList[i].amount;
                         }
-                        else if (60 <= accList[i].daysDue && accList[i].daysDue < 90)//60-90
+                        else if (60 <= accList[i].daysDue && accList[i].daysDue < 90)
                         {
                             aView.ninetyAmount += accList[i].amount;
                         }
-                        else                                                          //90+
+                        else
                         {
                             aView.ninetyPlusAmount += accList[i].amount;
                         }
                     }
                 }
-                 if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear) //If one week doesnt surpass today, add one week
+                if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear) //If one week doesnt surpass today, add one week
                 {
                     tempDate = tempDate.AddDays(timeIntervall);
                 }
