@@ -80,27 +80,8 @@ namespace Datawarehouse_Backend.Controllers
             return comparisonDate;
         }
 
-        /*
-        * A method to fetch all inbound invoices from a specific tennant.
-        */
 
-
-
-        // [Authorize]
-        [HttpGet("invoices")]
-        public List<Invoice> getAllInboundInvoice(string filter)
-        {
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var invoice = _warehouseDb.Invoices
-            .Where(i => i.voucher.client.tennantFK == tennantId)
-            .Where(d => d.dueDate >= comparisonDate)
-            .OrderByDescending(d => d.dueDate)
-            .ToList();
-            return invoice;
-        }
-
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("accrec")]
         public List<DateStatusView> getAccountReceivables(string filter)
         {
@@ -123,17 +104,16 @@ namespace Datawarehouse_Backend.Controllers
 
             // Now we find all the vouchers that has been paid too late.
             List<AccRecView> accList = new List<AccRecView>();
-
-            for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
+            for (int i = 0; i < vouchers.Count; i++)
             {
+                //Even though there shouldnt be any vouchers without invoices getting through the datasubmission
+                //We double check to avoid any errors, and still provide a visual feed in the frontend.
                 if (vouchers[i].invoice == null)
                 {
                     i++;
                 }
-                Console.WriteLine("i value: " + i);
                 if (i < vouchers.Count - 1)
                 {
-                    Console.WriteLine("voucher PID: " + vouchers[i].paymentId + "\n Next pid:" + vouchers[i + 1].paymentId);
                     //if outbound and payment has same paymentId and is paid too late
                     if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
                     {
@@ -160,8 +140,7 @@ namespace Datawarehouse_Backend.Controllers
                         view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
                         accList.Add(view);
                     }
-                    //If the outbound voucher is paid, and paid within the duedate
-                    //Skip the next voucher.
+                    //If the outbound voucher is paid, and paid within the duedate, skip this and next voucher.
                     else
                     {
                         i++;
@@ -181,17 +160,19 @@ namespace Datawarehouse_Backend.Controllers
                 }
             }
             accList.Sort((x, y) => x.dueDate.CompareTo(y.dueDate));
+            /*
+            We now have a sorted list of vouchers that was paid too late, or not paid at all.
 
-            /* We now have a sorted list of vouchers that was paid too late, or not paid at all.
             We start at the day of the filter requested, and move with a custom timeintervall that is now set to 7days,
             all the way til we reach todays date then once more for today.
             For every step we take towards todays date, we iterate over the list of vouchers that was paid too late, or not paid at all.
-            For every voucher in that list we check which duedate category it belongs to, and then add the amountdue the voucher has to the correct category*/
+            For every voucher in that list we check which duedate category it belongs to, and then add the amountdue the voucher has to the correct category
+            */
 
-            List<DateStatusView> graphList = new List<DateStatusView>();
             //Setting the temporary date to the first day of the filter requested.
+            //And setting timeIntervall to 7 Days.
+            List<DateStatusView> graphList = new List<DateStatusView>();
             DateTime tempDate = comparisonDate;
-            //Amount of days between each update for the accountsreceivables.
             int timeIntervall = 7;
             while (tempDate <= dateTimeNow)
             {
@@ -203,13 +184,10 @@ namespace Datawarehouse_Backend.Controllers
                 aView.sixtyAmount = 0;
                 aView.ninetyAmount = 0;
                 aView.ninetyPlusAmount = 0;
-                Console.WriteLine("im here");
-                Console.WriteLine("tempDate:" + tempDate);
 
                 for (int i = 0; i < accList.Count; i++)
                 {
-                    Console.WriteLine("now im here");
-
+                    Console.WriteLine("Adding data for date: " + tempDate);
                     if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
                     {
                         if (accList[i].daysDue < 30)
@@ -239,7 +217,6 @@ namespace Datawarehouse_Backend.Controllers
                 else if (tempDate != dateTimeNow)
                 {
                     tempDate = dateTimeNow;
-
                 }
                 // We have now added all dates wanted, including todays date, push it over to break the whileloop.
                 else
@@ -270,24 +247,20 @@ namespace Datawarehouse_Backend.Controllers
             .OrderBy(d => d.fromDate)
             .ToList();
 
-            Console.WriteLine("Number of objects found: " + absence.Count);
             List<AbsenceView> absenceViews = new List<AbsenceView>();
             double totalAbsence = 0;
-
             if (filter == "thisWeek" || filter == "thisMonth" || filter == "lastThirtyDays" || filter == "lastSevenDays")
             {
                 try
                 {
                     for (int i = 0; i < absence.Count; i++)
                     {
-                        Console.WriteLine("i value: " + i);
                         if (i != absence.Count - 1)
                         {
                             if (absence[i].fromDate.Day == absence[i + 1].fromDate.Day)
                             { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
                                 totalAbsence += absence[i].duration;
-                                Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
-                                Console.WriteLine("Next absence is: " + absence[i + 1].id);
+                                Console.WriteLine("Adding absence.." + "\nCurrent total: " + totalAbsence);
                             }
                             else
                             { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
@@ -334,7 +307,6 @@ namespace Datawarehouse_Backend.Controllers
                 catch (Exception e)
                 {
                     Console.WriteLine("Error: " + e);
-                    //TODO: Create errorlogg
                 }
                 return absenceViews;
             }
@@ -344,17 +316,17 @@ namespace Datawarehouse_Backend.Controllers
                 {
                     for (int i = 0; i < absence.Count; i++)
                     {
-                        Console.WriteLine("i value: " + i);
                         if (i != absence.Count - 1)
                         {
+                            //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
                             if (absence[i].fromDate.Month == absence[i + 1].fromDate.Month)
-                            { //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
+                            { 
                                 totalAbsence += absence[i].duration;
                                 Console.WriteLine("Adding days.." + "\nCurrent total: " + totalAbsence);
-                                Console.WriteLine("Next absence is: " + absence[i + 1].id);
                             }
+                            // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
                             else
-                            { // Next absence is a new month, add the current absence we're on and add the view to the new list of views.
+                            { 
                                 totalAbsence += absence[i].duration;
                                 AbsenceView view = new AbsenceView();
                                 view.year = absence[i].fromDate.Year;
@@ -365,8 +337,9 @@ namespace Datawarehouse_Backend.Controllers
                                 totalAbsence = 0;
                             }
                         }
+                        //last absence has the same month as the one previously added absence
                         else if (absence[i].fromDate.Month == absence[i - 1].fromDate.Month)
-                        { //last absence has the same month as the one previously added absence
+                        { 
                             totalAbsence += absence[i].duration;
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
@@ -376,8 +349,9 @@ namespace Datawarehouse_Backend.Controllers
                             absenceViews.Add(view);
                             totalAbsence = 0;
                         }
+                        //last absence is in a new month
                         else
-                        { //last absence is in a new month
+                        { 
                             totalAbsence += absence[i].duration;
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
@@ -392,7 +366,6 @@ namespace Datawarehouse_Backend.Controllers
                 catch (Exception e)
                 {
                     Console.WriteLine("Error: " + e);
-                    //TODO: Create errorlogg
                 }
                 return absenceViews;
             }
@@ -405,8 +378,7 @@ namespace Datawarehouse_Backend.Controllers
             DateTime comparisonDate = compareDates(filter);
             long tennantId = getTennantId();
             var timeRegisters = _warehouseDb.TimeRegisters
-            .Where(t => t.employee.tennantFK == tennantId)
-            .Where(d => d.recordDate >= comparisonDate)
+            .Where(t => t.employee.tennantFK == tennantId && t.recordDate >= comparisonDate)
             .OrderByDescending(d => d.recordDate)
             .ToList();
             return timeRegisters;
@@ -432,11 +404,9 @@ namespace Datawarehouse_Backend.Controllers
             {
                 OrderView order = new OrderView();
                 order.clientName = orders[i].client.clientName;
-                //order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);
-
             }
             return orderList;
         }
@@ -458,7 +428,6 @@ namespace Datawarehouse_Backend.Controllers
             {
                 OrderView order = new OrderView();
                 order.clientName = orders[i].client.clientName;
-                //order.invoiceTotal = orders[i].invoice.amountTotal;
                 order.jobname = orders[i].jobName;
                 order.endDate = orders[i].endDate;
                 orderList.Add(order);
@@ -482,14 +451,15 @@ namespace Datawarehouse_Backend.Controllers
         [HttpGet("customers")]
         public List<ClientView> getCustomers()
         {
-            var customers = getTennant().clients
-            .OrderByDescending(c => c.clientName)
+            long tennantId = getTennantId();
+            var customers = _warehouseDb.Clients
+            .Where(c => c.tennantFK == tennantId)
+            .OrderBy(c => c.clientName)
             .ToList();
 
             List<ClientView> customerList = new List<ClientView>();
             for (int i = 0; i < customers.Count; i++)
             {
-
                 ClientView cust = new ClientView();
                 cust.clientName = customers[i].clientName;
                 cust.address = customers[i].address;
@@ -509,66 +479,32 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        * A method to fetch all inbound invoices from a specific tennant.
-        *
         * 
-        * Returns:
-        * A list of customer addresses, zipcodes, cities and total amount due
         */
 
         [Authorize]
         [HttpGet("balance")]
         public List<BnbView> getBalanceAndBudget(string filter)
         {
-            //Gets all BnBs within the filter
             DateTime comparisonDate = compareDates(filter);
             var balanceAndBudgets = getTennant().bnb
             .Where(d => d.periodDate >= comparisonDate)
             .OrderByDescending(d => d.periodDate).ToList();
-            //Grab the important information and put it in a list of views so it's easier to handle @frontend
             List<BnbView> bnbList = new List<BnbView>();
             for (int i = 0; i < balanceAndBudgets.Count; i++)
             {
                 BnbView bnb = new BnbView();
                 bnb.account = balanceAndBudgets[i].account;
                 bnb.startBalance = balanceAndBudgets[i].startBalance;
-                bnb.periodBalance = balanceAndBudgets[i].periodBalance;
                 bnb.endBalance = balanceAndBudgets[i].endBalance;
+                bnb.periodBalance = balanceAndBudgets[i].periodBalance;
                 bnbList.Add(bnb);
             }
             return bnbList;
         }
 
         /*
-        * Finds all the customers for the tennant then for each customer it iterates over
-        * the customers accountreceivables and adds the information needed to AccountsView
-        * and returns a list of AccountsView
-        [Authorize]
-        [HttpGet("accreceive")]
-        public List<AccountsView> getAccountsReceivables(string filter)
-        {
-            Tennant tennant = getTennant();
-            var customers = tennant.customers.ToList();
-            List<AccountsView> accountsReceivable = new List<AccountsView>();
-            for (int i = 0; i < customers.Count; i++)
-            {
-                List<AccountsReceivable> accounts = customers[i].accountsreceivables.ToList();
-                for (int j = 0; j < accounts.Count; j++)
-                {
-                    AccountsView acc = new AccountsView();
-                    acc.amount = accounts[j].amount;
-                    acc.amountDue = accounts[j].amountDue;
-                    acc.dueDate = accounts[j].dueDate;
-                    accountsReceivable.Add(acc);
-                }
-            }
-            return accountsReceivable;
-        }
-        */
-
-
-        /*
-        * Two functions that takes the first claim from the JWT Token to find which tennantId
+        * Two functions that takes the first claim from the JWT Token to find which tennant/tennantId
         * their accounts is bound to.  The first function returns the object tennant based on the ID
         * The other function simply returns the tennantId that has been found.
         */
