@@ -40,7 +40,10 @@ namespace Datawarehouse_Backend.App_Start
                 opt.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials().Build());
             });
             
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
             services.AddScoped<IWarehouseContext, WarehouseContext>();
             services.AddScoped<ILoginDatabaseContext, LoginDatabaseContext>();
 
