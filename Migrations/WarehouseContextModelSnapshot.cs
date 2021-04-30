@@ -26,14 +26,14 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<long>("AbsenceRegisterId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("abcenseType")
                         .HasColumnType("text");
 
                     b.Property<string>("abcenseTypeText")
                         .HasColumnType("text");
+
+                    b.Property<long>("absenceRegisterId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("comment")
                         .HasColumnType("text");
@@ -45,6 +45,9 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<long>("employeeFK")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("fromDate")
@@ -82,7 +85,10 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<string>("description")
                         .HasColumnType("text");
 
-                    b.Property<long>("financialFK")
+                    b.Property<long>("financialYearFK")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("financialYearid")
                         .HasColumnType("bigint");
 
                     b.Property<int>("number")
@@ -93,7 +99,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("financialFK");
+                    b.HasIndex("financialYearFK");
 
                     b.ToTable("Accounts");
                 });
@@ -299,8 +305,8 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<decimal>("amountTotal")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("clientId")
-                        .HasColumnType("text");
+                    b.Property<long>("clientId")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("dueDate")
                         .HasColumnType("timestamp without time zone");
@@ -316,6 +322,9 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.Property<string>("specification")
                         .HasColumnType("text");
+
+                    b.Property<long>("voucherId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("voucherFK");
 
@@ -339,6 +348,9 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<long>("invoiceFK")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("invoiceId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("invoiceLineId")
@@ -374,6 +386,9 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("text");
 
                     b.Property<long>("clientFK")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("clientId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("clientName")
@@ -497,7 +512,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("businessId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("tennantName")
@@ -522,6 +536,9 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<long>("employeeFK")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("employeeId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("invoiceRate")
@@ -640,6 +657,9 @@ namespace Datawarehouse_Backend.Migrations
                     b.Property<long>("clientFK")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("clientId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("date")
                         .HasColumnType("timestamp without time zone");
 
@@ -675,13 +695,13 @@ namespace Datawarehouse_Backend.Migrations
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Account", b =>
                 {
-                    b.HasOne("Datawarehouse_Backend.Models.FinancialYear", "FinancialYear")
+                    b.HasOne("Datawarehouse_Backend.Models.FinancialYear", "financialYear")
                         .WithMany("accounts")
-                        .HasForeignKey("financialFK")
+                        .HasForeignKey("financialYearFK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FinancialYear");
+                    b.Navigation("financialYear");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.BalanceAndBudget", b =>
