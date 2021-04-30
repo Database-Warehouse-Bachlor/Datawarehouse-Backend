@@ -112,7 +112,7 @@ namespace Datawarehouse_Backend.Controllers
             .Include(c => c.invoice)
             .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
-            
+
             return vouchers;
         }
 
@@ -189,7 +189,7 @@ namespace Datawarehouse_Backend.Controllers
             return accList;
         }
 
-
+        [Authorize]
         [HttpGet("accrec")]
         public List<DateStatusView> getAccountReceivables(string filter)
         {
@@ -200,20 +200,25 @@ namespace Datawarehouse_Backend.Controllers
             .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
             .Where(d => d.Type == "outbound" || d.Type == "payment")
             .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.Type)
             .ToList();
             //We now have a list of all vouchers that has date
-            //after the filter given, ordered by paymentId, then by date
+            //after the filter given, ordered by paymentId, then by type
             // This enables us to compare voucher n to n+1
             // if n has a voucher that is paid, it will be n+1
             // and it makes sure that voucher n is the first voucher that is made on that id
             // making n the outgoing voucher, and n+1 the payment voucher
             // but only if n and n+1 has same paymentId
-            Console.WriteLine("Voucher size: " + vouchers.Count);
+
             // Now we find all the vouchers that has been paid too late.
             List<AccRecView> accList = new List<AccRecView>();
+
             for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
             {
+                if (vouchers[i].invoice == null)
+                {
+                    i++;
+                }
                 Console.WriteLine("i value: " + i);
                 if (i < vouchers.Count - 1)
                 {
@@ -264,17 +269,24 @@ namespace Datawarehouse_Backend.Controllers
                     accList.Add(view);
                 }
             }
-
             accList.Sort((x, y) => x.dueDate.CompareTo(y.dueDate));
-            //We now have a sorted list of vouchers that was paid too late.
+            /* We now have a sorted list of vouchers that was paid too late, or not paid at all.
+            We start at the day of the filter requested, and move with a custom timeintervall that is now set to 7days,
+            all the way til we reach todays date then once more for today.
+            For every step we take towards todays date, we iterate over the list of vouchers that was paid too late, or not paid at all.
+            For every voucher in the list,  */
 
             List<DateStatusView> graphList = new List<DateStatusView>();
-            DateTime tempDate = comparisonDate;  //Setting the temporary date to the first day of the filter requested.
+            //Setting the temporary date to the first day of the filter requested.
+            DateTime tempDate = comparisonDate;
+            //Amount of days between each update for the accountsreceivables.
             int timeIntervall = 7;
             while (tempDate <= dateTimeNow)
             {
                 DateStatusView aView = new DateStatusView();
-                aView.date = tempDate;
+                aView.year = tempDate.Year;
+                aView.month = tempDate.Month;
+                aView.day = tempDate.Day;
                 aView.thirtyAmount = 0;
                 aView.sixtyAmount = 0;
                 aView.ninetyAmount = 0;
@@ -292,11 +304,11 @@ namespace Datawarehouse_Backend.Controllers
                         {
                             aView.thirtyAmount += accList[i].amount;
                         }
-                        else if ( accList[i].daysDue >= 30  && accList[i].daysDue < 60)
+                        else if (accList[i].daysDue >= 30 && accList[i].daysDue < 60)
                         {
                             aView.sixtyAmount += accList[i].amount;
                         }
-                        else if ( accList[i].daysDue >= 60 && accList[i].daysDue < 90)
+                        else if (accList[i].daysDue >= 60 && accList[i].daysDue < 90)
                         {
                             aView.ninetyAmount += accList[i].amount;
                         }
@@ -306,16 +318,20 @@ namespace Datawarehouse_Backend.Controllers
                         }
                     }
                 }
-                if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear) //If one week doesnt surpass today, add one week
+                //If one week doesnt surpass today, add one week
+                if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear)
                 {
                     tempDate = tempDate.AddDays(timeIntervall);
                 }
-                else if(tempDate != dateTimeNow)                                    // else set the date as todays date.
+                // if one week surpasses todays date, set it as today
+                else if (tempDate != dateTimeNow)
                 {
                     tempDate = dateTimeNow;
 
                 }
-                else{
+                // We have now added all dates wanted, including todays date, push it over to break the whileloop.
+                else
+                {
                     tempDate = dateTimeNow.AddDays(1);
                 }
                 graphList.Add(aView);
