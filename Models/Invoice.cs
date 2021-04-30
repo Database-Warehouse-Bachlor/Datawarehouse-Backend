@@ -8,24 +8,19 @@ namespace Datawarehouse_Backend.Models
 
     public class Invoice
     {
-        [Key]
-        public long id { get; set; }
+        [Key, ForeignKey("voucher")]
+        public long voucherFK { get; set; }
         public long invoiceId { get; set; }
+        public DateTime dueDate { get; set; }
         public long clientId { get; set; }
-        public DateTime invoiceDate { get; set; }
         public decimal amountTotal { get; set; }
         public string specification { get; set; }
         public string invoicePdf { get; set; }
         public long orderId { get; set; }
         public long voucherId { get; set; }
 
-        [ForeignKey("voucher")]
-        public long voucherFK { get; set; }
-        
-        public virtual Voucher voucher { get; set; }        
-
+        public Voucher voucher { get; set; }
         public ICollection<InvoiceLine> invoiceLines { get; set; } = new List<InvoiceLine>();
-
     }
 
 }

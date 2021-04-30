@@ -3,15 +3,17 @@ using System;
 using Datawarehouse_Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Datawarehouse_Backend.Migrations
+namespace Datawarehouse_Backend.Migrations.LoginDatabase
 {
-    [DbContext(typeof(WarehouseContext))]
-    partial class WarehouseContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(LoginDatabaseContext))]
+    [Migration("20210429105441_onetoone")]
+    partial class onetoone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,7 +62,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("employeeFK");
 
-                    b.ToTable("AbsenceRegisters");
+                    b.ToTable("AbsenceRegister");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Account", b =>
@@ -95,7 +97,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("financialFK");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Account");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.BalanceAndBudget", b =>
@@ -136,7 +138,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("BalanceAndBudgets");
+                    b.ToTable("BalanceAndBudget");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Client", b =>
@@ -174,7 +176,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Client");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Employee", b =>
@@ -236,30 +238,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("Datawarehouse_Backend.Models.ErrorLog", b =>
-                {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("errorMessage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("errorType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("timeOfError")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ErrorLogs");
+                    b.ToTable("Employee");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.FinancialYear", b =>
@@ -288,7 +267,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("FinancialYears");
+                    b.ToTable("FinancialYear");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Invoice", b =>
@@ -319,7 +298,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("voucherFK");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoice");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.InvoiceLine", b =>
@@ -360,7 +339,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("invoiceFK");
 
-                    b.ToTable("InvoiceLines");
+                    b.ToTable("InvoiceLine");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Order", b =>
@@ -442,7 +421,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Post", b =>
@@ -482,7 +461,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("voucherFK");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Tennant", b =>
@@ -505,7 +484,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Tennants");
+                    b.ToTable("Tennant");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.TimeRegister", b =>
@@ -594,7 +573,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("employeeFK");
 
-                    b.ToTable("TimeRegisters");
+                    b.ToTable("TimeRegister");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.User", b =>
@@ -624,7 +603,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("tennantFK");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.Voucher", b =>
@@ -659,7 +638,7 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.HasIndex("clientFK");
 
-                    b.ToTable("Vouchers");
+                    b.ToTable("Voucher");
                 });
 
             modelBuilder.Entity("Datawarehouse_Backend.Models.AbsenceRegister", b =>

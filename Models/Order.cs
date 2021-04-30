@@ -18,7 +18,7 @@ namespace Datawarehouse_Backend.Models
         public DateTime lastChanged { get; set; }
         public DateTime warrantyDate { get; set; }
         public string caseHandler { get; set; }
-        public string customerName { get; set; }
+        public string clientName { get; set; }
         public long jobId { get; set; }
         public string jobName { get; set; }
         public long jobSiteId { get; set; }
