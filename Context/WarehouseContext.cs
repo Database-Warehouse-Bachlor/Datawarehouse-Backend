@@ -24,11 +24,11 @@ namespace Datawarehouse_Backend.Context
         public DbSet<Tennant> Tennants { get; set; }
         public DbSet<TimeRegister> TimeRegisters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
-        public DbSet<InvoiceLine> InvoiceLines {get; set;}       
-        public DbSet<Voucher> Vouchers {get; set;}       
-        public DbSet<Post> Posts {get; set;}       
-        public DbSet<Account> Accounts {get; set;}       
-        public DbSet<FinancialYear> FinancialYears {get; set;}       
+        public DbSet<InvoiceLine> InvoiceLines { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<FinancialYear> FinancialYears { get; set; }
         //public DbSet<AccountsReceivable> AccountsReceivables { get; set; }
 
         public Tennant findTennantById(long tennantId)
@@ -61,7 +61,8 @@ namespace Datawarehouse_Backend.Context
         public int getNumberOfErrorsLastTwentyFour()
         {
             DateTime currentTime = DateTime.Now;
-            var errors =  ErrorLogs.Where(d => d.timeOfError >= currentTime.AddHours(-24))
+            var errors = ErrorLogs
+            .Where(d => d.timeOfError >= currentTime.AddHours(-24))
             .Count();
             return errors;
         }
@@ -76,6 +77,46 @@ namespace Datawarehouse_Backend.Context
         public List<Tennant> getAllTennants()
         {
             return Tennants.ToList();
+        }
+
+        public List<AbsenceRegister> getAllAbsenceFromDate(long tennantId, DateTime comparisonDate)
+        {
+            var absence = AbsenceRegisters
+            .Where(i => i.employee.tennantFK == tennantId)
+            .Where(d => d.fromDate >= comparisonDate)
+            .OrderBy(d => d.fromDate)
+            .ToList();
+            return absence;
+        }
+
+        public List<Invoice> getAllInboundInvoice(long tennantId, DateTime comparisonDate)
+        {
+            var inboundInvoice = Invoices
+            .Where(i => i.voucher.client.tennantFK == tennantId)
+            .Where(d => d.invoiceDate >= comparisonDate)
+            .OrderByDescending(d => d.invoiceDate)
+            .ToList();
+            return inboundInvoice;
+        }
+
+        public List<TimeRegister> getAllTimeRegistersInDescendingOrder(long tennantId, DateTime comparisonDate)
+        {
+            var timeRegisters = TimeRegisters
+            .Where(t => t.employee.tennantFK == tennantId)
+            .Where(d => d.recordDate >= comparisonDate)
+            .OrderByDescending(d => d.recordDate)
+            .ToList();    
+            return timeRegisters;
+        }
+
+        public List<Voucher> getVouchersInDescendingByPaymentThenByDate(long tennantId, DateTime comparisonDate)
+        {
+            var vouchers = Vouchers
+            .Where(v => v.client.tennantFK == tennantId)
+            .Where(d => d.date >= comparisonDate)
+            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.date)
+            .ToList();
+            return vouchers;
         }
     }
 }
