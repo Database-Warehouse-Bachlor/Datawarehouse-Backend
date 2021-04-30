@@ -19,7 +19,7 @@ namespace Datawarehouse_Backend.Models
 
         [ForeignKey("FinancialYear")]
         public long financialFK {get; set;}
-        public FinancialYear FinancialYear {get; set;}
+        public FinancialYear financialYear {get; set;}
 
         public ICollection<Post> posts { get; set; } = new List<Post>();
     }
