@@ -114,7 +114,8 @@ namespace Datawarehouse_Backend.Context
             var vouchers = Vouchers
             .Where(v => v.client.tennantFK == tennantId)
             .Where(d => d.date >= comparisonDate)
-            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.date)
+            .Include(c => c.invoice)
+            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
             .ToList();
             return vouchers;
         }
