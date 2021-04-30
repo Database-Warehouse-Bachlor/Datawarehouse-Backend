@@ -100,95 +100,6 @@ namespace Datawarehouse_Backend.Controllers
             return invoice;
         }
 
-        [HttpGet("testing1")]
-        public List<Voucher> getInvoiceTest(string filter)
-        {
-            DateTime dateTimeNow = DateTime.Now;
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
-            .Where(d => d.Type == "outbound" || d.Type == "payment")
-            .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
-            .ToList();
-
-            return vouchers;
-        }
-
-        [HttpGet("testing")]
-        public List<AccRecView> getVoucherTest(string filter)
-        {
-            DateTime dateTimeNow = DateTime.Now;
-            long tennantId = getTennantId();
-            DateTime comparisonDate = compareDates(filter);
-            var vouchers = _warehouseDb.Vouchers
-            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
-            .Where(d => d.Type == "outbound" || d.Type == "payment")
-            .Include(c => c.invoice)
-            .OrderByDescending(p => p.paymentId).ThenBy(d => d.date)
-            .ToList();
-
-            Console.WriteLine("Voucher size: " + vouchers.Count);
-            // Now we find all the vouchers that has been paid too late.
-            List<AccRecView> accList = new List<AccRecView>();
-            for (int i = 0; i < vouchers.Count; i++) //Since we're only gathering pairs, the last one will either allready be paired or has no pair.
-            {
-                Console.WriteLine("i value: " + i);
-                if (i < vouchers.Count - 1)
-                {
-                    Console.WriteLine("voucher PID: " + vouchers[i].paymentId + "\n Next pid:" + vouchers[i + 1].paymentId);
-                    //if outbound and payment has same paymentId and is paid too late
-                    if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
-                    {
-                        AccRecView view = new AccRecView();
-                        Console.WriteLine("PID getting added: " + vouchers[i].paymentId);
-                        view.PID = vouchers[i].paymentId;
-                        view.dueDate = vouchers[i].invoice.dueDate;
-                        view.payDate = vouchers[i + 1].date;
-                        view.amount = vouchers[i].invoice.amountTotal;
-                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
-                        accList.Add(view);
-                        i++; //Skip i+1, since we compiled i and i+1
-                    }
-                    //If an outbound voucher has not been paid. 
-                    //Setting payDate to the date of request so that I can categorize how long overdue the payment is. 
-                    else if (vouchers[i].paymentId != vouchers[i + 1].paymentId)
-                    {
-                        Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
-                        AccRecView view = new AccRecView();
-                        view.PID = vouchers[i].paymentId;
-                        view.dueDate = vouchers[i].invoice.dueDate;
-                        view.payDate = dateTimeNow;
-                        view.amount = vouchers[i].invoice.amountTotal;
-                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
-                        accList.Add(view);
-                    }
-                    //If the outbound voucher is paid, and paid within the duedate
-                    //Skip the next voucher.
-                    else
-                    {
-                        i++;
-                    }
-                }
-                //Last payment n was not connected to n-1, therefore it's an unpaid outbound invoice.
-                else
-                {
-                    Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
-                    AccRecView view = new AccRecView();
-                    view.PID = vouchers[i].paymentId;
-                    view.dueDate = vouchers[i].invoice.dueDate;
-                    view.payDate = dateTimeNow;
-                    view.amount = vouchers[i].invoice.amountTotal;
-                    view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
-                    accList.Add(view);
-                }
-                //If it's not one of the 4 conditions above, the outbound invoice was paid in time.
-                //Else do nothing and move to next.
-            }
-            return accList;
-        }
-
         [Authorize]
         [HttpGet("accrec")]
         public List<DateStatusView> getAccountReceivables(string filter)
@@ -270,11 +181,12 @@ namespace Datawarehouse_Backend.Controllers
                 }
             }
             accList.Sort((x, y) => x.dueDate.CompareTo(y.dueDate));
+
             /* We now have a sorted list of vouchers that was paid too late, or not paid at all.
             We start at the day of the filter requested, and move with a custom timeintervall that is now set to 7days,
             all the way til we reach todays date then once more for today.
             For every step we take towards todays date, we iterate over the list of vouchers that was paid too late, or not paid at all.
-            For every voucher in the list,  */
+            For every voucher in that list we check which duedate category it belongs to, and then add the amountdue the voucher has to the correct category*/
 
             List<DateStatusView> graphList = new List<DateStatusView>();
             //Setting the temporary date to the first day of the filter requested.
@@ -319,7 +231,7 @@ namespace Datawarehouse_Backend.Controllers
                     }
                 }
                 //If one week doesnt surpass today, add one week
-                if (tempDate.DayOfYear + timeIntervall < dateTimeNow.DayOfYear)
+                if (tempDate.AddDays(timeIntervall) < dateTimeNow)
                 {
                     tempDate = tempDate.AddDays(timeIntervall);
                 }
@@ -337,9 +249,7 @@ namespace Datawarehouse_Backend.Controllers
                 graphList.Add(aView);
             }
             return graphList;
-
         }
-
 
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
@@ -348,7 +258,7 @@ namespace Datawarehouse_Backend.Controllers
         * So instead of getting a list of all absences, it gives a list of total absences per month/date.
         */
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("absence")]
         public IList<AbsenceView> getAbsenceRegister(string filter)
         {
