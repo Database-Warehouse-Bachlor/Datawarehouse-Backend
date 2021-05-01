@@ -398,7 +398,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             var orders = _warehouseDb.Orders
-            .Where(c => c.client.tennantFK == tennantId)
+            .Where(c => c.client.tennantFK == tennantId && c.endDate >= DateTime.Now)
             .OrderByDescending(o => o.endDate)
             .ToList();
             List<OrderView> orderList = new List<OrderView>();
@@ -515,7 +515,7 @@ namespace Datawarehouse_Backend.Controllers
         }
 
         /*
-        *
+        * A method to get statistics over number of employees and the male to female ratio
         * Returns:
         * Number of female / male Employees
         */

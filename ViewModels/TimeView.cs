@@ -8,6 +8,6 @@ namespace Datawarehouse_Backend.ViewModels
         public int month { get; set; }
         public int day { get; set; }
         public string weekDay { get; set; }
-        public int totalQty { get; set; }
+        public int totalAmount { get; set; }
     }
 }
