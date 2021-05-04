@@ -398,7 +398,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             long tennantId = getTennantId();
             var orders = _warehouseDb.Orders
-            .Where(c => c.client.tennantFK == tennantId)
+            .Where(c => c.client.tennantFK == tennantId && c.endDate >= DateTime.Now)
             .OrderByDescending(o => o.endDate)
             .ToList();
             List<OrderView> orderList = new List<OrderView>();
