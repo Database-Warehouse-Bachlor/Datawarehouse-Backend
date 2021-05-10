@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore;
 
 /*
 *   This controller is for authenticating users and registering new users. 
-*/ 
+*/
 namespace Datawarehouse_Backend.Controllers
 {
     [Route("auth/")]
@@ -42,7 +42,7 @@ namespace Datawarehouse_Backend.Controllers
         /*
         * A function to find the correct Tennant based on it's ID.
         */
-         private long getTennantId()
+        private long getTennantId()
         {
             // HttpContext holds information about the current request. 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -129,9 +129,9 @@ namespace Datawarehouse_Backend.Controllers
         * After this connection is set up, the business can use the other registration-call to add additional users to it's business.
         */
 
-       // TODO: [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("initregister")]
-        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd,[FromForm] long tennantId )
+        public IActionResult initRegister([FromForm] string email, [FromForm] string pwd, [FromForm] long tennantId)
         {
             IActionResult response;
 
@@ -156,7 +156,7 @@ namespace Datawarehouse_Backend.Controllers
             }
             else
             {
-                response = BadRequest("User already exist");
+                response = BadRequest("A User with this email already exist, or no such tennant exist");
             }
             return response;
         }
@@ -181,7 +181,7 @@ namespace Datawarehouse_Backend.Controllers
             Tennant tennant = _warehousedb.findTennantById(getTennantId());
             return tennant.tennantName;
         }
-        
+
     }
 
 }

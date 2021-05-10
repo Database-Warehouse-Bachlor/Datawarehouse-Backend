@@ -71,9 +71,6 @@ namespace Datawarehouse_Backend.Controllers
                     comparisonDate = dateTimeNow.Date.AddYears(-30);
                     break;
             }
-            Console.WriteLine("Filter selected: " + time);
-            Console.WriteLine("current date: " + dateTimeNow);
-            Console.WriteLine("Filtering by: " + comparisonDate);
             return comparisonDate;
         }
 
