@@ -140,8 +140,7 @@ namespace Datawarehouse_Backend.Controllers
                     else if (vouchers[i].paymentId != vouchers[i + 1].paymentId && vouchers[i].type == "payment")
                     {
                         //Go to next
-                        Console.WriteLine("PID: " + vouchers[i].paymentId + "is a payment without outbound");
-
+                        Console.WriteLine("PID: " + vouchers[i].paymentId + "is a payment without outbound, or outbound before filter");
                     }
                     //If the outbound voucher is paid, and paid within the duedate, skip this and next voucher.
                     else
