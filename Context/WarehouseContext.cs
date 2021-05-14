@@ -119,5 +119,15 @@ namespace Datawarehouse_Backend.Context
             .ToList();
             return vouchers;
         }
+        public List<Voucher> getInboundVouchersInDescendingByPaymentThenByType(long tennantId, DateTime comparisonDate)
+        {
+            var vouchers = Vouchers
+            .Where(v => v.client.tennantFK == tennantId && v.date >= comparisonDate)
+            .Where(d => d.type == "inbound" || d.type == "disbursement")
+            .Include(c => c.invoice)
+            .OrderByDescending(p => p.paymentId).ThenByDescending(d => d.type)
+            .ToList();
+            return vouchers;
+        }
     }
 }

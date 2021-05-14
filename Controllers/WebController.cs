@@ -229,6 +229,152 @@ namespace Datawarehouse_Backend.Controllers
             return graphList;
         }
 
+        [Authorize(Roles = "User")]
+        [HttpGet("inbound")]
+        public List<DateInboundView> getInbounds(string filter)
+        {
+            DateTime dateTimeNow = DateTime.Now;
+            long tennantId = getTennantId();
+            DateTime comparisonDate = compareDates(filter);
+            var vouchers = _warehouseDb.getInboundVouchersInDescendingByPaymentThenByType(tennantId, comparisonDate);
+            //We now have a list of all vouchers that has date
+            //after the filter given, ordered by paymentId, then by descending type
+            // This enables us to compare voucher n to n+1
+            // if n has a voucher that is paid, it will be n+1
+            // and it makes sure that voucher n is the first voucher that is made on that id
+            // making n the outgoing voucher, and n+1 the payment voucher
+            // but only if n and n+1 has same paymentId
+
+            // Now we find all the vouchers that has been paid too late.
+            List<AccRecView> accList = new List<AccRecView>();
+            for (int i = 0; i < vouchers.Count; i++)
+            {
+                //Even though there shouldnt be any vouchers without invoices getting through the datasubmission
+                //We double check to avoid any errors, and still provide a visual feed in the frontend.
+                if (vouchers[i].invoice == null)
+                {
+                    i++;
+                }
+                if (i < vouchers.Count - 1)
+                {
+                    //if outbound and payment has same paymentId and is paid too late
+                    if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
+                    {
+                        AccRecView view = new AccRecView();
+                        Console.WriteLine("PID getting added: " + vouchers[i].paymentId);
+                        view.PID = vouchers[i].paymentId;
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = vouchers[i + 1].date;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                        accList.Add(view);
+                        i++; //Skip i+1, since we compiled i and i+1
+                    }
+                    //If an outbound voucher has not been paid. 
+                    //Setting payDate to the date of request so that I can categorize how long overdue the payment is. 
+                    else if (vouchers[i].paymentId != vouchers[i + 1].paymentId && vouchers[i].type == "inbound")
+                    {
+                        Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                        AccRecView view = new AccRecView();
+                        view.PID = vouchers[i].paymentId;
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = dateTimeNow;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                        accList.Add(view);
+                    }
+                    //if a payment without an outbound ended up in the list. Which is either a mistake or because of filter.
+                    else if (vouchers[i].paymentId != vouchers[i + 1].paymentId && vouchers[i].type == "disbursement")
+                    {
+                        //Go to next
+                        Console.WriteLine("PID: " + vouchers[i].paymentId + "is a payment without inbound, or inbound before filter");
+                    }
+                    //If the inbound voucher is paid, and paid within the duedate
+                    else
+                    {
+                        AccRecView view = new AccRecView();
+                        Console.WriteLine("PID getting added: " + vouchers[i].paymentId);
+                        view.PID = vouchers[i].paymentId;
+                        view.dueDate = vouchers[i].invoice.dueDate;
+                        view.payDate = vouchers[i + 1].date;
+                        view.amount = vouchers[i].invoice.amountTotal;
+                        view.daysDue = 0;
+                        accList.Add(view);
+                        i++; //Skip i+1, since we compiled i and i+1
+                    }
+                }
+                //Last payment n was not connected to n-1, therefore it's an unpaid inbound invoice.
+                else
+                {
+                    Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
+                    AccRecView view = new AccRecView();
+                    view.PID = vouchers[i].paymentId;
+                    view.dueDate = vouchers[i].invoice.dueDate;
+                    view.payDate = dateTimeNow;
+                    view.amount = vouchers[i].invoice.amountTotal;
+                    view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
+                    accList.Add(view);
+                }
+            }
+
+            List<DateInboundView> graphList = new List<DateInboundView>();
+            DateTime tempDate = comparisonDate;
+            int timeIntervall = 7;
+            while (tempDate <= dateTimeNow)
+            {
+                DateInboundView aView = new DateInboundView();
+                aView.year = tempDate.Year;
+                aView.month = tempDate.Month;
+                aView.day = tempDate.Day;
+                aView.zeroAmount = 0;
+                aView.thirtyAmount = 0;
+                aView.sixtyAmount = 0;
+                aView.ninetyAmount = 0;
+                aView.ninetyPlusAmount = 0;
+
+                for (int i = 0; i < accList.Count; i++)
+                {
+                    if (accList[i].dueDate <= tempDate && tempDate <= accList[i].payDate)
+                    {
+                        if (accList[i].daysDue == 0 )
+                        {
+                            aView.zeroAmount += accList[i].amount;
+                        }
+                        if (accList[i].daysDue > 0 && accList[i].daysDue < 30)
+                        {
+                            aView.thirtyAmount += accList[i].amount;
+                        }
+                        else if (accList[i].daysDue >= 30 && accList[i].daysDue < 60)
+                        {
+                            aView.sixtyAmount += accList[i].amount;
+                        }
+                        else if (accList[i].daysDue >= 60 && accList[i].daysDue < 90)
+                        {
+                            aView.ninetyAmount += accList[i].amount;
+                        }
+                        else
+                        {
+                            aView.ninetyPlusAmount += accList[i].amount;
+                        }
+                    }
+                }
+                if (tempDate.AddDays(timeIntervall) < dateTimeNow)
+                {
+                    tempDate = tempDate.AddDays(timeIntervall);
+                }
+                else if (tempDate != dateTimeNow)
+                {
+                    tempDate = dateTimeNow;
+                }
+                else
+                {
+                    tempDate = dateTimeNow.AddDays(1);
+                }
+                graphList.Add(aView);
+            }
+            return graphList;
+        }
+
         /*
         *  Takes information from all the absenceRegisters requested, and puts them into a new list of absence viewmodels which
         *  only tracks year, month and total absence for that month OR Date and total absence for that date.
