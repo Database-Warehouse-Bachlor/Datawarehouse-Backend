@@ -67,7 +67,6 @@ namespace Datawarehouse_Backend.Controllers
                     comparisonDate = dateTimeNow.Date.AddMonths(-tempMonth + 1).AddDays(-tempDay + 1);
                     break;
                 default:
-                    Console.WriteLine("No filter added, listing all..");
                     comparisonDate = dateTimeNow.Date.AddYears(-30);
                     break;
             }
@@ -114,7 +113,6 @@ namespace Datawarehouse_Backend.Controllers
                     if (vouchers[i].paymentId == vouchers[i + 1].paymentId && vouchers[i].invoice.dueDate < vouchers[i + 1].date)
                     {
                         AccRecView view = new AccRecView();
-                        Console.WriteLine("PID getting added: " + vouchers[i].paymentId);
                         view.PID = vouchers[i].paymentId;
                         view.dueDate = vouchers[i].invoice.dueDate;
                         view.payDate = vouchers[i + 1].date;
@@ -127,7 +125,6 @@ namespace Datawarehouse_Backend.Controllers
                     //Setting payDate to the date of request so that I can categorize how long overdue the payment is. 
                     else if (vouchers[i].paymentId != vouchers[i + 1].paymentId && vouchers[i].type == "outbound")
                     {
-                        Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
                         AccRecView view = new AccRecView();
                         view.PID = vouchers[i].paymentId;
                         view.dueDate = vouchers[i].invoice.dueDate;
@@ -136,11 +133,10 @@ namespace Datawarehouse_Backend.Controllers
                         view.daysDue = view.payDate.DayOfYear - view.dueDate.DayOfYear;
                         accList.Add(view);
                     }
-                    //if a payment without an outbound ended up in the list. Which is either a mistake or because of filter.
+                    //if a payment without an outbound ended up in the list. Which is either a missing outbound or because the outbound was before the filter.
                     else if (vouchers[i].paymentId != vouchers[i + 1].paymentId && vouchers[i].type == "payment")
                     {
                         //Go to next
-                        Console.WriteLine("PID: " + vouchers[i].paymentId + "is a payment without outbound, or outbound before filter");
                     }
                     //If the outbound voucher is paid, and paid within the duedate, skip this and next voucher.
                     else
@@ -151,7 +147,6 @@ namespace Datawarehouse_Backend.Controllers
                 //Last payment n was not connected to n-1, therefore it's an unpaid outbound invoice.
                 else
                 {
-                    Console.WriteLine("PID: " + vouchers[i].paymentId + "has not been paid");
                     AccRecView view = new AccRecView();
                     view.PID = vouchers[i].paymentId;
                     view.dueDate = vouchers[i].invoice.dueDate;
@@ -238,7 +233,7 @@ namespace Datawarehouse_Backend.Controllers
         * A list of absences for each date an absence was recorded, or a summarized duration of absences for a given month.
         */
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("absence")]
         public IList<AbsenceView> getAbsenceRegister(string filter)
         {
@@ -286,23 +281,19 @@ namespace Datawarehouse_Backend.Controllers
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = totalAbsence;
-                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
-                            totalAbsence = 0;
                         }
                         //last absence is in a new day
                         else
                         {
-                            totalAbsence += absence[i].duration; //remove
+                            totalAbsence += absence[i].duration; 
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.day = absence[i].fromDate.Day;
                             view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
                             view.totalDuration = absence[i].duration;
-                            Console.WriteLine("Adding new absence: \nWeekDay: " + view.weekDay + "\nMonth: " + view.month + "\nYear: " + view.year + "\nTotal Duration: " + view.totalDuration);
                             absenceViews.Add(view);
-                            totalAbsence = 0; //remove
                         }
                     }
                 }
@@ -346,18 +337,16 @@ namespace Datawarehouse_Backend.Controllers
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = totalAbsence;
                             absenceViews.Add(view);
-                            totalAbsence = 0;
                         }
                         //last absence is in a new month
                         else
                         {
-                            totalAbsence += absence[i].duration; //remove
+                            totalAbsence += absence[i].duration; 
                             AbsenceView view = new AbsenceView();
                             view.year = absence[i].fromDate.Year;
                             view.month = absence[i].fromDate.Month;
                             view.totalDuration = absence[i].duration;
                             absenceViews.Add(view);
-                            totalAbsence = 0; //remove
                         }
                     }
                 }
@@ -374,7 +363,7 @@ namespace Datawarehouse_Backend.Controllers
         * Returns:
         * A list of all time registers, the list is not adapted for frontend-view.
         */
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("timeregister")]
         public List<TimeRegister> getTimeRegisters(string filter)
         {
@@ -394,7 +383,7 @@ namespace Datawarehouse_Backend.Controllers
         * All orders are converted to orderView that only show customer name, jobname and end date.
         */
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("pendingOrders")]
         public List<OrderView> getPendingOrders()
         {
@@ -422,7 +411,7 @@ namespace Datawarehouse_Backend.Controllers
         * and the name of the job that the order was given and the date the order ended.
         */
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("allOrders")]
         public List<OrderView> getAllOrders()
         {
@@ -450,7 +439,7 @@ namespace Datawarehouse_Backend.Controllers
         * A list of client addresses, zipcode, city and type of client
         */
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("clients")]
         public List<ClientView> getClients()
         {
@@ -480,8 +469,12 @@ namespace Datawarehouse_Backend.Controllers
             return customerList;
         }
 
-        //Gets statistic over how many customer the tennant has in each city
-        [Authorize]
+        /*
+        * A method to find all clients for each city, for the given tennant
+        * Returns:
+        * A list of cities with amount of customers for that city
+        */
+        [Authorize(Roles = "User")]
         [HttpGet("customerzones")]
         public List<ZoneView> getClientZones()
         {
@@ -539,7 +532,7 @@ namespace Datawarehouse_Backend.Controllers
         * Returns:
         * A statistic of how many customer and suppliers the tennant has
         */
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("clientnumbers")]
         public ClientStatisticsView getNumberOfClients()
         {
@@ -574,7 +567,7 @@ namespace Datawarehouse_Backend.Controllers
         * Returns:
         * Number of female / male Employees
         */
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("employeenumber")]
         public EmployeeStatView getNumberOfEmployees()
         {
@@ -612,7 +605,7 @@ namespace Datawarehouse_Backend.Controllers
         * The statbalance, endbalance and periodBalance. 
         */
 
-        [Authorize]
+        [Authorize(Roles = "User")]
         [HttpGet("balance")]
         public List<BnbView> getBalanceAndBudget(string filter)
         {
@@ -640,14 +633,6 @@ namespace Datawarehouse_Backend.Controllers
         * their accounts is bound to.  The first function returns the object tennant based on the ID
         * The other function simply returns the tennantId that has been found.
         */
-        private Tennant getTennant()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            long tennantId = long.Parse(claim[0].Value);
-            Tennant tennant = _warehouseDb.findTennantById(tennantId);
-            return tennant;
-        }
         private long getTennantId()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
