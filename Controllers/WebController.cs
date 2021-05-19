@@ -457,7 +457,6 @@ namespace Datawarehouse_Backend.Controllers
             long tennantId = getTennantId();
             var clients = _warehouseDb.Clients
             .Where(c => c.tennantFK == tennantId)
-            .OrderBy(c => c.clientName)
             .ToList();
 
             List<ClientView> customerList = new List<ClientView>();
@@ -479,6 +478,54 @@ namespace Datawarehouse_Backend.Controllers
                 customerList.Add(cust);
             }
             return customerList;
+        }
+
+        [Authorize]
+        [HttpGet("customerzones")]
+        public List<ZoneView> getClientZones()
+        {
+            long tennantId = getTennantId();
+            var clients = _warehouseDb.Clients
+            .Where(c => c.tennantFK == tennantId && c.customer == true)
+            .OrderBy(c => c.city)
+            .ToList();
+
+            List<ZoneView> zoneList = new List<ZoneView>();
+            int totalClients = 0;
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (i != clients.Count() - 1)
+                {
+                    if (clients[i].city == clients[i + 1].city)
+                    {
+                        totalClients += 1;
+                    }
+                    else
+                    {
+                        ZoneView zone = new ZoneView();
+                        zone.city = clients[i].city;
+                        zone.totalAmount = totalClients;
+                        zoneList.Add(zone);
+                        totalClients = 0;
+                    }
+                }
+                else if (clients[i].city == clients[i - 1].city)
+                {
+                    totalClients += 1;
+                    ZoneView zone = new ZoneView();
+                    zone.city = clients[i].city;
+                    zone.totalAmount = totalClients;
+                    zoneList.Add(zone);
+                }
+                else
+                {
+                    ZoneView zone = new ZoneView();
+                    zone.city = clients[i].city;
+                    zone.totalAmount = 1;
+                    zoneList.Add(zone);
+                }
+            }
+            return zoneList;
         }
 
         /*
