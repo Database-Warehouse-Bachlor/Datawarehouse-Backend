@@ -10,8 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 
 /*
 *   Generates a JWT token with different claims. Claims gives information about the current user.
-*   TODO: This is currently adapted from, but we're not sure about the real origin of this.
-*       - https://stackoverflow.com/questions/61296262/c-sharp-jwt-token-persist-claims-after-update
+*   This class is adapter from c-sharpcorner, and customized the claims for our use.
+*    - https://www.c-sharpcorner.com/article/jwt-json-web-token-authentication-in-asp-net-core/
 */
 namespace Datawarehouse_Backend.Authentication
 {
