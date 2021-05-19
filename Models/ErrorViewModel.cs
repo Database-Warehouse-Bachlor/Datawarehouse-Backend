@@ -1,5 +1,3 @@
-using System;
-
 namespace Datawarehouse_Backend.Models
 {
     public class ErrorViewModel
