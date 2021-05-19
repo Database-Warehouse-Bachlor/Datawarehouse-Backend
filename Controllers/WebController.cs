@@ -250,6 +250,16 @@ namespace Datawarehouse_Backend.Controllers
                 {
                     for (int i = 0; i < absence.Count; i++)
                     {
+                        if(absence.Count < 2) {
+                            totalAbsence += absence[i].duration;
+                                AbsenceView view = new AbsenceView();
+                                view.year = absence[i].fromDate.Year;
+                                view.month = absence[i].fromDate.Month;
+                                view.day = absence[i].fromDate.Day;
+                                view.weekDay = absence[i].fromDate.DayOfWeek.ToString();
+                                view.totalDuration = absence[i].duration;
+                                absenceViews.Add(view);
+                        }
                         if (i != absence.Count - 1)
                         {
                             //since the list is ordered allready, we can compare current month with next, if it is, add the duration to months total
