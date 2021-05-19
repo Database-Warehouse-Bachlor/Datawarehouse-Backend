@@ -7,6 +7,7 @@ namespace Datawarehouse_Backend.ViewModels
         public int year { get; set; }
         public int month { get; set; }
         public int day { get; set; }
+        public decimal zeroAmount { get; set; }
         public decimal thirtyAmount { get; set; }
         public decimal sixtyAmount { get; set; }
         public decimal ninetyAmount { get; set; }
