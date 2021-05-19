@@ -1,20 +1,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
 using Datawarehouse_Backend.Context;
-using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
 
 
 /*

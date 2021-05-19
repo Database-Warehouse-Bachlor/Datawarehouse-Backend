@@ -1,4 +1,3 @@
-using System;
 
 namespace Datawarehouse_Backend.ViewModels
 {
