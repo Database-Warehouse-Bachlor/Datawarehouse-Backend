@@ -505,16 +505,10 @@ namespace Datawarehouse_Backend.Controllers
                     // adds the city and number to list, 1 if its alone
                     else
                     {
+                        totalClients += 1;
                         ZoneView zone = new ZoneView();
                         zone.city = clients[i].city;
-                        if (totalClients != 0)
-                        {
-                            zone.totalAmount = totalClients;
-                        }
-                        else
-                        {
-                            zone.totalAmount = 1;
-                        }
+                        zone.totalAmount = totalClients;
                         zoneList.Add(zone);
                         totalClients = 0;
                     }
@@ -525,14 +519,7 @@ namespace Datawarehouse_Backend.Controllers
                     totalClients += 1;
                     ZoneView zone = new ZoneView();
                     zone.city = clients[i].city;
-                    if (totalClients != 0)
-                    {
-                        zone.totalAmount = totalClients;
-                    }
-                    else
-                    {
-                        zone.totalAmount = 1;
-                    }
+                    zone.totalAmount = totalClients;
                     zoneList.Add(zone);
                 }
                 //Last is a new city
