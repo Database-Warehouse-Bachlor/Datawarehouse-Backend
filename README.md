@@ -1,16 +1,33 @@
 # Datawarehouse-Backend
 
-Model instruksjoner:
-Hver model har en egen ID som vi genererer og forholder oss til ved senere kall, som instruktert av oppdragsgiver at vi må benytte oss av egne IDer.
-I tillegg til disse IDene har hver model en ekstra ID som heter <model>ID, hvor oppdragsgiver kan sende inn sin egen ID for å spesifisere hvilken model den snakker om.
+## Project Name & Pitch
 
-Eksempel:
-Order har en egen ID som genereres ved opprettelse av objektet.
-Når oppdragsgiver sender inn en Order-model kan de sende med sin egen ID som blir lagret som OrderId.  Denne IDen vil kun bli lagret i modellen, men ikke knyttet opp til en annen model. 
+Backend for Cordel Norge
 
-Hvis cordel sender inn en ny InvoiceOutbound og sier at den skal knyttes opp mot en Order de har sendt inn tidligere eller samtidig: Så sender de med sin egene ID, altså OrderID, som vi kan benytte oss av for å finne riktig Order.  Når vi finner Orderen de tenker på, henter vi ut IDen vår for så å knytte disse to Modellene opp mot hverandre mtp. relasjonsdatabasen.
+An application used for handling and storing data from Cordel Norge's tennants. Built with .Net and C#
 
-Oppretting av tennant:
-Det er to registreringskall som eksisterer i APIen.  
-1. InitRegister  - Denne kan kunn bli kalt 
+## Project Status
+
+This project is a finished MVP. The project will be further developeloped by Cordel.
+
+## Installation and Setup Instructions
+
+To setup this application, open the Terminal and write the following code:
+
+This command builds the project and its dependencies
+
+    - dotnet build
+    
+Starts the application
+
+    - dotnet run
+    
+
+## Reflection
+
+This was a 4 month project, and is a part of a system made in collaboration with Cordel Norge, as a bachelorproject. The goad for this applicaiton is a system for handling the incoming data, store it, and make it accessible for other parts of the project.
+
+It has been challenging working with alot of new software, and therefore posing as a very good learning experience.
+
+
 
