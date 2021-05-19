@@ -26,8 +26,6 @@ namespace Datawarehouse_Backend.Controllers
 {
     [Route("submission/")]
     [ApiController]
-
-
     public class DataSubmissionController : ControllerBase
     {
 
@@ -295,12 +293,10 @@ namespace Datawarehouse_Backend.Controllers
                                 }
                             }
 
-                            //Adds Voucher to datawarehouse
+                            //Adds Invoice to datawarehouse
                             for (int i = 0; i < contentsList.Invoices.Count; i++)
-                            {
-                                //Creates a new Invoice object
+                            { 
                                 Invoice invoice = new Invoice();
-                                //Connects the new Invoice object to data from the request(Incoming data)
                                 invoice = contentsList.Invoices[i];
 
                                 //Checks if the Invoice exists in the datawarehouse
@@ -525,10 +521,7 @@ namespace Datawarehouse_Backend.Controllers
                     _db.SaveChanges();
 
                 }
-                /*
-                The programm picks up this error if the JsonConvert.DeserializeObject fails.
-                Fields that are null or not the expected datatype can cause this
-                */
+                return Ok();
             }
             catch (DbUpdateException e)
             {
@@ -543,6 +536,10 @@ namespace Datawarehouse_Backend.Controllers
                 logError(errorMessage, errorType);
 
             }
+            /*
+            The programm picks up this error if the JsonConvert.DeserializeObject fails.
+            Fields that are null or not the expected datatype can cause this
+            */
             catch (JsonSerializationException e)
             {
 
@@ -599,8 +596,7 @@ namespace Datawarehouse_Backend.Controllers
                 logError(errorMessage, errorType);
 
             }
-
-            return Ok();
+            return BadRequest("An error has occured"); 
         }
 
         /*
@@ -617,7 +613,6 @@ namespace Datawarehouse_Backend.Controllers
         {
             try
             {
-
                 //If no apiKey is send with the request
                 if (apiKey == null)
                 {
@@ -630,6 +625,7 @@ namespace Datawarehouse_Backend.Controllers
                     //Creates a new errorLog to the datawarehouse
                     logError(errorMessage, errorType);
 
+                    return BadRequest("No ApiKey registerd");
                 }
                 else
                 {
@@ -655,8 +651,6 @@ namespace Datawarehouse_Backend.Controllers
                 //Creates a new errorLog to the datawarehouse
                 logError(errorMessage, errorType);
             }
-
-
             return Ok();
         }
 
@@ -976,6 +970,8 @@ namespace Datawarehouse_Backend.Controllers
 
             _db.ErrorLogs.Add(errorLog);
             _db.SaveChanges();
+
+            
         }
     }
 }
