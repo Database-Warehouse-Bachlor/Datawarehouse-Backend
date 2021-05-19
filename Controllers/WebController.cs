@@ -480,6 +480,7 @@ namespace Datawarehouse_Backend.Controllers
             return customerList;
         }
 
+        //Gets statistic over how many customer the tennant has in each city
         [Authorize]
         [HttpGet("customerzones")]
         public List<ZoneView> getClientZones()
@@ -496,27 +497,45 @@ namespace Datawarehouse_Backend.Controllers
             {
                 if (i != clients.Count() - 1)
                 {
+                    // there are more clients in that city
                     if (clients[i].city == clients[i + 1].city)
                     {
                         totalClients += 1;
                     }
+                    // adds the city and number to list, 1 if its alone
                     else
                     {
                         ZoneView zone = new ZoneView();
                         zone.city = clients[i].city;
-                        zone.totalAmount = totalClients;
+                        if (totalClients != 0)
+                        {
+                            zone.totalAmount = totalClients;
+                        }
+                        else
+                        {
+                            zone.totalAmount = 1;
+                        }
                         zoneList.Add(zone);
                         totalClients = 0;
                     }
                 }
+                //last is not a new city
                 else if (clients[i].city == clients[i - 1].city)
                 {
                     totalClients += 1;
                     ZoneView zone = new ZoneView();
                     zone.city = clients[i].city;
-                    zone.totalAmount = totalClients;
+                    if (totalClients != 0)
+                    {
+                        zone.totalAmount = totalClients;
+                    }
+                    else
+                    {
+                        zone.totalAmount = 1;
+                    }
                     zoneList.Add(zone);
                 }
+                //Last is a new city
                 else
                 {
                     ZoneView zone = new ZoneView();
