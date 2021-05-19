@@ -3,16 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Security;
 using System.Security.Claims;
 using Datawarehouse_Backend.Context;
 using Datawarehouse_Backend.Models;
 using Datawarehouse_Backend.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
 /*
 * This controller handles API-calls from logged in users on the website. The calls handled by this controller
