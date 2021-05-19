@@ -45,7 +45,7 @@ namespace Datawarehouse_Backend.Tests
         *   A test that checks that the correct number is returned
         */
 
-        [Fact]
+        /*[Fact]
         public void getNumberOfTennants_ShouldReturnNumberOfTennants()
         {
             //Given
@@ -63,11 +63,12 @@ namespace Datawarehouse_Backend.Tests
             var viewResult = Assert.IsType<int>(result);
             Assert.Equal(2, viewResult);
             Assert.NotEqual(1, viewResult);
-        }
+        */
 
         /*
         *   A test that checks that the correct number is returned
         */
+        /*
         [Fact]
         public void getNumberOfErrorsLastTwentyFour_ShouldReturnInt()
         {
@@ -86,6 +87,7 @@ namespace Datawarehouse_Backend.Tests
             var viewResult = Assert.IsType<int>(result);
             Assert.Equal(2, viewResult);
         }
+        */
 
         /*
         *   A test that checks if the list is as long as it should and that it contains the correct information

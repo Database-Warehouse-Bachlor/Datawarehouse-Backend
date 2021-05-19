@@ -34,7 +34,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             IActionResult response;
 
-            AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
+            /*AppInfoHomeMenu appInfoHomeMenu = new AppInfoHomeMenu();
 
             appInfoHomeMenu.numberOfTennants = getNumberOfTennants();
             appInfoHomeMenu.numberOfErrors = getNumberOfErrorsLastTwentyFour(); 
@@ -42,8 +42,8 @@ namespace Datawarehouse_Backend.Controllers
             var dataToJson = JsonConvert.SerializeObject(appInfoHomeMenu);
 
             response = Ok(dataToJson);
-
-            return response;
+            */
+            return Ok();
         }
 
         /*
@@ -77,17 +77,18 @@ namespace Datawarehouse_Backend.Controllers
         /*
         *   Returns number of all tennants
         */
+        /*
         public int getNumberOfTennants()
         {
             return _warehouseDb.getNumberOfTennants();
         }
-
+        */
         /*
         *   Returns number of errors the last 24 hours
         */
-        public int getNumberOfErrorsLastTwentyFour()
+        /*public int getNumberOfErrorsLastTwentyFour()
         {
             return _warehouseDb.getNumberOfErrorsLastTwentyFour();
-        }
+        }*/
     }
 }

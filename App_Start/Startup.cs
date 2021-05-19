@@ -16,7 +16,14 @@ using Npgsql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Identity;
+using System.Web;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle;
 
 
 namespace Datawarehouse_Backend.App_Start
@@ -36,6 +43,12 @@ namespace Datawarehouse_Backend.App_Start
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DataSubmissionApi", Version = "v1" });
+            });
+
             services.AddCors(opt => {
                 opt.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials().Build());
             });
@@ -46,8 +59,6 @@ namespace Datawarehouse_Backend.App_Start
 );
             services.AddScoped<IWarehouseContext, WarehouseContext>();
             services.AddScoped<ILoginDatabaseContext, LoginDatabaseContext>();
-
-
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt => 
@@ -104,6 +115,10 @@ namespace Datawarehouse_Backend.App_Start
             app.UseAuthentication();
            
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DataSubmissionApi"));
+
 
             app.UseEndpoints(endpoints =>
             {
