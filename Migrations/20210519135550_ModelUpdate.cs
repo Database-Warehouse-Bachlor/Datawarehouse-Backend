@@ -44,7 +44,7 @@ namespace Datawarehouse_Backend.Migrations
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BalanceAndBudgetId = table.Column<long>(type: "bigint", nullable: false),
+                    balanceAndBudgetId = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "text", nullable: true),
                     account = table.Column<string>(type: "text", nullable: true),
                     periodDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -225,7 +225,7 @@ namespace Datawarehouse_Backend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     voucherId = table.Column<long>(type: "bigint", nullable: false),
                     number = table.Column<long>(type: "bigint", nullable: false),
-                    Type = table.Column<string>(type: "text", nullable: true),
+                    type = table.Column<string>(type: "text", nullable: true),
                     description = table.Column<string>(type: "text", nullable: true),
                     date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     paymentId = table.Column<int>(type: "integer", nullable: false),

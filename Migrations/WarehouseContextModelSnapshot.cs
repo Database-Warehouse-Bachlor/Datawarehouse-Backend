@@ -111,11 +111,11 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<long>("BalanceAndBudgetId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("account")
                         .HasColumnType("text");
+
+                    b.Property<long>("balanceAndBudgetId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("department")
                         .HasColumnType("text");
@@ -651,9 +651,6 @@ namespace Datawarehouse_Backend.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Type")
-                        .HasColumnType("text");
-
                     b.Property<long>("clientFK")
                         .HasColumnType("bigint");
 
@@ -671,6 +668,9 @@ namespace Datawarehouse_Backend.Migrations
 
                     b.Property<int>("paymentId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("type")
+                        .HasColumnType("text");
 
                     b.Property<long>("voucherId")
                         .HasColumnType("bigint");
