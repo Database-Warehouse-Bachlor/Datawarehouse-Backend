@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Datawarehouse_Backend.Context;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Datawarehouse_Backend.Controllers
 {
@@ -590,7 +590,7 @@ namespace Datawarehouse_Backend.Controllers
         This api is used when a tennant has bought the solution. This registers the tennant to the datawarehouse
         and the system is after that ready to handle incoming data to the datawarehouse.
         */
-        //[Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         [HttpPost("registerTennant")]
         [Consumes("application/x-www-form-urlencoded")]
         public IActionResult registerTennant(
