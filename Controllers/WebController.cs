@@ -395,10 +395,7 @@ namespace Datawarehouse_Backend.Controllers
         public List<OrderView> getPendingOrders()
         {
             long tennantId = getTennantId();
-            var orders = _warehouseDb.Orders
-            .Where(c => c.client.tennantFK == tennantId && c.endDate >= DateTime.Now)
-            .OrderByDescending(o => o.endDate)
-            .ToList();
+            var orders = _warehouseDb.getPendingOrdersByDescending(tennantId);
             List<OrderView> orderList = new List<OrderView>();
             for (int i = 0; i < orders.Count; i++)
             {
@@ -423,10 +420,7 @@ namespace Datawarehouse_Backend.Controllers
         public List<OrderView> getAllOrders()
         {
             long tennantId = getTennantId();
-            var orders = _warehouseDb.Orders
-            .Where(c => c.client.tennantFK == tennantId)
-            .OrderByDescending(o => o.endDate)
-            .ToList();
+            var orders = _warehouseDb.getOrdersByDescending(tennantId);
             List<OrderView> orderList = new List<OrderView>();
 
             for (int i = 0; i < orders.Count; i++)
@@ -451,9 +445,7 @@ namespace Datawarehouse_Backend.Controllers
         public List<ClientView> getClients()
         {
             long tennantId = getTennantId();
-            var clients = _warehouseDb.Clients
-            .Where(c => c.tennantFK == tennantId)
-            .ToList();
+            var clients = _warehouseDb.getAllClients(tennantId);
 
             List<ClientView> customerList = new List<ClientView>();
             for (int i = 0; i < clients.Count; i++)
@@ -486,10 +478,7 @@ namespace Datawarehouse_Backend.Controllers
         public List<ZoneView> getClientZones()
         {
             long tennantId = getTennantId();
-            var clients = _warehouseDb.Clients
-            .Where(c => c.tennantFK == tennantId && c.customer == true)
-            .OrderBy(c => c.city)
-            .ToList();
+            var clients = _warehouseDb.getAllCustomersOrderedByCity(tennantId);
 
             List<ZoneView> zoneList = new List<ZoneView>();
             int totalClients = 0;
@@ -544,10 +533,7 @@ namespace Datawarehouse_Backend.Controllers
         public ClientStatisticsView getNumberOfClients()
         {
             long tennantId = getTennantId();
-            var clients = _warehouseDb.Clients
-            .Where(c => c.tennantFK == tennantId)
-            .OrderBy(c => c.clientName)
-            .ToList();
+            var clients = _warehouseDb.getAllClients(tennantId);
 
             ClientStatisticsView statisticsView = new ClientStatisticsView();
             statisticsView.numberOfCustomers = 0;
@@ -579,10 +565,7 @@ namespace Datawarehouse_Backend.Controllers
         public EmployeeStatView getNumberOfEmployees()
         {
             long tennantId = getTennantId();
-            var employees = _warehouseDb.Employees
-            .Where(c => c.tennantFK == tennantId)
-            .OrderBy(c => c.gender)
-            .ToList();
+            var employees = _warehouseDb.getAllEmployees(tennantId);
 
             EmployeeStatView statisticsView = new EmployeeStatView();
             statisticsView.numberOfEmployees = employees.Count;
@@ -618,10 +601,7 @@ namespace Datawarehouse_Backend.Controllers
         {
             DateTime comparisonDate = compareDates(filter);
             long tennantId = getTennantId();
-            var balanceAndBudgets = _warehouseDb.BalanceAndBudgets
-            .Where(d => d.tennantFK == tennantId && d.periodDate >= comparisonDate)
-            .OrderByDescending(d => d.periodDate)
-            .ToList();
+            var balanceAndBudgets = _warehouseDb.GetBalanceAndBudgetsWithFilter(tennantId, comparisonDate);
             List<BnbView> bnbList = new List<BnbView>();
             for (int i = 0; i < balanceAndBudgets.Count; i++)
             {

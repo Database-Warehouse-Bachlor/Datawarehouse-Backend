@@ -118,5 +118,50 @@ namespace Datawarehouse_Backend.Context
             .ToList();
             return vouchers;
         }
+        public List<Order> getPendingOrdersByDescending(long tennantId)
+        {
+            var orders = Orders
+            .Where(c => c.client.tennantFK == tennantId && c.endDate >= DateTime.Now)
+            .OrderByDescending(o => o.endDate)
+            .ToList();
+            return orders;
+        }
+        public List<Order> getOrdersByDescending(long tennantId)
+        {
+            var orders = Orders
+            .Where(c => c.client.tennantFK == tennantId)
+            .OrderByDescending(o => o.endDate)
+            .ToList();
+            return orders;
+        }
+        public List<Client> getAllClients(long tennantId)
+        {
+            var clients = Clients
+            .Where(c => c.tennantFK == tennantId)
+            .ToList();
+            return clients;
+        }
+        public List<Client> getAllCustomersOrderedByCity(long tennantId)
+        {
+            var clients = Clients
+            .Where(c => c.tennantFK == tennantId && c.customer == true)
+            .OrderBy(c => c.city)
+            .ToList();
+            return clients;
+        }
+        public List<Employee> getAllEmployees(long tennantId)
+        {
+            var employees = Employees
+            .Where(c => c.tennantFK == tennantId)
+            .ToList();
+            return employees;
+        }
+        public List<BalanceAndBudget> GetBalanceAndBudgetsWithFilter(long tennantId, DateTime comparisonDate)
+        {
+            var bnb = BalanceAndBudgets
+            .Where(d => d.tennantFK == tennantId && d.periodDate >= comparisonDate)
+            .ToList();
+            return bnb;
+        }
     }
 }
