@@ -1,0 +1,1054 @@
+{
+    "apiKey": "345kjhk2312k3jh15gk4j34l6b23jb52l3jh4l",
+    "Clients": [
+        {
+            "clientId": 54,
+            "address": "Gangsrødveien 78",
+            "zipcode": "1634",
+            "city": "Fredrikstad",
+            "clientName": "Henrik Axel Hanssen"
+        },
+        {
+            "clientId": 55,
+            "address": "Søren Jaabæks gate 233",
+            "zipcode": "2819",
+            "city": "Gjøvik",
+            "clientName": "Max T Jørgensen"
+        },
+        {
+            "clientId": 56,
+            "address": "Gamle Kongevei 110",
+            "zipcode": "7043",
+            "city": "Trondheim",
+            "clientName": "Jesper F Eide"
+        },
+        {
+            "clientId": 57,
+            "address": "Sivblomstien 44",
+            "zipcode": "4017",
+            "city": "Stavanger",
+            "clientName": "Ingrid K Tengesdal"
+        },
+        {
+            "clientId": 58,
+            "address": "Hasselbakken 40",
+            "zipcode": "1515",
+            "city": "Moss",
+            "clientName": "Nikolai M Jacobsen"
+        },
+        {
+            "clientId": 59,
+            "address": "Kløverveien 151",
+            "zipcode": "1715",
+            "city": "Yven",
+            "clientName": "Alva J Haaland"
+        }
+    ],
+    "BalanceAndBudgets": [
+        {
+            "account": "clientAccount",
+            "startBalance": 1400,
+            "endBalance": 1778,
+            "periodBalance": 4500
+        },
+        {
+            "account": "debtAccount",
+            "startBalance": 367,
+            "endBalance": 310,
+            "periodBalance": 34
+        },
+        {
+            "account": "salaryAccount",
+            "startBalance": 1034,
+            "endBalance": 1002,
+            "periodBalance": 43
+        }
+    ],
+    "AbsenceRegisters": [
+        {
+            "absenceRegisterId": 333,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-25",
+            "toDate": "2020-06-30",
+            "duration": 20,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 334,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-06-25",
+            "toDate": "2020-07-12",
+            "duration": 30,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 336,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-07-25",
+            "toDate": "2022-02-12",
+            "duration": 21,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 81
+        },
+        {
+            "absenceRegisterId": 337,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-08-25",
+            "toDate": "2022-02-12",
+            "duration": 45,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 70
+        },
+        {
+            "absenceRegisterId": 338,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-09-25",
+            "toDate": "2022-02-12",
+            "duration": 24,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 71
+        },
+        {
+            "absenceRegisterId": 339,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-10-25",
+            "toDate": "2022-02-12",
+            "duration": 27,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 72
+        },
+        {
+            "absenceRegisterId": 340,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-11-25",
+            "toDate": "2022-02-12",
+            "duration": 39,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 80
+        },
+        {
+            "absenceRegisterId": 341,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-12-25",
+            "toDate": "2022-02-12",
+            "duration": 32,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 342,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-01-25",
+            "toDate": "2022-02-12",
+            "duration": 19,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 76
+        },
+        {
+            "absenceRegisterId": 343,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-02-25",
+            "toDate": "2022-02-12",
+            "duration": 48,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 81
+        },
+        {
+            "absenceRegisterId": 344,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-03-25",
+            "toDate": "2022-02-12",
+            "duration": 41,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 74
+        },
+        {
+            "absenceRegisterId": 345,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-15",
+            "toDate": "2022-02-12",
+            "duration": 4,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 69
+        },
+        {
+            "absenceRegisterId": 346,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-18",
+            "toDate": "2022-02-12",
+            "duration": 2,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 68
+        },
+        {
+            "absenceRegisterId": 347,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-21",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 78
+        },
+        {
+            "absenceRegisterId": 348,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-25",
+            "toDate": "2022-02-12",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 73
+        },
+        {
+            "absenceRegisterId": 349,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-28",
+            "toDate": "2022-02-12",
+            "duration": 3,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 350,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-30",
+            "toDate": "2022-02-12",
+            "duration": 15,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 82
+        },
+        {
+            "absenceRegisterId": 351,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-02",
+            "toDate": "2022-02-12",
+            "duration": 3,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 78
+        },
+        {
+            "absenceRegisterId": 352,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-04",
+            "toDate": "2022-02-12",
+            "duration": 6,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 71
+        },
+        {
+            "absenceRegisterId": 353,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-06",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 354,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-10",
+            "toDate": "2022-02-12",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 350,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-04-30",
+            "toDate": "2022-02-12",
+            "duration": 15,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 82
+        },
+        {
+            "absenceRegisterId": 351,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-02",
+            "toDate": "2022-02-12",
+            "duration": 3,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 78
+        },
+        {
+            "absenceRegisterId": 352,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2020-05-04",
+            "toDate": "2022-02-12",
+            "duration": 6,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 71
+        },
+        {
+            "absenceRegisterId": 353,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-03-06",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 354,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-04-10",
+            "toDate": "2022-02-12",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 355,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-06",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 356,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-01-10",
+            "toDate": "2022-02-12",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 357,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-02-06",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 358,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-04-10",
+            "toDate": "2022-02-12",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 359,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-15",
+            "toDate": "2021-05-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 360,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-18",
+            "toDate": "2021-05-23",
+            "duration": 5,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 73
+        },
+        {
+            "absenceRegisterId": 361,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-17",
+            "toDate": "2022-05-17",
+            "duration": 9,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 362,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-15",
+            "toDate": "2022-02-12",
+            "duration": 7,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 67
+        },
+        {
+            "absenceRegisterId": 363,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-14",
+            "toDate": "2022-02-12",
+            "duration": 2,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 364,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-19",
+            "toDate": "2022-02-12",
+            "duration": 4,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        },
+        {
+            "absenceRegisterId": 365,
+            "abcenseTypeText": "Sykemelding",
+            "absenceId": 69,
+            "fromDate": "2021-05-20",
+            "toDate": "2022-02-12",
+            "duration": 8,
+            "soleCaretaker": true,
+            "abcenseType": "alone",
+            "comment": "sjukt",
+            "degreeDisability": "neiiii",
+            "employeeId": 66
+        }
+    ],
+    "Employees": [
+        {
+            "employeeId": 66,
+            "gender": "male"
+        },
+        {
+            "employeeId": 67,
+            "gender": "male"
+        },
+        {
+            "employeeId": 68,
+            "gender": "female"
+        },
+        {
+            "employeeId": 69,
+            "gender": "male"
+        },
+        {
+            "employeeId": 70,
+            "gender": "male"
+        },
+        {
+            "employeeId": 71,
+            "gender": "male"
+        },
+        {
+            "employeeId": 72,
+            "gender": "male"
+        },
+        {
+            "employeeId": 73,
+            "gender": "male"
+        },
+        {
+            "employeeId": 74,
+            "gender": "female"
+        },
+        {
+            "employeeId": 75,
+            "gender": "female"
+        },
+        {
+            "employeeId": 76,
+            "gender": "male"
+        },
+        {
+            "employeeId": 77,
+            "gender": "male"
+        },
+        {
+            "employeeId": 78,
+            "gender": "male"
+        },
+        {
+            "employeeId": 79,
+            "gender": "female"
+        },
+        {
+            "employeeId": 80,
+            "gender": "female"
+        },
+        {
+            "employeeId": 81,
+            "gender": "female"
+        },
+        {
+            "employeeId": 82,
+            "gender": "female"
+        }
+    ],
+    "Orders": [
+        {
+            "orderId": 77,
+            "clientName": "Henrik Axel Hanssen",
+            "jobname": "Fogdegården",
+            "endDate": "2021-07-25",
+            "clientId": 54
+        },
+        {
+            "orderId": 78,
+            "clientName": "Max T Jørgensen",
+            "jobname": "Singsaker boligkompleks",
+            "endDate": "2021-08-03",
+            "clientId": 55
+        },
+        {
+            "orderId": 79,
+            "clientName": "Jesper F Eide",
+            "jobname": "Gamlebybro rehablitering",
+            "endDate": "2021-10-25",
+            "clientId": 56
+        },
+        {
+            "orderId": 80,
+            "clientName": "Ingrid K Tengesdal",
+            "jobname": "Ålesund hurtigbåtterminal",
+            "endDate": "2021-06-25",
+            "clientId": 57
+        }
+    ],
+    "TimeRegisters": [],
+    "Vouchers": [
+        {
+            "clientId": 54,
+            "voucherId": 1,
+            "paymentId": 10,
+            "date": "2020-06-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 2,
+            "paymentId": 10,
+            "date": "2020-06-26",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 3,
+            "paymentId": 20,
+            "date": "2020-06-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 4,
+            "paymentId": 20,
+            "date": "2020-06-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 5,
+            "paymentId": 30,
+            "date": "2020-07-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 6,
+            "paymentId": 30,
+            "date": "2020-08-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 7,
+            "paymentId": 40,
+            "date": "2020-09-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 8,
+            "paymentId": 40,
+            "date": "2020-12-14",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 9,
+            "paymentId": 50,
+            "date": "2020-10-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 10,
+            "paymentId": 60,
+            "date": "2020-11-01",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 12,
+            "paymentId": 80,
+            "date": "2020-10-15",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 13,
+            "paymentId": 80,
+            "date": "2020-12-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 31,
+            "paymentId": 110,
+            "date": "2021-01-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 32,
+            "paymentId": 110,
+            "date": "2021-01-26",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 33,
+            "paymentId": 120,
+            "date": "2021-01-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 34,
+            "paymentId": 120,
+            "date": "2021-02-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 35,
+            "paymentId": 130,
+            "date": "2021-01-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 36,
+            "paymentId": 130,
+            "date": "2021-04-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 37,
+            "paymentId": 140,
+            "date": "2021-01-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 38,
+            "paymentId": 140,
+            "date": "2020-05-14",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 39,
+            "paymentId": 150,
+            "date": "2021-01-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 42,
+            "paymentId": 180,
+            "date": "2021-02-15",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 43,
+            "paymentId": 180,
+            "date": "2021-03-20",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 44,
+            "paymentId": 190,
+            "date": "2021-01-15",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 45,
+            "paymentId": 190,
+            "date": "2021-04-05",
+            "type": "payment"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 46,
+            "paymentId": 200,
+            "date": "2020-06-01",
+            "type": "outbound"
+        },
+        {
+            "clientId": 54,
+            "voucherId": 47,
+            "paymentId": 200,
+            "date": "2020-10-10",
+            "type": "payment"
+        }
+    ],
+    "Invoices": [
+        {
+            "invoiceId": 1,
+            "voucherId": 1,
+            "clientId": 54,
+            "dueDate": "2020-06-10",
+            "amountTotal": 1000
+        },
+        {
+            "invoiceId": 2,
+            "voucherId": 2,
+            "clientId": 54,
+            "dueDate": "2020-06-10",
+            "amountTotal": 1000
+        },
+        {
+            "invoiceId": 3,
+            "voucherId": 3,
+            "clientId": 54,
+            "dueDate": "2020-06-3",
+            "amountTotal": 1500
+        },
+        {
+            "invoiceId": 4,
+            "voucherId": 4,
+            "clientId": 54,
+            "dueDate": "2020-06-3",
+            "amountTotal": 1500
+        },
+        {
+            "invoiceId": 5,
+            "voucherId": 5,
+            "clientId": 54,
+            "dueDate": "2020-07-15",
+            "amountTotal": 1750
+        },
+        {
+            "invoiceId": 6,
+            "voucherId": 6,
+            "clientId": 54,
+            "dueDate": "2020-07-15",
+            "amountTotal": 1750
+        },
+        {
+            "invoiceId": 7,
+            "voucherId": 7,
+            "clientId": 54,
+            "dueDate": "2020-09-28",
+            "amountTotal": 1300
+        },
+        {
+            "invoiceId": 8,
+            "voucherId": 8,
+            "clientId": 54,
+            "dueDate": "2020-09-28",
+            "amountTotal": 1300
+        },
+        {
+            "invoiceId": 9,
+            "voucherId": 9,
+            "clientId": 54,
+            "dueDate": "2020-10-01",
+            "amountTotal": 1000
+        },
+        {
+            "invoiceId": 10,
+            "voucherId": 10,
+            "clientId": 54,
+            "dueDate": "2020-02-01",
+            "amountTotal": 1000
+        },
+        {
+            "invoiceId": 12,
+            "voucherId": 12,
+            "clientId": 54,
+            "dueDate": "2020-11-15",
+            "amountTotal": 750
+        },
+        {
+            "invoiceId": 13,
+            "voucherId": 13,
+            "clientId": 54,
+            "dueDate": "2020-11-15",
+            "amountTotal": 750
+        },
+        {
+            "invoiceId": 31,
+            "voucherId": 31,
+            "clientId": 54,
+            "dueDate": "2021-01-10",
+            "amountTotal": 500
+        },
+        {
+            "invoiceId": 32,
+            "voucherId": 32,
+            "clientId": 54,
+            "dueDate": "2021-01-10",
+            "amountTotal": 760
+        },
+        {
+            "invoiceId": 33,
+            "voucherId": 33,
+            "clientId": 54,
+            "dueDate": "2021-01-3",
+            "amountTotal": 750
+        },
+        {
+            "invoiceId": 34,
+            "voucherId": 34,
+            "clientId": 54,
+            "dueDate": "2021-01-3",
+            "amountTotal": 1000
+        },
+        {
+            "invoiceId": 35,
+            "voucherId": 35,
+            "clientId": 54,
+            "dueDate": "2021-01-15",
+            "amountTotal": 1050
+        },
+        {
+            "invoiceId": 36,
+            "voucherId": 36,
+            "clientId": 54,
+            "dueDate": "2021-01-15",
+            "amountTotal": 1550
+        },
+        {
+            "invoiceId": 37,
+            "voucherId": 37,
+            "clientId": 54,
+            "dueDate": "2021-01-28",
+            "amountTotal": 500
+        },
+        {
+            "invoiceId": 38,
+            "voucherId": 38,
+            "clientId": 54,
+            "dueDate": "2021-01-28",
+            "amountTotal": 300
+        },
+        {
+            "invoiceId": 39,
+            "voucherId": 39,
+            "clientId": 54,
+            "dueDate": "2021-02-01",
+            "amountTotal": 800
+        },
+        {
+            "invoiceId": 42,
+            "voucherId": 42,
+            "clientId": 54,
+            "dueDate": "2021-02-15",
+            "amountTotal": 850
+        },
+        {
+            "invoiceId": 43,
+            "voucherId": 43,
+            "clientId": 54,
+            "dueDate": "2021-02-15",
+            "amountTotal": 850
+        },
+        {
+            "invoiceId": 44,
+            "voucherId": 44,
+            "clientId": 54,
+            "dueDate": "2021-01-20",
+            "amountTotal": 850
+        },
+        {
+            "invoiceId": 45,
+            "voucherId": 45,
+            "clientId": 54,
+            "dueDate": "2021-01-20",
+            "amountTotal": 850
+        },
+        {
+            "invoiceId": 46,
+            "voucherId": 46,
+            "clientId": 54,
+            "dueDate": "2020-06-10",
+            "amountTotal": 1150
+        },
+        {
+            "invoiceId": 47,
+            "voucherId": 47,
+            "clientId": 54,
+            "dueDate": "2020-06-10",
+            "amountTotal": 1150
+        }
+    ],
+    "InvoiceLines": [],
+    "FinancialYears": [
+        {
+            "financialYearId": 1
+        }
+    ],
+    "Accounts": [
+        {
+            "accountId": 1,
+            "financialYearId": 1
+        },
+        {
+            "accountId": 2,
+            "financialYearId": 1
+        },
+        {
+            "accountId": 3,
+            "financialYearId": 1
+        }
+    ],
+    "Posts": []
+}
