@@ -4,7 +4,7 @@
 
 Backend for Cordel Norge
 
-An application used for handling and storing data from Cordel Norge's tennants. Built with .Net and C#
+An application used for handling and storing data from Cordel Norge's tenants. Built with .Net and C#
 
 ## Project Status
 
